@@ -3,70 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="4b3c7a56-3d21-4a31-aaf0-e89c496e4f7a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/Avatar.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/Badge.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/MaterialList.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/Pager.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/Paper.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/Popover.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/alert.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/button.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/control.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/auto.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/calendar.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/checkbox.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/date.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/datetime.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/editor.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/file.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/form-table.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/image.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/money.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/radio.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/select-tag.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/select.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/tag.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/text.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/controls/time.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/detail.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/dialog.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/drag.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/drawer.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/dropdown.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/filter.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/form.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/guide.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/icon.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/layout.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/layout/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/layout/layout.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/linear-progress.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/list/body.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/list/filter.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/list/header.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/list/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/list/item.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/material-list.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/multi-control.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/nav.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/nav/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/page.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/refresh-indicator.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/step.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/stepper.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/style.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/svg-icon.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/table/body.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/table/footer.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/table/header.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/table/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/table/pager.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/tabs.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/tag.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/toolbar.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/utils.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/vender/qiniu-uploader.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -81,9 +18,9 @@
     <session id="680498475">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="47" />
+          <entry key="project.closed" value="48" />
           <entry key="project.open.time.0" value="5" />
-          <entry key="project.open.time.1" value="17" />
+          <entry key="project.open.time.1" value="18" />
           <entry key="project.open.time.10" value="4" />
           <entry key="project.open.time.11" value="2" />
           <entry key="project.open.time.12" value="1" />
@@ -99,7 +36,7 @@
           <entry key="project.open.time.7" value="1" />
           <entry key="project.open.time.8" value="2" />
           <entry key="project.open.time.9" value="2" />
-          <entry key="project.opened" value="52" />
+          <entry key="project.opened" value="53" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -120,24 +57,24 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="js" value="63713" />
-          <entry key="json" value="111" />
+          <entry key="json" value="112" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JSON" value="111" />
+          <entry key="JSON" value="112" />
           <entry key="JavaScript" value="63713" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="585">
-              <caret line="39" column="23" selection-start-line="39" selection-start-column="23" selection-end-line="39" selection-end-column="23" />
+            <state relative-caret-position="90">
+              <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
             </state>
           </provider>
         </entry>
@@ -213,7 +150,6 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/drag.js" />
-        <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/src/controls/calendar.js" />
         <option value="$PROJECT_DIR$/src/dialog.js" />
         <option value="$PROJECT_DIR$/src/dropdown.js" />
@@ -263,6 +199,7 @@
         <option value="$PROJECT_DIR$/src/index.js" />
         <option value="$PROJECT_DIR$/src/table/body.js" />
         <option value="$PROJECT_DIR$/src/controls/select.js" />
+        <option value="$PROJECT_DIR$/package.json" />
       </list>
     </option>
   </component>
@@ -295,11 +232,6 @@
             <path>
               <item name="sixbee-material-ui" type="b2602c69:ProjectViewProjectNode" />
               <item name="sixbee-material-ui" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="sixbee-material-ui" type="b2602c69:ProjectViewProjectNode" />
-              <item name="sixbee-material-ui" type="462c0819:PsiDirectoryNode" />
-              <item name="dist" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="sixbee-material-ui" type="b2602c69:ProjectViewProjectNode" />
@@ -449,23 +381,24 @@
       <workItem from="1553240535703" duration="2862000" />
       <workItem from="1553312777249" duration="1537000" />
       <workItem from="1553437790987" duration="2164000" />
-      <workItem from="1553498109147" duration="1162000" />
+      <workItem from="1553498109147" duration="1856000" />
+      <workItem from="1553501101362" duration="1208000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="425515000" />
+    <option name="totallyTimeSpent" value="427417000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1920" height="971" extended-state="0" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.82008994" visible="true" weight="0.16271722" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.8191126" visible="true" weight="0.16271722" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="npm" order="2" sideWeight="0.17991005" side_tool="true" visible="true" weight="0.16271722" />
+      <window_info id="npm" order="2" sideWeight="0.18088737" side_tool="true" visible="true" weight="0.16271722" />
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.24118316" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.24118316" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -828,8 +761,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="585">
-          <caret line="39" column="23" selection-start-line="39" selection-start-column="23" selection-end-line="39" selection-end-column="23" />
+        <state relative-caret-position="90">
+          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
         </state>
       </provider>
     </entry>
