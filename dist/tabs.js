@@ -139,7 +139,7 @@ var Tabs = function (_Component) {
                     this.props.dataSource.map(function (data, index) {
                         return _react2.default.createElement(
                             'div',
-                            { className: 'tab-item ' + (activeIndex == index ? 'active' : ''), key: index,
+                            { className: 'tab-item ' + (activeIndex == index ? 'active' : ''), key: index, style: data.style,
                                 onClick: _this2.handleChange(index) },
                             data.label
                         );
@@ -169,7 +169,9 @@ var Tabs = function (_Component) {
 Tabs.defaultProps = {
     defaultActiveIndex: 0,
     activeIndex: undefined,
-    transition: 'fade' };
+    transition: 'fade',
+    contentStyle: {}
+};
 exports.default = Tabs;
 
 var FadeViews = function (_Component2) {

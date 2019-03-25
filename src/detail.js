@@ -26,7 +26,7 @@ export default class Detail extends Component {
                          style={{minHeight: 20}}>{field.render ? field.render(this.props.data) : (text === '' || text === undefined || text === null ? '-' : text)} </div>
                 </div>
             }
-        })
+        });
     }
 
     render() {

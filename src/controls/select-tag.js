@@ -119,7 +119,7 @@ export default class SelectTag extends Component {
 
     render() {
         let label = this.props.label;
-        return <div>
+        return <div style={{marginTop: 12}}>
             {
                 label === false ? null : <div>
                     <span style={{
@@ -138,6 +138,7 @@ export default class SelectTag extends Component {
                             background: '#f1f1f1',
                             padding: '4px 8px',
                             marginRight: 8,
+                            marginBottom: 8,
                             color: '#222'
                         };
                         let value = _.get(data, this.props.dataSourceConfig.value);

@@ -14,6 +14,7 @@ export default class Tabs extends Component {
         defaultActiveIndex: 0,      //默认
         activeIndex: undefined,     //当前
         transition: 'fade',         //切换效果
+        contentStyle: {},
     };
 
     state = {
@@ -77,7 +78,7 @@ export default class Tabs extends Component {
         return <div ref="container" className="layout direction-column">
             <div className="tab" style={this.props.labelStyle}>
                 {this.props.dataSource.map((data, index) => {
-                    return <div className={`tab-item ${activeIndex == index ? 'active' : ''}`} key={index}
+                    return <div className={`tab-item ${activeIndex == index ? 'active' : ''}`} key={index} style={data.style}
                                 onClick={this.handleChange(index)}>
                         {data.label}
                     </div>
@@ -92,6 +93,7 @@ export default class Tabs extends Component {
             </div>
         </div>
     }
+
 }
 
 class FadeViews extends Component {

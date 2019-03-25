@@ -28,31 +28,27 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _propTypes = require('prop-types');
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Footer = function (_Component) {
-    (0, _inherits3.default)(Footer, _Component);
+var SvgIcon = function (_Component) {
+    (0, _inherits3.default)(SvgIcon, _Component);
 
-    function Footer() {
-        (0, _classCallCheck3.default)(this, Footer);
-        return (0, _possibleConstructorReturn3.default)(this, (Footer.__proto__ || (0, _getPrototypeOf2.default)(Footer)).apply(this, arguments));
+    function SvgIcon() {
+        (0, _classCallCheck3.default)(this, SvgIcon);
+        return (0, _possibleConstructorReturn3.default)(this, (SvgIcon.__proto__ || (0, _getPrototypeOf2.default)(SvgIcon)).apply(this, arguments));
     }
 
-    (0, _createClass3.default)(Footer, [{
+    (0, _createClass3.default)(SvgIcon, [{
         key: 'render',
         value: function render() {
-            return _react2.default.createElement('div', null);
+            var useTag = '<use xlink:href="#icon-' + this.props.name + '"></use>';
+            return _react2.default.createElement('svg', { className: 'icon', 'aria-hidden': 'true', style: this.props.style, dangerouslySetInnerHTML: { __html: useTag } });
         }
     }]);
-    return Footer;
+    return SvgIcon;
 }(_react.Component);
 
-Footer.contextTypes = {
-    state: _propTypes2.default.object,
-    props: _propTypes2.default.object
+SvgIcon.defaultProps = {
+    name: undefined
 };
-exports.default = Footer;
+exports.default = SvgIcon;

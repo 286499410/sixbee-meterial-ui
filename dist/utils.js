@@ -185,7 +185,7 @@ var utils = {
         return utils.round(number, float).toFixed(float);
     },
 
-    getDataSource: function getDataSource(searchText, dataSource, dataSourceConfig) {
+    getDataSource: function getDataSource(searchText, dataSource, dataSourceConfig, context) {
         var preprocessing = function preprocessing(dataSource) {
             dataSource.map(function (row) {
                 if (row[dataSourceConfig.text] === undefined) {
@@ -196,7 +196,7 @@ var utils = {
         };
         return new _promise2.default(function (resolve, reject) {
             if (_loadsh2.default.isFunction(dataSource)) {
-                dataSource = dataSource(searchText);
+                dataSource = dataSource(searchText, context);
             }
             if (_loadsh2.default.isArray(dataSource)) {
                 resolve(preprocessing(dataSource));

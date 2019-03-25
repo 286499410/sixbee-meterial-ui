@@ -58,6 +58,10 @@ var _jquery = require('jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
+var _icon = require('../icon');
+
+var _icon2 = _interopRequireDefault(_icon);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var TableBody = function (_Component) {
@@ -126,7 +130,6 @@ var TableBody = function (_Component) {
                 _react2.default.createElement(TableBodyColGroup, { ref: 'thead' }),
                 _react2.default.createElement(TableBodyContent, { ref: 'tbody' })
             );
-            console.log(props.containerHeight || state.bodyHeight);
             return _react2.default.createElement(
                 'div',
                 { ref: 'container',
@@ -463,8 +466,8 @@ var TableBodyContent = function (_Component2) {
                             !props.rowCheckboxEnabled || props.rowCheckboxEnabled(data) ? _react2.default.createElement(_Checkbox2.default, (0, _extends3.default)({ checked: _this6.isChecked(data),
                                 onCheck: _this6.handleCheck(data) }, props.checkboxStyle)) : _react2.default.createElement('div', { style: {
                                     display: 'inline-block',
-                                    width: 13,
-                                    height: 13,
+                                    width: 16,
+                                    height: 16,
                                     background: '#b9b9b9',
                                     opacity: 0.65,
                                     borderRadius: 2,
@@ -481,11 +484,11 @@ var TableBodyContent = function (_Component2) {
                                         { style: { width: '100%', overflow: 'hidden' } },
                                         group.map(function (row, index) {
                                             if (rowIndex < _this6.state.showMinRows || rowIndex > _this6.state.showMaxRows) {
-                                                return _react2.default.createElement('div', { key: index, className: 'td' });
+                                                return _react2.default.createElement('div', { key: index, className: 'td', style: { height: props.bodyRowHeight, lineHeight: props.bodyRowHeight - 12 + 'px' } });
                                             }
                                             return _react2.default.createElement(
                                                 'div',
-                                                { key: index, className: 'td' },
+                                                { key: index, className: 'td', style: { height: props.bodyRowHeight, lineHeight: props.bodyRowHeight - 12 + 'px' } },
                                                 column.render ? column.render(row, column, _this6.context.Table) : _this6.context.cellRender(row, column)
                                             );
                                         })
@@ -515,35 +518,35 @@ var TableBodyContent = function (_Component2) {
                                         );
                                     } else if (hasChildren && data[column.key + '_indent'] !== undefined || !hasChildren && data[column.key + '_indent'] > 0) {
                                         var indent = data[column.key + '_indent'];
+                                        var text = _react2.default.createElement(
+                                            'span',
+                                            { style: {
+                                                    display: 'table-cell',
+                                                    verticalAlign: 'middle',
+                                                    lineHeight: 1
+                                                }, onClick: column.onClick ? column.onClick.bind(_this6, data) : undefined },
+                                            content()
+                                        );
                                         return _react2.default.createElement(
                                             'div',
                                             {
                                                 className: '' + (column.onClick ? 'text-primary cursor-pointer' : ''),
                                                 style: { paddingLeft: indent, lineHeight: 1 } },
-                                            props.collapsible ? _react2.default.createElement(Icon, { type: 'button',
-                                                className: state.collapsed[data[props.primaryKey]] ? "icon-plus" : "icon-minus",
-                                                size: 18,
-                                                style: {
-                                                    display: 'table-cell',
-                                                    opacity: data.children && data.children.length > 0 ? 1 : 0
-                                                },
-                                                iconStyle: {
-                                                    display: 'block',
-                                                    marginTop: -2
-                                                },
-                                                onClick: _this6.handleCollapse(data)
-                                            }) : null,
-                                            _react2.default.createElement(
-                                                'span',
-                                                {
-                                                    style: {
-                                                        display: 'table-cell',
-                                                        verticalAlign: 'middle',
-                                                        lineHeight: 1
-                                                    },
-                                                    onClick: column.onClick ? column.onClick.bind(_this6, data) : undefined },
-                                                content()
-                                            )
+                                            props.collapsible ? _react2.default.createElement(
+                                                'div',
+                                                { className: 'flex middle' },
+                                                _react2.default.createElement(
+                                                    'div',
+                                                    { style: { opacity: data.children.length > 0 ? 1 : 0 } },
+                                                    _react2.default.createElement(_icon2.default, { type: 'button',
+                                                        name: state.collapsed[data[props.primaryKey]] ? "plus-square" : "minus-square",
+                                                        size: 14,
+                                                        padding: 4,
+                                                        onClick: _this6.handleCollapse(data)
+                                                    })
+                                                ),
+                                                text
+                                            ) : text
                                         );
                                     } else {
                                         return content();
@@ -567,9 +570,9 @@ var TableBodyContent = function (_Component2) {
                                             'div',
                                             { className: 'icons-event' },
                                             events.map(function (event, key) {
-                                                return _react2.default.createElement(Icon, { key: key,
+                                                return _react2.default.createElement(_icon2.default, { key: key,
                                                     type: 'button',
-                                                    className: 'icon-' + (event === 'delete' ? 'del' : event),
+                                                    name: 'icon-' + event,
                                                     title: label[event],
                                                     onClick: props.iconEvents[event].bind(_this6, data, column, _this6.context.Table) });
                                             })

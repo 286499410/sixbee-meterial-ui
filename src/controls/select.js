@@ -33,6 +33,7 @@ export default class Select extends Component {
         rows: 1,                    //行数
         fullWidth: true,            //宽度100%显示
         size: 'default',
+        cancel: false               //是否取消选择
     };
 
     indent = {
@@ -90,7 +91,7 @@ export default class Select extends Component {
      * @param dataSource
      */
     setDataSource = (dataSource = this.props.dataSource) => {
-        utils.getDataSource(undefined, dataSource, this.props.dataSourceConfig).then((dataSource) => {
+        utils.getDataSource(undefined, dataSource, this.props.dataSourceConfig, this).then((dataSource) => {
             this.setState({dataSource: dataSource});
         });
     };
@@ -165,7 +166,7 @@ export default class Select extends Component {
     }
 
     handleChange = (data) => {
-        if(this.props.multiple === false) {
+        if (this.props.multiple === false) {
             this.state.open = false;
         }
         this.setValue(data);
@@ -188,10 +189,12 @@ export default class Select extends Component {
         let selectValue = (this.props.multiple && this.props.carryKey) ? (value || []).map((n) => (_.get(n, this.props.dataSourceConfig.value))) : value;
         return <div className="relative" style={{overflow: 'hidden'}}>
             <div className="relative cursor-pointer" onClick={(event) => {
-                this.setState({
-                    open: true,
-                    anchorEl: event.currentTarget,
-                })
+                if (!this.props.disabled) {
+                    this.setState({
+                        open: true,
+                        anchorEl: event.currentTarget,
+                    })
+                }
             }}>
                 <SelectField value={selectValue}
                              name={this.props.name || this.props.dataKey || utils.uuid()}
@@ -239,6 +242,7 @@ export default class Select extends Component {
                     multiple={this.props.multiple}
                     carryKey={this.props.carryKey}
                     dataSourceConfig={this.props.dataSourceConfig}
+                    cancel={this.props.cancel}
                 />
             </Popover>
         </div>
@@ -261,7 +265,7 @@ class Options extends Component {
 
     handleItemClick = (event, menuItem, index) => {
         let data = this.state.dataSource[index];
-        if(data) {
+        if (data) {
             let value = data.value, originValue = this.props.value || [];
             if (this.props.multiple) {
                 if (this.isChecked(value)) {
@@ -274,11 +278,7 @@ class Options extends Component {
                     originValue.push(value);
                 }
             } else {
-                if (this.isChecked(value)) {
-                    originValue = undefined;
-                } else {
-                    originValue = value;
-                }
+                originValue = value;
             }
             if (this.props.onChange) {
                 this.props.onChange(originValue);
@@ -325,11 +325,13 @@ class Options extends Component {
                                  style={style}
                 />
             })}
-            <MenuItem value={null}
-                      primaryText={"取消选择"}
-                      innerDivStyle={this.props.styleProps.menuItemStyle.innerDivStyle}
-                      style={{color: '#9b9b9b'}}
-            />
+            {
+                this.props.cancel ? <MenuItem value={null}
+                                              primaryText={"取消选择"}
+                                              innerDivStyle={this.props.styleProps.menuItemStyle.innerDivStyle}
+                                              style={{color: '#9b9b9b'}}
+                /> : null
+            }
         </Menu>
     }
 }

@@ -135,6 +135,10 @@ var DateTime = function (_Component) {
         _this.handleClick = function (type) {
             return function (event) {
                 event.stopPropagation();
+                var value = _this.getValue();
+                if (value.date === undefined && value.time === undefined) {
+                    type = 'datetime';
+                }
                 _this.state.clickType = type;
                 switch (type) {
                     case 'datetime':
@@ -151,10 +155,9 @@ var DateTime = function (_Component) {
         };
 
         _this.handleClear = function (event) {
-            _this.setState({
-                date: undefined,
-                time: undefined
-            });
+            _this.state.date = undefined;
+            _this.state.time = undefined;
+            _this.forceUpdate();
             _this.handleChange();
         };
 
@@ -188,8 +191,8 @@ var DateTime = function (_Component) {
         key: 'handleChange',
         value: function handleChange() {
             if (this.props.onChange) {
-                var value = this.state.date === undefined || this.state.time === undefined ? undefined : this.state.date + ' ' + this.state.time;
-                if (value && this.props.timestamp) {
+                var value = this.state.date === undefined || this.state.time === undefined ? '' : this.state.date + ' ' + this.state.time;
+                if (value && value !== '' && this.props.timestamp) {
                     value = _utils2.default.strToTime(value);
                 }
                 this.props.onChange(value, this);
@@ -198,13 +201,15 @@ var DateTime = function (_Component) {
     }, {
         key: 'setDate',
         value: function setDate(date) {
-            this.setState({ date: date });
+            this.state.date = date;
+            this.forceUpdate();
             this.handleChange();
         }
     }, {
         key: 'setTime',
         value: function setTime(time) {
-            this.setState({ time: time });
+            this.state.time = time;
+            this.forceUpdate();
             this.handleChange();
         }
     }, {

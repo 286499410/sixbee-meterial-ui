@@ -10,7 +10,6 @@ import TableBody from './body';
 import Pager from './pager';
 import $ from 'jquery';
 import utils from '../utils';
-import Tag from '../tag';
 import Icon from "../icon";
 
 let debug = false;
@@ -63,6 +62,7 @@ export default class Table extends Component {
         resize: false,                          //列宽度是否可拖动更改
         cellRender: undefined,                  //单元格渲染处理函数
         loading: false,                         //是否显示loading
+        footerFixed: false,                     //footer是否固定底部
         checkboxStyle: {
             style: {
                 marginLeft: 15,
@@ -353,7 +353,7 @@ export default class Table extends Component {
             let parent = Object.assign(indentData, data);
             let children = [];
             if (data.children && data.children.length > 0) {
-                children = this.filterData(data.children, indent + 16);
+                children = this.getFilteredRows(data.children, indent + 16);
             }
             if (this.checkRow(parent) || children.length > 0) {
                 rows.push(parent);
@@ -643,7 +643,7 @@ class Filter extends Component {
         return <div ref="container" style={{display: 'inline-block', position: 'relative'}}>
             <Icon ref="filterIcon"
                   type="button"
-                  className="icon-filter"
+                  name="filter"
                   color={Object.keys(this.state.formData).length > 0 ? '#1890ff' : undefined}
                   onClick={this.handleOpen}/>
             <Popover style={{left: -10000}}

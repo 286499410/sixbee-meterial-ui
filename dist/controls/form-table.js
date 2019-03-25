@@ -541,6 +541,20 @@ var FormTable = function (_Component) {
             return _react2.default.createElement(
                 'div',
                 { style: (0, _extends3.default)({ marginTop: 16 }, this.props.style) },
+                this.props.label === false ? null : _react2.default.createElement(
+                    'div',
+                    { style: this.props.labelStyle },
+                    _react2.default.createElement(
+                        'span',
+                        { style: {
+                                transform: "scale(0.75)",
+                                transformOrigin: 'left top 0px',
+                                color: 'rgba(0,0,0,0.3)',
+                                fontSize: 15,
+                                display: 'inline-block' } },
+                        this.props.label
+                    )
+                ),
                 _react2.default.createElement(_table2.default, (0, _extends3.default)({ ref: 'table',
                     className: this.props.tableClassName,
                     bordered: this.props.bordered,

@@ -88,10 +88,6 @@ var _utils = require('../utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
-var _tag = require('../tag');
-
-var _tag2 = _interopRequireDefault(_tag);
-
 var _icon = require('../icon');
 
 var _icon2 = _interopRequireDefault(_icon);
@@ -466,7 +462,7 @@ var Table = function (_Component) {
                 var parent = (0, _assign2.default)(indentData, data);
                 var children = [];
                 if (data.children && data.children.length > 0) {
-                    children = _this4.filterData(data.children, indent + 16);
+                    children = _this4.getFilteredRows(data.children, indent + 16);
                 }
                 if (_this4.checkRow(parent) || children.length > 0) {
                     rows.push(parent);
@@ -610,6 +606,7 @@ Table.defaultProps = {
     resize: false,
     cellRender: undefined,
     loading: false,
+    footerFixed: false,
     checkboxStyle: {
         style: {
             marginLeft: 15,
@@ -770,7 +767,7 @@ var Filter = function (_Component3) {
                 { ref: 'container', style: { display: 'inline-block', position: 'relative' } },
                 _react2.default.createElement(_icon2.default, { ref: 'filterIcon',
                     type: 'button',
-                    className: 'icon-filter',
+                    name: 'filter',
                     color: (0, _keys2.default)(this.state.formData).length > 0 ? '#1890ff' : undefined,
                     onClick: this.handleOpen }),
                 _react2.default.createElement(

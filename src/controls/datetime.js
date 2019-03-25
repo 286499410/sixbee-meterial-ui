@@ -99,7 +99,7 @@ export default class DateTime extends Component {
     initData(props) {
         if (props.value !== undefined && props.value !== '' && props.value !== null) {
             let value = props.value;
-            if(this.props.timestamp) {
+            if (this.props.timestamp) {
                 value = utils.date('Y-m-d H:i', value);
             }
             [this.state.date, this.state.time] = value.split(' ');
@@ -108,8 +108,8 @@ export default class DateTime extends Component {
 
     handleChange() {
         if (this.props.onChange) {
-            let value = (this.state.date === undefined || this.state.time === undefined) ? undefined : this.state.date + ' ' + this.state.time;
-            if(value && this.props.timestamp) {
+            let value = (this.state.date === undefined || this.state.time === undefined) ? '' : this.state.date + ' ' + this.state.time;
+            if (value && value !== '' && this.props.timestamp) {
                 value = utils.strToTime(value);
             }
             this.props.onChange(value, this);
@@ -117,12 +117,14 @@ export default class DateTime extends Component {
     }
 
     setDate(date) {
-        this.setState({date: date});
+        this.state.date = date;
+        this.forceUpdate();
         this.handleChange();
     }
 
     setTime(time) {
-        this.setState({time: time});
+        this.state.time = time;
+        this.forceUpdate();
         this.handleChange();
     }
 
@@ -169,6 +171,10 @@ export default class DateTime extends Component {
 
     handleClick = (type) => (event) => {
         event.stopPropagation();
+        let value = this.getValue();
+        if (value.date === undefined && value.time === undefined) {
+            type = 'datetime';
+        }
         this.state.clickType = type;
         switch (type) {
             case 'datetime':
@@ -188,10 +194,9 @@ export default class DateTime extends Component {
      * @param event
      */
     handleClear = (event) => {
-        this.setState({
-            date: undefined,
-            time: undefined
-        });
+        this.state.date = undefined;
+        this.state.time = undefined;
+        this.forceUpdate();
         this.handleChange();
     };
 
@@ -214,7 +219,7 @@ export default class DateTime extends Component {
                     </div>
                 </div>
                 {
-                    (date !== undefined || time !== undefined ) && this.props.hasClear && !this.props.disabled && !this.props.immutable ?
+                    (date !== undefined || time !== undefined) && this.props.hasClear && !this.props.disabled && !this.props.immutable ?
                         <IconButton iconClassName="iconfont icon-close-circle-fill" onClick={this.handleClear}
                                     style={{position: 'absolute', right: 0, ...styleProps.iconStyle.style}}
                                     iconStyle={{color: '#e0e0e0', ...styleProps.iconStyle.iconStyle}}

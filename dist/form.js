@@ -341,7 +341,6 @@ var Form = function (_Component) {
             if (this.props.actions !== false) {
                 contentHeight = 'calc(100% - ' + footerHeight + 'px)';
             }
-
             return _react2.default.createElement(
                 'div',
                 { className: "relative " + this.props.className,
@@ -589,7 +588,7 @@ var _initialiseProps = function _initialiseProps() {
                                 key: index },
                             _react2.default.createElement(
                                 'div',
-                                { className: ' flex middle ' + (!isShow ? 'hidden' : ''),
+                                { className: 'flex middle ' + (!isShow ? 'hidden' : ''),
                                     style: { width: field.width || _this6.props.controlWidth } },
                                 field.label ? _react2.default.createElement(
                                     'div',

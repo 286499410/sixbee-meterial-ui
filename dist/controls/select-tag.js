@@ -151,7 +151,7 @@ var SelectTag = function (_Component) {
             var label = this.props.label;
             return _react2.default.createElement(
                 'div',
-                null,
+                { style: { marginTop: 12 } },
                 label === false ? null : _react2.default.createElement(
                     'div',
                     null,
@@ -175,6 +175,7 @@ var SelectTag = function (_Component) {
                             background: '#f1f1f1',
                             padding: '4px 8px',
                             marginRight: 8,
+                            marginBottom: 8,
                             color: '#222'
                         };
                         var value = _lodash2.default.get(data, _this4.props.dataSourceConfig.value);

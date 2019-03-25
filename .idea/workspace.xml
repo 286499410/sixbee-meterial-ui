@@ -2,54 +2,35 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4b3c7a56-3d21-4a31-aaf0-e89c496e4f7a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/alert.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/avatar.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/badge.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/button.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/control.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controls/checkbox.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controls/date.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controls/datetime.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controls/editor.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controls/file.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controls/form-table.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controls/image.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controls/money.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controls/radio.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controls/select-tag.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controls/select.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controls/time.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/detail.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/dialog.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/drawer.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/dropdown.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/form.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/icon.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/layout.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/linear-progress.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/list/body.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/list/filter.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/list/header.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/list/index.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/list/item.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/multi-control.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/nav.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/page.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/paper.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/popover.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/stepper.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/table/body.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/table/footer.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/table/header.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/table/index.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/table/pager.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tabs.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tag.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/toolbar.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/vender/qiniu-uploader.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/material-list.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/refresh-indicator.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/svg-icon.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/controls/datetime.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/controls/datetime.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/controls/file.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/controls/file.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/controls/form-table.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/controls/form-table.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/controls/select-tag.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/controls/select-tag.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/controls/select.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/controls/select.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/form.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/form.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/table/body.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/table/body.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/table/footer.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/table/footer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/table/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/table/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/tabs.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/tabs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/utils.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/utils.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controls/datetime.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/controls/datetime.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controls/file.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/controls/file.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controls/form-table.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/controls/form-table.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controls/select-tag.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/controls/select-tag.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controls/select.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/controls/select.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/detail.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/detail.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/form.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/form.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/table/body.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/table/body.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/table/footer.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/table/footer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/table/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/table/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tabs.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/tabs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -64,11 +45,12 @@
     <session id="680498475">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="33" />
-          <entry key="project.open.time.0" value="2" />
-          <entry key="project.open.time.1" value="10" />
+          <entry key="project.closed" value="47" />
+          <entry key="project.open.time.0" value="5" />
+          <entry key="project.open.time.1" value="17" />
           <entry key="project.open.time.10" value="4" />
-          <entry key="project.open.time.11" value="1" />
+          <entry key="project.open.time.11" value="2" />
+          <entry key="project.open.time.12" value="1" />
           <entry key="project.open.time.13" value="1" />
           <entry key="project.open.time.14" value="3" />
           <entry key="project.open.time.15" value="3" />
@@ -77,18 +59,18 @@
           <entry key="project.open.time.2" value="1" />
           <entry key="project.open.time.23" value="1" />
           <entry key="project.open.time.5" value="1" />
-          <entry key="project.open.time.6" value="1" />
+          <entry key="project.open.time.6" value="3" />
           <entry key="project.open.time.7" value="1" />
           <entry key="project.open.time.8" value="2" />
-          <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="37" />
+          <entry key="project.open.time.9" value="2" />
+          <entry key="project.opened" value="52" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="babelrc" value="2" />
           <entry key="css" value="1" />
-          <entry key="js" value="396" />
+          <entry key="js" value="450" />
           <entry key="json" value="10" />
         </counts>
       </usages-collector>
@@ -96,47 +78,25 @@
         <counts>
           <entry key="CSS" value="1" />
           <entry key="JSON" value="12" />
-          <entry key="JavaScript" value="396" />
+          <entry key="JavaScript" value="450" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="js" value="60365" />
+          <entry key="js" value="63713" />
           <entry key="json" value="111" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="JSON" value="111" />
-          <entry key="JavaScript" value="60365" />
+          <entry key="JavaScript" value="63713" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/controls/radio.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="645">
-              <caret line="46" column="7" selection-start-line="46" selection-start-column="7" selection-end-line="46" selection-end-column="7" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/controls/select.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="206">
-              <caret line="231" column="17" selection-start-line="231" selection-start-column="17" selection-end-line="231" selection-end-column="17" />
-              <folding>
-                <element signature="e#50#89#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -148,27 +108,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>4</find>
-      <find>zIndex</find>
-      <find>bodyHeight</find>
-      <find>&lt;c</find>
-      <find>this.setState(</find>
-      <find>props.dataSource</find>
-      <find>checkMinRow</find>
-      <find>setDataSource</find>
-      <find>carryKey</find>
-      <find>$</find>
-      <find>utils.render</find>
-      <find>render</find>
-      <find>'image'</find>
-      <find>cadetblue</find>
-      <find>check</find>
-      <find>submit</find>
-      <find>formStatus</find>
-      <find>.check</find>
-      <find>onChange</find>
-      <find>select</find>
-      <find>getControl</find>
       <find>strToDate</find>
       <find>cons</find>
       <find>console</find>
@@ -177,6 +116,27 @@
       <find>.carryKey</find>
       <find>reset(</find>
       <find>con</find>
+      <find>&lt;I</find>
+      <find>&lt;Icon</find>
+      <find>indent</find>
+      <find>16</find>
+      <find>12</find>
+      <find>20</find>
+      <find>_indent</find>
+      <find>&lt;i</find>
+      <find>Icon</find>
+      <find>group</find>
+      <find>bodyRowHeight</find>
+      <find>headerRowHeight</find>
+      <find>delete</find>
+      <find>control</find>
+      <find>render</find>
+      <find>submit</find>
+      <find>_.set</find>
+      <find>dataSource</find>
+      <find>Scrollbars</find>
+      <find>RefreshIndicator</find>
+      <find>checkbox</find>
       <find>conso</find>
     </findStrings>
     <replaceStrings>
@@ -196,6 +156,7 @@
       <dir>$PROJECT_DIR$/dist</dir>
       <dir>$PROJECT_DIR$/src/controls</dir>
       <dir>$PROJECT_DIR$/src/table</dir>
+      <dir>$PROJECT_DIR$</dir>
       <dir>$PROJECT_DIR$/src</dir>
     </dirStrings>
   </component>
@@ -205,12 +166,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/table/header.js" />
-        <option value="$PROJECT_DIR$/src/list/header.js" />
-        <option value="$PROJECT_DIR$/src/list/filter.js" />
-        <option value="$PROJECT_DIR$/src/list/item.js" />
-        <option value="$PROJECT_DIR$/src/list/body.js" />
-        <option value="$PROJECT_DIR$/src/nav/index.js" />
         <option value="$PROJECT_DIR$/src/drag.js" />
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/src/controls/calendar.js" />
@@ -221,7 +176,6 @@
         <option value="$PROJECT_DIR$/src/Pager.js" />
         <option value="$PROJECT_DIR$/src/Avatar.js" />
         <option value="$PROJECT_DIR$/src/Badge.js" />
-        <option value="$PROJECT_DIR$/src/icon.js" />
         <option value="$PROJECT_DIR$/src/table/pager.js" />
         <option value="$PROJECT_DIR$/src/page.js" />
         <option value="$PROJECT_DIR$/src/controls/radio.js" />
@@ -230,31 +184,38 @@
         <option value="$PROJECT_DIR$/src/controls/text.js" />
         <option value="$PROJECT_DIR$/src/controls/auto.js" />
         <option value="$PROJECT_DIR$/src/controls/tag.js" />
-        <option value="$PROJECT_DIR$/src/control.js" />
         <option value="$PROJECT_DIR$/src/controls/date.js" />
-        <option value="$PROJECT_DIR$/src/controls/image.js" />
-        <option value="$PROJECT_DIR$/src/tabs.js" />
         <option value="$PROJECT_DIR$/src/nav.js" />
-        <option value="$PROJECT_DIR$/src/table/body.js" />
-        <option value="$PROJECT_DIR$/src/table/index.js" />
-        <option value="$PROJECT_DIR$/src/controls/form-table.js" />
         <option value="$PROJECT_DIR$/src/list/index.js" />
         <option value="$PROJECT_DIR$/src/step.js" />
         <option value="$PROJECT_DIR$/src/drawer.js" />
         <option value="$PROJECT_DIR$/src/stepper.js" />
         <option value="$PROJECT_DIR$/src/style.js" />
-        <option value="$PROJECT_DIR$/src/controls/datetime.js" />
         <option value="$PROJECT_DIR$/src/linear-progress.js" />
-        <option value="$PROJECT_DIR$/src/detail.js" />
-        <option value="$PROJECT_DIR$/src/utils.js" />
         <option value="$PROJECT_DIR$/src/controls/checkbox.js" />
         <option value="$PROJECT_DIR$/src/layout.js" />
         <option value="$PROJECT_DIR$/src/filter.js" />
         <option value="$PROJECT_DIR$/src/Popover.js" />
-        <option value="$PROJECT_DIR$/src/index.js" />
         <option value="$PROJECT_DIR$/src/toolbar.js" />
-        <option value="$PROJECT_DIR$/src/controls/select-tag.js" />
+        <option value="$PROJECT_DIR$/src/controls/image.js" />
+        <option value="$PROJECT_DIR$/src/icon.js" />
+        <option value="$PROJECT_DIR$/src/svg-icon.js" />
+        <option value="$PROJECT_DIR$/src/controls/file.js" />
+        <option value="$PROJECT_DIR$/src/table/index.js" />
+        <option value="$PROJECT_DIR$/src/table/footer.js" />
+        <option value="$PROJECT_DIR$/src/controls/form-table.js" />
+        <option value="$PROJECT_DIR$/src/control.js" />
         <option value="$PROJECT_DIR$/src/form.js" />
+        <option value="$PROJECT_DIR$/src/controls/datetime.js" />
+        <option value="$PROJECT_DIR$/src/detail.js" />
+        <option value="$PROJECT_DIR$/src/utils.js" />
+        <option value="$PROJECT_DIR$/src/MaterialList.js" />
+        <option value="$PROJECT_DIR$/src/tabs.js" />
+        <option value="$PROJECT_DIR$/src/material-list.js" />
+        <option value="$PROJECT_DIR$/src/controls/select-tag.js" />
+        <option value="$PROJECT_DIR$/src/2.js" />
+        <option value="$PROJECT_DIR$/src/index.js" />
+        <option value="$PROJECT_DIR$/src/table/body.js" />
         <option value="$PROJECT_DIR$/src/controls/select.js" />
       </list>
     </option>
@@ -272,17 +233,16 @@
       <path value="$PROJECT_DIR$/package.json" />
     </packageJsonPaths>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds">
     <option name="y" value="23" />
-    <option name="width" value="1920" />
-    <option name="height" value="1001" />
+    <option name="width" value="1680" />
+    <option name="height" value="971" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -290,21 +250,11 @@
               <item name="sixbee-material-ui" type="b2602c69:ProjectViewProjectNode" />
               <item name="sixbee-material-ui" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="sixbee-material-ui" type="b2602c69:ProjectViewProjectNode" />
-              <item name="sixbee-material-ui" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="sixbee-material-ui" type="b2602c69:ProjectViewProjectNode" />
-              <item name="sixbee-material-ui" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="controls" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -342,6 +292,16 @@
     </option>
   </component>
   <component name="RunManager" selected="npm.prepublish">
+    <configuration name="build" type="js.build_tools.npm" factoryName="npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <configuration name="compile" type="js.build_tools.npm" factoryName="npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -365,10 +325,12 @@
     <list>
       <item itemvalue="npm.prepublish" />
       <item itemvalue="npm.compile" />
+      <item itemvalue="npm.build" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="npm.compile" />
+        <item itemvalue="npm.build" />
         <item itemvalue="npm.prepublish" />
       </list>
     </recent_temporary>
@@ -417,23 +379,38 @@
       <workItem from="1551786550406" duration="1923000" />
       <workItem from="1551864433895" duration="598000" />
       <workItem from="1551923547398" duration="497000" />
+      <workItem from="1552011657464" duration="7719000" />
+      <workItem from="1552268016706" duration="9229000" />
+      <workItem from="1552389902152" duration="4748000" />
+      <workItem from="1552443454952" duration="12625000" />
+      <workItem from="1552616879744" duration="2292000" />
+      <workItem from="1552654209411" duration="481000" />
+      <workItem from="1552900165849" duration="4029000" />
+      <workItem from="1552965577100" duration="1704000" />
+      <workItem from="1553044552388" duration="468000" />
+      <workItem from="1553071197463" duration="3244000" />
+      <workItem from="1553160472855" duration="4461000" />
+      <workItem from="1553240535703" duration="2862000" />
+      <workItem from="1553312777249" duration="1537000" />
+      <workItem from="1553437790987" duration="2164000" />
+      <workItem from="1553498109147" duration="208000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="366790000" />
+    <option name="totallyTimeSpent" value="424561000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1920" height="1001" extended-state="6" />
+    <frame x="0" y="23" width="1680" height="971" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.8371837" visible="true" weight="0.16271722" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.8202503" visible="true" weight="0.18625678" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="npm" order="2" sideWeight="0.16281629" side_tool="true" visible="true" weight="0.16271722" />
+      <window_info id="npm" order="2" sideWeight="0.17974971" side_tool="true" visible="true" weight="0.18625678" />
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.23322332" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.24118316" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -454,59 +431,10 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/vender/qiniu-uploader.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1425">
-          <caret line="96" column="6" selection-start-line="96" selection-start-column="6" selection-end-line="96" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/badge.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="18" selection-start-line="6" selection-start-column="18" selection-end-line="6" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/icon.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="485">
-          <caret line="64" column="25" lean-forward="true" selection-start-line="64" selection-start-column="25" selection-end-line="64" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/multi-control.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="15" selection-start-line="12" selection-start-column="15" selection-end-line="12" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/dialog.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-732">
-          <caret line="4" column="7" lean-forward="true" selection-start-line="4" selection-start-column="7" selection-end-line="4" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/alert.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="36" column="6" selection-start-line="36" selection-start-column="6" selection-end-line="36" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/avatar.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" selection-start-line="4" selection-end-line="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/table/header.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="11" column="6" lean-forward="true" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
         </state>
       </provider>
     </entry>
@@ -562,48 +490,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/controls/image.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" lean-forward="true" selection-start-line="26" selection-end-line="26" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/table/footer.js">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/tabs.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/nav.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="390">
           <caret line="28" selection-start-line="28" selection-end-line="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/table/body.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="100">
-          <caret line="100" column="13" lean-forward="true" selection-start-line="100" selection-start-column="13" selection-end-line="100" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/control.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="553">
-          <caret line="47" column="6" lean-forward="true" selection-start-line="47" selection-start-column="6" selection-end-line="47" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/controls/form-table.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="551">
-          <caret line="94" column="5" lean-forward="true" selection-start-line="94" selection-start-column="5" selection-end-line="94" selection-end-column="5" />
         </state>
       </provider>
     </entry>
@@ -618,13 +508,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="663">
           <caret line="101" column="5" selection-start-line="101" selection-start-column="5" selection-end-line="101" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/button.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="34" column="10" lean-forward="true" selection-start-line="34" selection-start-column="10" selection-end-line="34" selection-end-column="10" />
         </state>
       </provider>
     </entry>
@@ -684,41 +567,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/detail.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="21" column="54" selection-start-line="21" selection-start-column="54" selection-end-line="21" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/linear-progress.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="22" selection-start-line="1" selection-start-column="22" selection-end-line="1" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/controls/datetime.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="116" column="5" selection-start-line="116" selection-start-column="5" selection-end-line="116" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/controls/checkbox.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1530">
           <caret line="106" column="6" selection-start-line="106" selection-start-column="6" selection-end-line="106" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/utils.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="975">
-          <caret line="68" column="4" selection-start-line="68" selection-start-column="4" selection-end-line="85" selection-end-column="10" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -744,10 +596,129 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/index.js">
+    <entry file="file://$PROJECT_DIR$/src/toolbar.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="39" column="1" selection-start-line="39" selection-start-column="1" selection-end-line="39" selection-end-column="1" />
+        <state relative-caret-position="645">
+          <caret line="43" column="23" lean-forward="true" selection-start-line="43" selection-start-column="23" selection-end-line="43" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/controls/image.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="641">
+          <caret line="124" column="33" selection-start-line="112" selection-start-column="24" selection-end-line="124" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/svg-icon.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="1" lean-forward="true" selection-start-line="12" selection-start-column="1" selection-end-line="12" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dist/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="373">
+          <caret line="79" column="29" selection-start-line="79" selection-start-column="26" selection-end-line="79" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/button.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="155">
+          <caret line="17" column="10" lean-forward="true" selection-start-line="17" selection-start-column="10" selection-end-line="17" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/icon.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="37" column="22" lean-forward="true" selection-start-line="37" selection-start-column="22" selection-end-line="37" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/controls/file.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="57" column="5" lean-forward="true" selection-start-line="57" selection-start-column="5" selection-end-line="57" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/table/header.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" selection-start-line="1" selection-end-line="1" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/table/footer.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="1" lean-forward="true" selection-start-line="16" selection-start-column="1" selection-end-line="16" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/control.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1080">
+          <caret line="86" selection-start-line="86" selection-end-line="86" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/controls/radio.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1375">
+          <caret line="106" column="14" lean-forward="true" selection-start-line="106" selection-start-column="14" selection-end-line="106" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/controls/form-table.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="832">
+          <caret line="594" column="13" selection-start-line="594" selection-start-column="13" selection-end-line="594" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/controls/datetime.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="720">
+          <caret line="176" column="9" lean-forward="true" selection-start-line="176" selection-start-column="9" selection-end-line="176" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/controls/select-tag.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2175">
+          <caret line="147" column="25" selection-start-line="147" selection-start-column="25" selection-end-line="147" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/form.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7380">
+          <caret line="499" column="35" selection-start-line="499" selection-start-column="25" selection-end-line="499" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tabs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1200">
+          <caret line="83" column="26" selection-start-line="83" selection-start-column="26" selection-end-line="83" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/detail.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="27" column="13" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/utils.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3345">
+          <caret line="226" column="63" selection-start-line="226" selection-start-column="56" selection-end-line="226" selection-end-column="63" />
         </state>
       </provider>
     </entry>
@@ -758,48 +729,52 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/toolbar.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="645">
-          <caret line="43" column="23" lean-forward="true" selection-start-line="43" selection-start-column="23" selection-end-line="43" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/table/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="60" column="25" selection-start-line="60" selection-start-column="8" selection-end-line="60" selection-end-column="25" />
+        <state relative-caret-position="-136">
+          <caret line="181" column="26" selection-start-line="181" selection-start-column="26" selection-end-line="181" selection-end-column="26" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/form.js">
+    <entry file="file://$PROJECT_DIR$/src/linear-progress.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="207">
-          <caret line="194" column="13" selection-start-line="194" selection-start-column="8" selection-end-line="194" selection-end-column="13" />
+        <state>
+          <caret column="21" selection-start-column="7" selection-end-column="21" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/controls/select-tag.js">
+    <entry file="file://$PROJECT_DIR$/src/material-list.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="207">
-          <caret line="19" column="8" selection-start-line="19" selection-start-column="4" selection-end-line="19" selection-end-column="8" />
+        <state relative-caret-position="300">
+          <caret line="20" column="5" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/controls/radio.js">
+    <entry file="file://$PROJECT_DIR$/src/refresh-indicator.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="645">
-          <caret line="46" column="7" selection-start-line="46" selection-start-column="7" selection-end-line="46" selection-end-column="7" />
+        <state relative-caret-position="90">
+          <caret line="6" column="31" selection-start-line="6" selection-start-column="31" selection-end-line="6" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="385">
+          <caret line="61" column="13" selection-start-line="61" selection-start-column="13" selection-end-line="61" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/table/body.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="568">
+          <caret line="498" column="49" lean-forward="true" selection-start-line="498" selection-start-column="49" selection-end-line="498" selection-end-column="49" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/controls/select.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="206">
-          <caret line="231" column="17" selection-start-line="231" selection-start-column="17" selection-end-line="231" selection-end-column="17" />
-          <folding>
-            <element signature="e#50#89#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="268">
+          <caret line="267" selection-start-line="267" selection-end-line="267" />
         </state>
       </provider>
     </entry>

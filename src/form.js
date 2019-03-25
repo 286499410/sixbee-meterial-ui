@@ -434,7 +434,7 @@ export default class Form extends Component {
                         return <div className={`col col-${fieldCols}`}
                                     style={{width: '100%', marginBottom: this.props.controlBetweenSpace}}
                                     key={index}>
-                            <div className={` flex middle ${!isShow ? 'hidden' : ''}`}
+                            <div className={`flex middle ${!isShow ? 'hidden' : ''}`}
                                  style={{width: field.width || this.props.controlWidth}}>
                                 {
                                     field.label ? <div
@@ -465,7 +465,6 @@ export default class Form extends Component {
     };
 
     getTabDataSource() {
-
         return this.props.tabs.map((tab) => {
             return {
                 label: tab.label,
@@ -486,7 +485,6 @@ export default class Form extends Component {
         if (this.props.actions !== false) {
             contentHeight = `calc(100% - ${footerHeight}px)`;
         }
-
         return (
             <div className={"relative " + this.props.className}
                  style={{

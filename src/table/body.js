@@ -5,6 +5,7 @@ import Checkbox from 'material-ui/Checkbox';
 import {Scrollbars} from 'react-custom-scrollbars';
 import RefreshIndicator from 'material-ui/RefreshIndicator'
 import $ from 'jquery';
+import Icon from '../icon';
 
 /**
  * 表体数据
@@ -73,7 +74,6 @@ export default class TableBody extends Component {
             <TableBodyColGroup ref="thead"/>
             <TableBodyContent ref="tbody"/>
         </table>;
-            console.log(props.containerHeight || state.bodyHeight);
         return <div ref="container"
                     className="table-body"
                     style={{
@@ -428,7 +428,6 @@ class TableBodyContent extends Component {
         });
     };
 
-
     render() {
         let state = this.context.state;
         let props = this.context.props;
@@ -485,8 +484,8 @@ class TableBodyContent extends Component {
                                                   onCheck={this.handleCheck(data)} {...props.checkboxStyle}/> :
                                         <div style={{
                                             display: 'inline-block',
-                                            width: 13,
-                                            height: 13,
+                                            width: 16,
+                                            height: 16,
                                             background: '#b9b9b9',
                                             opacity: 0.65,
                                             borderRadius: 2,
@@ -504,9 +503,9 @@ class TableBodyContent extends Component {
                                     return <div style={{width: '100%', overflow: 'hidden'}}>
                                         {group.map((row, index) => {
                                             if (rowIndex < this.state.showMinRows || rowIndex > this.state.showMaxRows) {
-                                                return <div key={index} className="td"></div>;
+                                                return <div key={index} className="td" style={{height: props.bodyRowHeight, lineHeight: (props.bodyRowHeight - 12) + 'px'}}></div>;
                                             }
-                                            return <div key={index} className="td">
+                                            return <div key={index} className="td" style={{height: props.bodyRowHeight, lineHeight: (props.bodyRowHeight - 12) + 'px'}}>
                                                 {column.render ? column.render(row, column, this.context.Table) : this.context.cellRender(row, column)}
                                             </div>
                                         })}
@@ -535,34 +534,31 @@ class TableBodyContent extends Component {
                                             </span>;
                                         } else if ((hasChildren && data[`${column.key}_indent`] !== undefined) || (!hasChildren && data[`${column.key}_indent`] > 0)) {
                                             let indent = data[`${column.key}_indent`];
+                                            let text = <span style={{
+                                                display: 'table-cell',
+                                                verticalAlign: 'middle',
+                                                lineHeight: 1
+                                            }} onClick={column.onClick ? column.onClick.bind(this, data) : undefined}>
+                                                        {content()}
+                                            </span>;
                                             return <div
                                                 className={`${column.onClick ? 'text-primary cursor-pointer' : ''}`}
                                                 style={{paddingLeft: indent, lineHeight: 1}}>
                                                 {
-                                                    props.collapsible ?
-                                                        <Icon type="button"
-                                                              className={state.collapsed[data[props.primaryKey]] ? "icon-plus" : "icon-minus"}
-                                                              size={18}
-                                                              style={{
-                                                                  display: 'table-cell',
-                                                                  opacity: data.children && data.children.length > 0 ? 1 : 0
-                                                              }}
-                                                              iconStyle={{
-                                                                  display: 'block',
-                                                                  marginTop: -2
-                                                              }}
-                                                              onClick={this.handleCollapse(data)}
-                                                        /> : null
+                                                    props.collapsible ? <div className="flex middle">
+                                                        <div style={{opacity: data.children.length > 0 ? 1 : 0}}>
+                                                            <Icon type="button"
+                                                                  name={state.collapsed[data[props.primaryKey]] ? "plus-square" : "minus-square"}
+                                                                  size={14}
+                                                                  padding={4}
+                                                                  onClick={this.handleCollapse(data)}
+                                                            />
+                                                        </div>
+                                                        {text}
+                                                    </div> : text
                                                 }
-                                                <span
-                                                    style={{
-                                                        display: 'table-cell',
-                                                        verticalAlign: 'middle',
-                                                        lineHeight: 1
-                                                    }}
-                                                    onClick={column.onClick ? column.onClick.bind(this, data) : undefined}>
-                                                        {content()}
-                                                    </span>
+
+
                                             </div>;
                                         } else {
                                             return content();
@@ -589,7 +585,7 @@ class TableBodyContent extends Component {
                                                     events.map((event, key) => {
                                                         return <Icon key={key}
                                                                      type="button"
-                                                                     className={`icon-${event === 'delete' ? 'del' : event}`}
+                                                                     name={`icon-${event}`}
                                                                      title={label[event]}
                                                                      onClick={props.iconEvents[event].bind(this, data, column, this.context.Table)}/>
                                                     })

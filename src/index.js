@@ -16,6 +16,7 @@ import Form from './form';
 import Table from './table';
 import TableHeader from './table/header';
 import Icon from './icon';
+import SvgIcon from './svg-icon';
 import Button from './button';
 import Alert from './alert';
 import List from './list';
@@ -35,7 +36,8 @@ import Detail from './detail';
 import Stepper from './stepper';
 import LinearProgress from './linear-progress';
 import Popover from './popover';
-
+import MaterialList from './material-list';
+import RefreshIndicator from './refresh-indicator';
 import {Scrollbars} from 'react-custom-scrollbars';
 import utils from './utils';
 
@@ -63,6 +65,7 @@ export {
     Table,
     TableHeader,
     Icon,
+    SvgIcon,
     Detail,
     Paper,
     Avatar,
@@ -80,6 +83,8 @@ export {
     Stepper,
     LinearProgress,
     Popover,
+    MaterialList,
+    RefreshIndicator,
     utils,
     MuiThemeProvider,
     getMuiTheme

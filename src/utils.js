@@ -213,7 +213,7 @@ const utils = {
      * @returns {Promise<any>}
      */
     getDataSource:
-        (searchText, dataSource, dataSourceConfig) => {
+        (searchText, dataSource, dataSourceConfig, context) => {
             let preprocessing = (dataSource) => {
                 dataSource.map((row) => {
                     if (row[dataSourceConfig.text] === undefined) {
@@ -224,7 +224,7 @@ const utils = {
             };
             return new Promise((resolve, reject) => {
                 if (_.isFunction(dataSource)) {
-                    dataSource = dataSource(searchText);
+                    dataSource = dataSource(searchText, context);
                 }
                 if (_.isArray(dataSource)) {
                     resolve(preprocessing(dataSource));

@@ -583,6 +583,16 @@ export default class FormTable extends Component {
             }
         }
         return <div style={{marginTop: 16, ...this.props.style}}>
+            {
+                this.props.label === false ? null : <div style={this.props.labelStyle}>
+                    <span style={{
+                        transform: "scale(0.75)",
+                        transformOrigin: 'left top 0px',
+                        color: 'rgba(0,0,0,0.3)',
+                        fontSize: 15,
+                        display: 'inline-block'}}>{this.props.label}</span>
+                </div>
+            }
             <Table ref="table"
                    className={this.props.tableClassName}
                    bordered={this.props.bordered}

@@ -97,7 +97,7 @@ var Select = function (_Component) {
         _this.setDataSource = function () {
             var dataSource = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _this.props.dataSource;
 
-            _utils2.default.getDataSource(undefined, dataSource, _this.props.dataSourceConfig).then(function (dataSource) {
+            _utils2.default.getDataSource(undefined, dataSource, _this.props.dataSourceConfig, _this).then(function (dataSource) {
                 _this.setState({ dataSource: dataSource });
             });
         };
@@ -218,10 +218,12 @@ var Select = function (_Component) {
                 _react2.default.createElement(
                     'div',
                     { className: 'relative cursor-pointer', onClick: function onClick(event) {
-                            _this3.setState({
-                                open: true,
-                                anchorEl: event.currentTarget
-                            });
+                            if (!_this3.props.disabled) {
+                                _this3.setState({
+                                    open: true,
+                                    anchorEl: event.currentTarget
+                                });
+                            }
                         } },
                     _react2.default.createElement(
                         _SelectField2.default,
@@ -271,7 +273,8 @@ var Select = function (_Component) {
                         value: value,
                         multiple: this.props.multiple,
                         carryKey: this.props.carryKey,
-                        dataSourceConfig: this.props.dataSourceConfig
+                        dataSourceConfig: this.props.dataSourceConfig,
+                        cancel: this.props.cancel
                     })
                 )
             );
@@ -298,8 +301,8 @@ Select.defaultProps = {
     carryKey: true,
     rows: 1,
     fullWidth: true,
-    size: 'default'
-};
+    size: 'default',
+    cancel: false };
 exports.default = Select;
 
 var Options = function (_Component2) {
@@ -328,11 +331,7 @@ var Options = function (_Component2) {
                         originValue.push(value);
                     }
                 } else {
-                    if (_this4.isChecked(value)) {
-                        originValue = undefined;
-                    } else {
-                        originValue = value;
-                    }
+                    originValue = value;
                 }
                 if (_this4.props.onChange) {
                     _this4.props.onChange(originValue);
@@ -396,11 +395,11 @@ var Options = function (_Component2) {
                         style: style
                     });
                 }),
-                _react2.default.createElement(_MenuItem2.default, { value: null,
+                this.props.cancel ? _react2.default.createElement(_MenuItem2.default, { value: null,
                     primaryText: "取消选择",
                     innerDivStyle: this.props.styleProps.menuItemStyle.innerDivStyle,
                     style: { color: '#9b9b9b' }
-                })
+                }) : null
             );
         }
     }]);
