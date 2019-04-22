@@ -14,6 +14,7 @@ export default class Checkbox extends Component {
         label: undefined,           //标签
         defaultChecked: false,      //默认是否勾选
         errorText: undefined,       //错误提示
+        immutable: false,           //是否不可更改
         dataSource: [],             //数据源，选项,
         carryKey: true,             //多选时，值是否携带KEY
         dataSourceConfig: {text: 'text', value: 'value'},
@@ -107,6 +108,9 @@ export default class Checkbox extends Component {
     };
 
     handleCheck = (row) => (event, isInputChecked) => {
+        if(this.props.immutable) {
+            return;
+        }
         let originValue = this.getValue();
         if (this.props.multiple) {
             //多选
@@ -171,7 +175,7 @@ export default class Checkbox extends Component {
                 </div>
             </div>
         } else {
-            return <div style={{width: '100%'}}>
+            return <div style={{width: '100%', ...this.props.style}}>
                 <MaterialCheckbox
                     label={label}
                     disabled={this.props.disabled}

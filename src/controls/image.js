@@ -129,6 +129,7 @@ export default class Image extends Component {
                        type="file"
                        style={{
                            width: '100%',
+                           height: '100%',
                            position: 'absolute',
                            left: 0,
                            right: 0,

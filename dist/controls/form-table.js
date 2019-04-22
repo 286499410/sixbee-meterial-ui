@@ -214,6 +214,13 @@ var FormTable = function (_Component) {
     }, {
         key: 'setValue',
         value: function setValue(value) {
+            var _this2 = this;
+
+            if (_.isArray(value) && this.props.autoSortField) {
+                value.map(function (row, index) {
+                    row.sort = _this2.props.autoSortType == 'desc' ? value.length - index : index + 1;
+                });
+            }
             this.setState({ value: value });
             if (this.props.onChange) {
                 this.props.onChange(value, this);
@@ -340,7 +347,7 @@ var FormTable = function (_Component) {
     }, {
         key: 'getColumns',
         value: function getColumns(columns) {
-            var _this2 = this;
+            var _this3 = this;
 
             var tableColumns = [];
             if (this.props.hasSeriesNumber) {
@@ -363,7 +370,7 @@ var FormTable = function (_Component) {
                     label: '操作',
                     icon: 'icon-add',
                     iconEvent: function iconEvent() {
-                        _this2.addRow(null);
+                        _this3.addRow(null);
                     },
                     width: this.props.actionWidth
                 });
@@ -431,7 +438,7 @@ var FormTable = function (_Component) {
     }, {
         key: 'getTableDataRow',
         value: function getTableDataRow(row) {
-            var _this3 = this;
+            var _this4 = this;
 
             var data = this.state.value[row];
             if (!this.state.controls[row]) {
@@ -457,14 +464,14 @@ var FormTable = function (_Component) {
                     key: data._key
                 }, column, {
                     label: false,
-                    immutable: _this3.props.immutable,
-                    borderShow: _this3.props.controlBorderShow,
+                    immutable: _this4.props.immutable,
+                    borderShow: _this4.props.controlBorderShow,
                     value: value,
-                    size: _this3.props.controlSize,
-                    onFocus: _this3.handleFocus(row, column),
-                    onBlur: _this3.handleBlur(row, column),
-                    onKeyUp: _this3.handleKeyUp(row, column),
-                    onChange: _this3.handleChange(row, column)
+                    size: _this4.props.controlSize,
+                    onFocus: _this4.handleFocus(row, column),
+                    onBlur: _this4.handleBlur(row, column),
+                    onKeyUp: _this4.handleKeyUp(row, column),
+                    onChange: _this4.handleChange(row, column)
                 }));
             });
             if (this.props.hasAction) {
@@ -476,7 +483,7 @@ var FormTable = function (_Component) {
                         return _react2.default.createElement(
                             'span',
                             { key: index },
-                            _this3.getAction(action, row)
+                            _this4.getAction(action, row)
                         );
                     })
                 );
@@ -486,7 +493,7 @@ var FormTable = function (_Component) {
     }, {
         key: 'getDataSource',
         value: function getDataSource() {
-            var _this4 = this;
+            var _this5 = this;
 
             var dataSource = [];
             if (this.props.bodyHeaderData) {
@@ -497,7 +504,7 @@ var FormTable = function (_Component) {
                 }
             }
             this.state.value.map(function (data, row) {
-                var dataRow = _this4.getTableDataRow(row);
+                var dataRow = _this5.getTableDataRow(row);
                 dataSource.push(dataRow);
             });
             if (this.props.bodyFooterData) {
@@ -551,7 +558,8 @@ var FormTable = function (_Component) {
                                 transformOrigin: 'left top 0px',
                                 color: 'rgba(0,0,0,0.3)',
                                 fontSize: 15,
-                                display: 'inline-block' } },
+                                display: 'inline-block'
+                            } },
                         this.props.label
                     )
                 ),
@@ -595,6 +603,8 @@ FormTable.defaultProps = {
     hasSeriesNumber: true,
     hasAction: true,
     showCheckboxes: false,
+    autoSortField: false,
+    autoSortType: 'desc',
     rowCheckboxEnabled: undefined,
     seriesNumberWidth: 60,
     actionWidth: 140,

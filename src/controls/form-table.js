@@ -27,11 +27,13 @@ export default class FormTable extends Component {
         bordered: true,                         //是否有表格边框
         controlBorderShow: false,               //控件是否有边框显示
         containerWidth: '100%',                 //容器宽度
-        containerHeight: undefined,                //容器高度
+        containerHeight: undefined,             //容器高度
         tableWidth: undefined,                  //表实际宽度,不传时默认等于容器宽度
         hasSeriesNumber: true,                  //是否有自动序号
         hasAction: true,                        //是否有操作事件
         showCheckboxes: false,                  //是否显示复选框
+        autoSortField: false,                   //自动新增排序字段
+        autoSortType: 'desc',                   //自动排序字段
         rowCheckboxEnabled: undefined,          //逐行检查是否启用/禁用复选框
         seriesNumberWidth: 60,                  //序号列宽度
         actionWidth: 140,                       //操作事件列宽度
@@ -111,6 +113,11 @@ export default class FormTable extends Component {
      * @param value
      */
     setValue(value) {
+        if (_.isArray(value) && this.props.autoSortField) {
+            value.map((row, index) => {
+                row.sort = this.props.autoSortType == 'desc' ? value.length - index : index + 1;
+            });
+        }
         this.setState({value: value});
         if (this.props.onChange) {
             this.props.onChange(value, this);
@@ -271,7 +278,7 @@ export default class FormTable extends Component {
         if (column.onChange) {
             column.onChange(value, control, this, row);
         }
-        if(this.props.onChange) {
+        if (this.props.onChange) {
             this.props.onChange(this.state.value, this);
         }
     };
@@ -590,7 +597,8 @@ export default class FormTable extends Component {
                         transformOrigin: 'left top 0px',
                         color: 'rgba(0,0,0,0.3)',
                         fontSize: 15,
-                        display: 'inline-block'}}>{this.props.label}</span>
+                        display: 'inline-block'
+                    }}>{this.props.label}</span>
                 </div>
             }
             <Table ref="table"

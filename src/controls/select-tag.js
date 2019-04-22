@@ -11,6 +11,7 @@ export default class SelectTag extends Component {
         multiple: false,        //是否多选
         carryKey: true,         //多选时，值是否携带KEY
         disabled: [],           //禁用的选项,
+        style: {}
     };
 
     state = {
@@ -119,7 +120,7 @@ export default class SelectTag extends Component {
 
     render() {
         let label = this.props.label;
-        return <div style={{marginTop: 12}}>
+        return <div style={{marginTop: 12, ...this.props.style}}>
             {
                 label === false ? null : <div>
                     <span style={{

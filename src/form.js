@@ -114,7 +114,7 @@ export default class Form extends Component {
                 if (_.isFunction(defaultValue)) {
                     defaultValue = defaultValue(this);
                 }
-                _.set(this.state.fieldDefaultData, field.key, defaultValue);
+                _.set(this.state.fieldDefaultData, field.formKey || field.key, defaultValue);
             }
             if (field.fields) {
                 this.setFieldDefaultData(field.fields);
@@ -128,9 +128,9 @@ export default class Form extends Component {
      */
     setFieldOriginData(fields) {
         fields.map((field) => {
-            let value = _.get(this.state.originData, field.key);
+            let value = _.get(this.state.originData, field.formKey || field.key);
             if (value !== undefined) {
-                _.set(this.state.feildOriginData, field.key, value);
+                _.set(this.state.feildOriginData, field.formKey || field.key, value);
             }
             if (field.fields) {
                 this.setFieldOriginData(field.fields);
@@ -178,18 +178,18 @@ export default class Form extends Component {
      */
     handleChange = (field) => (value, control) => {
         this.setFormStatus(STATUS_EDITING);
-        if (field.filterKey) {
-            this.state.changedData[field.filterKey] = value;
-        } else {
-            _.set(this.state.changedData, field.key, value);
-        }
+        _.set(this.state.changedData, field.formKey || field.key, value);
         let data = this.getData('all');
         if (field.onChange) {
-            let value = _.get(data, field.key);
+            let value = _.get(data, field.formKey || field.key);
             field.onChange(value, control, this);
         }
         if (this.props.onChange) {
             this.props.onChange(data, field, control, this);
+        }
+        if(Object.keys(this.state.errorText).length > 0) {
+            let allData = this.getData('all');
+            this.check(allData);
         }
         this.forceUpdate();
         console.log('form change:', this.state.changedData);
@@ -229,12 +229,12 @@ export default class Form extends Component {
     submit() {
         let allData = this.getData('all');
         let submitData = this.getData();
-        if (this.beforeSubmit(submitData, this) === false) {
-            return false;
-        }
         console.log('submitData', submitData);
         //验证
         if (!this.check(allData)) {
+            return false;
+        }
+        if (this.beforeSubmit(submitData, this) === false) {
             return false;
         }
         this.state.errorText = {};
@@ -341,13 +341,13 @@ export default class Form extends Component {
         let allExtraData = this.getData('all-extra');
         let cols = this.props.cols || 1;
         return fields.map((field, index) => {
-            let value = _.get(data, field.key);
+            let value = _.get(data, field.formKey || field.key);
             let isShow = this.isShow(field, data);
             //强制转换
             if (field.convert)
                 value = field.convert(allExtraData);
             let fieldCols = (field.cols || 1);
-            let controlProps = _.get(this.props.controlProps, field.key, {});
+            let controlProps = _.get(this.props.controlProps, field.formKey || field.key, {});
             switch (field.type) {
                 case 'group':
                     //分组类型，有组标签field.label
@@ -507,7 +507,6 @@ export default class Form extends Component {
                             </div>
                         </Scrollbars>
                 }
-
                 {
                     this.props.actions === false || this.props.actions.length == 0 ? null : <div>
                         <div style={{height: footerHeight}}></div>

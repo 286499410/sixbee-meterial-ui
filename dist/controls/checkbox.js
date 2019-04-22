@@ -90,6 +90,9 @@ var Checkbox = function (_Component) {
 
         _this.handleCheck = function (row) {
             return function (event, isInputChecked) {
+                if (_this.props.immutable) {
+                    return;
+                }
                 var originValue = _this.getValue();
                 if (_this.props.multiple) {
                     var value = row.value;
@@ -212,7 +215,7 @@ var Checkbox = function (_Component) {
             } else {
                 return _react2.default.createElement(
                     'div',
-                    { style: { width: '100%' } },
+                    { style: (0, _extends3.default)({ width: '100%' }, this.props.style) },
                     _react2.default.createElement(_Checkbox2.default, (0, _extends3.default)({
                         label: label,
                         disabled: this.props.disabled,
@@ -232,6 +235,7 @@ Checkbox.defaultProps = {
     label: undefined,
     defaultChecked: false,
     errorText: undefined,
+    immutable: false,
     dataSource: [],
     carryKey: true,
     dataSourceConfig: { text: 'text', value: 'value' },

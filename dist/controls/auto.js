@@ -65,19 +65,7 @@ var Auto = function (_Component) {
         _initialiseProps.call(_this);
 
         _this.initData(props);
-
-        _utils2.default.getDataSource('', _this.props.dataSource, _this.props.dataSourceConfig).then(function (dataSource) {
-            _this.state.dataSource = dataSource;
-            var value = _this.getValue();
-
-            if (value !== undefined && _this.state.searchText === undefined) {
-                var data = _this.getData(value);
-                if (data) {
-                    _this.state.searchText = _lodash2.default.get(data, _this.props.dataSourceConfig.text);
-                }
-            }
-            _this.forceUpdate();
-        });
+        _this.setDataSource();
         return _this;
     }
 
@@ -100,7 +88,11 @@ var Auto = function (_Component) {
         key: 'setValue',
         value: function setValue(value) {
             var data = this.getData(value) || {};
-            this.setState({ searchText: this.props.supportSearchText ? value : _lodash2.default.get(data, this.props.dataSourceConfig.text), value: value });
+            var searchText = this.props.supportSearchText ? value : _lodash2.default.get(data, this.props.dataSourceConfig.text, '');
+            this.setState({
+                searchText: searchText,
+                value: value
+            });
             if (this.props.onChange) {
                 this.props.onChange(value, this);
             }
@@ -122,8 +114,17 @@ var Auto = function (_Component) {
 
             var dataSource = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props.dataSource;
 
-            _utils2.default.getDataSource(this.state.searchText, dataSource, this.props.dataSourceConfig).then(function (dataSource) {
-                _this3.setState({ dataSource: dataSource });
+            _utils2.default.getDataSource(this.state.searchText, dataSource, this.props.dataSourceConfig, this).then(function (dataSource) {
+                _this3.state.dataSource = dataSource;
+                var value = _this3.getValue();
+
+                if (value !== undefined && _this3.state.searchText === undefined) {
+                    var data = _this3.getData(value);
+                    if (data) {
+                        _this3.state.searchText = _lodash2.default.get(data, _this3.props.dataSourceConfig.text);
+                    }
+                }
+                _this3.forceUpdate();
             });
         }
     }]);
@@ -148,7 +149,9 @@ Auto.defaultProps = {
     maxSearchResults: undefined,
     multiLine: false,
     rows: 1,
-    fullWidth: true };
+    fullWidth: true,
+    events: undefined
+};
 
 var _initialiseProps = function _initialiseProps() {
     var _this4 = this;
@@ -207,8 +210,7 @@ var _initialiseProps = function _initialiseProps() {
     };
 
     this.handleClear = function (event) {
-        _this4.state.value = '';
-        _this4.handleUpdateInput('');
+        _this4.setValue(null);
         if (_this4.props.onClear) {
             _this4.props.onClear(event, _this4);
         }
@@ -243,55 +245,70 @@ var _initialiseProps = function _initialiseProps() {
         var label = _this4.props.label;
         return _react2.default.createElement(
             'div',
-            { ref: "container", style: { position: 'relative' } },
-            _react2.default.createElement(_AutoComplete2.default, {
-                ref: "auto",
-                filter: _this4.props.filter || _this4.filter,
-                name: _this4.props.name || _this4.props.dataKey || _utils2.default.uuid(),
-                fullWidth: _this4.props.fullWidth,
-                floatingLabelText: label,
-                value: value,
-                searchText: searchText,
-                disabled: _this4.props.disabled,
-                hintText: _this4.props.hintText,
-                errorText: _this4.props.errorText,
-                floatingLabelFixed: _this4.props.labelFixed,
-                underlineShow: _this4.props.borderShow,
-                dataSource: _this4.state.dataSource,
-                dataSourceConfig: _this4.props.dataSourceConfig,
-                maxSearchResults: _this4.props.maxSearchResults,
-                openOnFocus: _this4.props.openOnFocus,
-                onClose: _this4.handleClose,
-                onFocus: _this4.handleFocus,
-                onBlur: _this4.handleBlur,
-                onKeyUp: _this4.handleKeyUp,
-                onNewRequest: _this4.handleNewRequest,
-                onUpdateInput: _this4.handleUpdateInput,
-                multiLine: _this4.props.multiLine,
-                rows: _this4.props.rows,
-                rowsMax: _this4.props.rowsMax,
-                textFieldStyle: (0, _extends3.default)({}, styleProps.style, _this4.props.style),
-                textareaStyle: styleProps.textareaStyle,
-                floatingLabelStyle: styleProps.floatingLabelStyle,
-                floatingLabelFocusStyle: styleProps.floatingLabelFocusStyle,
-                floatingLabelShrinkStyle: styleProps.floatingLabelShrinkStyle,
-                errorStyle: styleProps.errorStyle,
-                hintStyle: styleProps.hintStyle,
-                underlineStyle: styleProps.underlineStyle,
-                inputStyle: styleProps.inputStyle,
-                menuProps: styleProps.menuProps,
-                menuStyle: styleProps.menuStyle,
-                disableFocusRipple: true,
-                style: styleProps.style,
-                anchorOrigin: _this4.state.anchorOrigin,
-                targetOrigin: _this4.state.targetOrigin,
-                popoverProps: styleProps.popoverProps
-            }),
-            value !== undefined && value !== null && value !== '' && _this4.props.hasClear && !_this4.props.disabled && !_this4.props.immutable ? _react2.default.createElement(_IconButton2.default, { iconClassName: 'iconfont icon-close-circle-fill', onClick: _this4.handleClear,
-                style: (0, _extends3.default)({ position: 'absolute', right: 0 }, styleProps.iconStyle.style),
-                iconStyle: (0, _extends3.default)({ color: '#e0e0e0' }, styleProps.iconStyle.iconStyle)
+            { className: 'flex between', ref: "container" },
+            _react2.default.createElement(
+                'div',
+                { style: { flexGrow: 1, position: 'relative' } },
+                _react2.default.createElement(_AutoComplete2.default, {
+                    ref: "auto",
+                    filter: _this4.props.filter || _this4.filter,
+                    name: _this4.props.name || _this4.props.dataKey || _utils2.default.uuid(),
+                    fullWidth: _this4.props.fullWidth,
+                    floatingLabelText: label,
+                    value: value,
+                    searchText: searchText,
+                    disabled: _this4.props.disabled,
+                    hintText: _this4.props.hintText,
+                    errorText: _this4.props.errorText,
+                    floatingLabelFixed: _this4.props.labelFixed,
+                    underlineShow: _this4.props.borderShow,
+                    dataSource: _this4.state.dataSource,
+                    dataSourceConfig: _this4.props.dataSourceConfig,
+                    maxSearchResults: _this4.props.maxSearchResults,
+                    openOnFocus: _this4.props.openOnFocus,
+                    onClose: _this4.handleClose,
+                    onFocus: _this4.handleFocus,
+                    onBlur: _this4.handleBlur,
+                    onKeyUp: _this4.handleKeyUp,
+                    onNewRequest: _this4.handleNewRequest,
+                    onUpdateInput: _this4.handleUpdateInput,
+                    multiLine: _this4.props.multiLine,
+                    rows: _this4.props.rows,
+                    rowsMax: _this4.props.rowsMax,
+                    textFieldStyle: (0, _extends3.default)({}, styleProps.style, _this4.props.style),
+                    textareaStyle: styleProps.textareaStyle,
+                    floatingLabelStyle: styleProps.floatingLabelStyle,
+                    floatingLabelFocusStyle: styleProps.floatingLabelFocusStyle,
+                    floatingLabelShrinkStyle: styleProps.floatingLabelShrinkStyle,
+                    errorStyle: styleProps.errorStyle,
+                    hintStyle: styleProps.hintStyle,
+                    underlineStyle: styleProps.underlineStyle,
+                    inputStyle: styleProps.inputStyle,
+                    menuProps: styleProps.menuProps,
+                    menuStyle: styleProps.menuStyle,
+                    disableFocusRipple: true,
+                    style: styleProps.style,
+                    anchorOrigin: _this4.state.anchorOrigin,
+                    targetOrigin: _this4.state.targetOrigin,
+                    popoverProps: styleProps.popoverProps
+                }),
+                value !== undefined && value !== null && value !== '' && _this4.props.hasClear && !_this4.props.disabled && !_this4.props.immutable ? _react2.default.createElement(_IconButton2.default, { iconClassName: 'iconfont icon-close-circle-fill', onClick: _this4.handleClear,
+                    style: (0, _extends3.default)({ position: 'absolute', right: 0 }, styleProps.iconStyle.style),
+                    iconStyle: (0, _extends3.default)({ color: '#e0e0e0' }, styleProps.iconStyle.iconStyle)
 
-            }) : null
+                }) : null
+            ),
+            _this4.props.events ? _react2.default.createElement(
+                'div',
+                { style: { position: 'relative', top: 18, width: _this4.props.events.length * 20 },
+                    className: 'flex center' },
+                _this4.props.events.map(function (event) {
+                    return _react2.default.createElement(_IconButton2.default, { iconStyle: (0, _extends3.default)({ color: '#aaa', fontSize: 20 }, event.style),
+                        title: event.title,
+                        iconClassName: "iconfont icon-" + event.icon,
+                        onClick: event.onClick.bind(_this4, _this4) });
+                })
+            ) : null
         );
     };
 };

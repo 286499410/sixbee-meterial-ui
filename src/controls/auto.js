@@ -33,6 +33,7 @@ export default class Auto extends Component {
         multiLine: false,           //是否多行显示
         rows: 1,                    //行数
         fullWidth: true,            //宽度100%显示
+        events: undefined,
     };
 
     state = {
@@ -47,21 +48,7 @@ export default class Auto extends Component {
     constructor(props) {
         super(props);
         this.initData(props);
-        /**
-         * 设置数据源
-         */
-        utils.getDataSource('', this.props.dataSource, this.props.dataSourceConfig).then(dataSource => {
-            this.state.dataSource = dataSource;
-            let value = this.getValue();
-            //设置了value，未设置searchText, 自动从dataSource获取
-            if (value !== undefined && this.state.searchText === undefined) {
-                let data = this.getData(value);
-                if (data) {
-                    this.state.searchText = _.get(data, this.props.dataSourceConfig.text);
-                }
-            }
-            this.forceUpdate();
-        });
+        this.setDataSource();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -102,8 +89,12 @@ export default class Auto extends Component {
      */
     setValue(value) {
         let data = this.getData(value) || {};
-        this.setState({searchText: this.props.supportSearchText ? value : _.get(data, this.props.dataSourceConfig.text), value: value});
-        if(this.props.onChange) {
+        let searchText = this.props.supportSearchText ? value : _.get(data, this.props.dataSourceConfig.text, '');
+        this.setState({
+            searchText: searchText,
+            value: value
+        });
+        if (this.props.onChange) {
             this.props.onChange(value, this);
         }
     }
@@ -129,8 +120,17 @@ export default class Auto extends Component {
      * @param dataSource
      */
     setDataSource(dataSource = this.props.dataSource) {
-        utils.getDataSource(this.state.searchText, dataSource, this.props.dataSourceConfig).then((dataSource) => {
-            this.setState({dataSource: dataSource});
+        utils.getDataSource(this.state.searchText, dataSource, this.props.dataSourceConfig, this).then((dataSource) => {
+            this.state.dataSource = dataSource;
+            let value = this.getValue();
+            //设置了value，未设置searchText, 自动从dataSource获取
+            if (value !== undefined && this.state.searchText === undefined) {
+                let data = this.getData(value);
+                if (data) {
+                    this.state.searchText = _.get(data, this.props.dataSourceConfig.text);
+                }
+            }
+            this.forceUpdate();
         });
     };
 
@@ -187,8 +187,7 @@ export default class Auto extends Component {
      * @param event
      */
     handleClear = (event) => {
-        this.state.value = '';
-        this.handleUpdateInput('');
+        this.setValue(null);
         if (this.props.onClear) {
             this.props.onClear(event, this);
         }
@@ -249,57 +248,73 @@ export default class Auto extends Component {
         let styleProps = _.merge(style.getStyle('auto', this.props), this.props.styleProps);
         let label = this.props.label;
         return (
-            <div ref={"container"} style={{position: 'relative'}}>
-                <AutoComplete
-                    ref={"auto"}
-                    filter={this.props.filter || this.filter}
-                    name={this.props.name || this.props.dataKey || utils.uuid()}
-                    fullWidth={this.props.fullWidth}
-                    floatingLabelText={label}
-                    value={value}
-                    searchText={searchText}
-                    disabled={this.props.disabled}
-                    hintText={this.props.hintText}
-                    errorText={this.props.errorText}
-                    floatingLabelFixed={this.props.labelFixed}
-                    underlineShow={this.props.borderShow}
-                    dataSource={this.state.dataSource}
-                    dataSourceConfig={this.props.dataSourceConfig}
-                    maxSearchResults={this.props.maxSearchResults}
-                    openOnFocus={this.props.openOnFocus}
-                    onClose={this.handleClose}
-                    onFocus={this.handleFocus}
-                    onBlur={this.handleBlur}
-                    onKeyUp={this.handleKeyUp}
-                    onNewRequest={this.handleNewRequest}
-                    onUpdateInput={this.handleUpdateInput}
-                    multiLine={this.props.multiLine}
-                    rows={this.props.rows}
-                    rowsMax={this.props.rowsMax}
-                    textFieldStyle={{...styleProps.style, ...this.props.style}}
-                    textareaStyle={styleProps.textareaStyle}
-                    floatingLabelStyle={styleProps.floatingLabelStyle}
-                    floatingLabelFocusStyle={styleProps.floatingLabelFocusStyle}
-                    floatingLabelShrinkStyle={styleProps.floatingLabelShrinkStyle}
-                    errorStyle={styleProps.errorStyle}
-                    hintStyle={styleProps.hintStyle}
-                    underlineStyle={styleProps.underlineStyle}
-                    inputStyle={styleProps.inputStyle}
-                    menuProps={styleProps.menuProps}
-                    menuStyle={styleProps.menuStyle}
-                    disableFocusRipple={true}
-                    style={styleProps.style}
-                    anchorOrigin={this.state.anchorOrigin}
-                    targetOrigin={this.state.targetOrigin}
-                    popoverProps={styleProps.popoverProps}
-                />
-                {
-                    (value !== undefined && value !== null && value !== '') && this.props.hasClear && !this.props.disabled && !this.props.immutable ?
-                        <IconButton iconClassName="iconfont icon-close-circle-fill" onClick={this.handleClear}
-                                    style={{position: 'absolute', right: 0, ...styleProps.iconStyle.style}}
-                                    iconStyle={{color: '#e0e0e0', ...styleProps.iconStyle.iconStyle}}
+            <div className="flex between" ref={"container"}>
+                <div style={{flexGrow: 1, position: 'relative'}}>
+                    <AutoComplete
+                        ref={"auto"}
+                        filter={this.props.filter || this.filter}
+                        name={this.props.name || this.props.dataKey || utils.uuid()}
+                        fullWidth={this.props.fullWidth}
+                        floatingLabelText={label}
+                        value={value}
+                        searchText={searchText}
+                        disabled={this.props.disabled}
+                        hintText={this.props.hintText}
+                        errorText={this.props.errorText}
+                        floatingLabelFixed={this.props.labelFixed}
+                        underlineShow={this.props.borderShow}
+                        dataSource={this.state.dataSource}
+                        dataSourceConfig={this.props.dataSourceConfig}
+                        maxSearchResults={this.props.maxSearchResults}
+                        openOnFocus={this.props.openOnFocus}
+                        onClose={this.handleClose}
+                        onFocus={this.handleFocus}
+                        onBlur={this.handleBlur}
+                        onKeyUp={this.handleKeyUp}
+                        onNewRequest={this.handleNewRequest}
+                        onUpdateInput={this.handleUpdateInput}
+                        multiLine={this.props.multiLine}
+                        rows={this.props.rows}
+                        rowsMax={this.props.rowsMax}
+                        textFieldStyle={{...styleProps.style, ...this.props.style}}
+                        textareaStyle={styleProps.textareaStyle}
+                        floatingLabelStyle={styleProps.floatingLabelStyle}
+                        floatingLabelFocusStyle={styleProps.floatingLabelFocusStyle}
+                        floatingLabelShrinkStyle={styleProps.floatingLabelShrinkStyle}
+                        errorStyle={styleProps.errorStyle}
+                        hintStyle={styleProps.hintStyle}
+                        underlineStyle={styleProps.underlineStyle}
+                        inputStyle={styleProps.inputStyle}
+                        menuProps={styleProps.menuProps}
+                        menuStyle={styleProps.menuStyle}
+                        disableFocusRipple={true}
+                        style={styleProps.style}
+                        anchorOrigin={this.state.anchorOrigin}
+                        targetOrigin={this.state.targetOrigin}
+                        popoverProps={styleProps.popoverProps}
+                    />
+                    {
+                        (value !== undefined && value !== null && value !== '') && this.props.hasClear && !this.props.disabled && !this.props.immutable ?
+                            <IconButton iconClassName="iconfont icon-close-circle-fill" onClick={this.handleClear}
+                                        style={{position: 'absolute', right: 0, ...styleProps.iconStyle.style}}
+                                        iconStyle={{color: '#e0e0e0', ...styleProps.iconStyle.iconStyle}}
 
-                        /> : null
+                            /> : null
+                    }
+                </div>
+                {
+                    this.props.events ?
+                        <div style={{position: 'relative', top: 18, width: this.props.events.length * 20}}
+                             className="flex center">
+                            {
+                                this.props.events.map((event) => {
+                                    return <IconButton iconStyle={{color: '#aaa', fontSize: 20, ...event.style}}
+                                                       title={event.title}
+                                                       iconClassName={"iconfont icon-" + event.icon}
+                                                       onClick={event.onClick.bind(this, this)}/>
+                                })
+                            }
+                        </div> : null
                 }
             </div>
         )

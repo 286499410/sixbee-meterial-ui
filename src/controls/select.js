@@ -7,10 +7,11 @@ import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
 import SelectField from 'material-ui/SelectField';
 import Menu from 'material-ui/Menu';
+import {Scrollbars} from 'react-custom-scrollbars';
+import TextField from 'material-ui/TextField';
 import _ from 'lodash';
 import style from '../style'
 import utils from '../utils';
-import Text from './text';
 
 export default class Select extends Component {
 
@@ -172,9 +173,9 @@ export default class Select extends Component {
         this.setValue(data);
     };
 
-    handleFilter = (value) => {
-        this.state.filterText = value;
-        this.refs.options.setDataSource(this.getOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]));
+    handleFilter = (event) => {
+        this.state.filterText = event.target.value;
+        this.setState({filterText: event.target.value});
     };
 
     handleRequestClose = () => {
@@ -187,7 +188,7 @@ export default class Select extends Component {
         let label = this.props.label;
         let options = this.getOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]);
         let selectValue = (this.props.multiple && this.props.carryKey) ? (value || []).map((n) => (_.get(n, this.props.dataSourceConfig.value))) : value;
-        return <div className="relative" style={{overflow: 'hidden'}}>
+        return <div className="relative" style={{overflow: 'hidden', ...this.props.style}}>
             <div className="relative cursor-pointer" onClick={(event) => {
                 if (!this.props.disabled) {
                     this.setState({
@@ -230,11 +231,11 @@ export default class Select extends Component {
                 onRequestClose={this.handleRequestClose}>
                 {
                     this.props.hasFilter ? <div style={{marginTop: 12, paddingLeft: 16, paddingRight: 16}}>
-                        <Text hintText="输入关键字筛选" value={this.state.filterText} onChange={this.handleFilter}/>
+                        <TextField hintText="输入关键字筛选" name="filterText" fullWidth value={this.state.filterText}
+                                   onChange={this.handleFilter}/>
                     </div> : null
                 }
                 <Options
-                    ref="options"
                     dataSource={options}
                     styleProps={styleProps}
                     onChange={this.handleChange}
@@ -256,15 +257,10 @@ class Options extends Component {
 
     constructor(props) {
         super(props);
-        this.state.dataSource = props.dataSource;
-    }
-
-    setDataSource(dataSource) {
-        this.setState({dataSource: dataSource});
     }
 
     handleItemClick = (event, menuItem, index) => {
-        let data = this.state.dataSource[index];
+        let data = this.props.dataSource[index];
         if (data) {
             let value = data.value, originValue = this.props.value || [];
             if (this.props.multiple) {
@@ -288,8 +284,6 @@ class Options extends Component {
                 this.props.onChange(this.props.multiple ? [] : null);
             }
         }
-
-
     };
 
     indexOf(value) {
@@ -307,31 +301,34 @@ class Options extends Component {
     }
 
     render() {
-        return <Menu style={this.props.styleProps.dropDownMenuProps}
-                     listStyle={this.props.styleProps.listStyle}
-                     menuItemStyle={this.props.styleProps.menuItemStyle}
-                     onItemClick={this.handleItemClick}>
-            {this.state.dataSource.map((option, index) => {
-                let style = {textIndent: option.indent};
-                if (this.isChecked(option.value)) {
-                    style.color = '#FF0099';
+        return <Scrollbars style={{maxHeight: 300}} autoHeight>
+            <Menu style={this.props.styleProps.dropDownMenuProps}
+                  listStyle={this.props.styleProps.listStyle}
+                  menuItemStyle={this.props.styleProps.menuItemStyle}
+                  disableAutoFocus={true}
+                  onItemClick={this.handleItemClick}>
+                {this.props.dataSource.map((option, index) => {
+                    let style = {textIndent: option.indent};
+                    if (this.isChecked(option.value)) {
+                        style.color = '#FF0099';
+                    }
+                    return <MenuItem key={index}
+                                     value={option.value}
+                                     label={option.text}
+                                     primaryText={option.selectText || option.label}
+                                     disabled={option.disabled}
+                                     innerDivStyle={this.props.styleProps.menuItemStyle.innerDivStyle}
+                                     style={style}
+                    />
+                })}
+                {
+                    this.props.cancel ? <MenuItem value={null}
+                                                  primaryText={"取消选择"}
+                                                  innerDivStyle={this.props.styleProps.menuItemStyle.innerDivStyle}
+                                                  style={{color: '#9b9b9b'}}
+                    /> : null
                 }
-                return <MenuItem key={index}
-                                 value={option.value}
-                                 label={option.text}
-                                 primaryText={option.selectText || option.label}
-                                 disabled={option.disabled}
-                                 innerDivStyle={this.props.styleProps.menuItemStyle.innerDivStyle}
-                                 style={style}
-                />
-            })}
-            {
-                this.props.cancel ? <MenuItem value={null}
-                                              primaryText={"取消选择"}
-                                              innerDivStyle={this.props.styleProps.menuItemStyle.innerDivStyle}
-                                              style={{color: '#9b9b9b'}}
-                /> : null
-            }
-        </Menu>
+            </Menu>
+        </Scrollbars>
     }
 }

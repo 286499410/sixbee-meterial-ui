@@ -135,7 +135,7 @@ var Form = function (_Component) {
                     if (_lodash2.default.isFunction(defaultValue)) {
                         defaultValue = defaultValue(_this2);
                     }
-                    _lodash2.default.set(_this2.state.fieldDefaultData, field.key, defaultValue);
+                    _lodash2.default.set(_this2.state.fieldDefaultData, field.formKey || field.key, defaultValue);
                 }
                 if (field.fields) {
                     _this2.setFieldDefaultData(field.fields);
@@ -148,9 +148,9 @@ var Form = function (_Component) {
             var _this3 = this;
 
             fields.map(function (field) {
-                var value = _lodash2.default.get(_this3.state.originData, field.key);
+                var value = _lodash2.default.get(_this3.state.originData, field.formKey || field.key);
                 if (value !== undefined) {
-                    _lodash2.default.set(_this3.state.feildOriginData, field.key, value);
+                    _lodash2.default.set(_this3.state.feildOriginData, field.formKey || field.key, value);
                 }
                 if (field.fields) {
                     _this3.setFieldOriginData(field.fields);
@@ -229,12 +229,12 @@ var Form = function (_Component) {
 
             var allData = this.getData('all');
             var submitData = this.getData();
-            if (this.beforeSubmit(submitData, this) === false) {
-                return false;
-            }
             console.log('submitData', submitData);
 
             if (!this.check(allData)) {
+                return false;
+            }
+            if (this.beforeSubmit(submitData, this) === false) {
                 return false;
             }
             this.state.errorText = {};
@@ -443,18 +443,18 @@ var _initialiseProps = function _initialiseProps() {
     this.handleChange = function (field) {
         return function (value, control) {
             _this6.setFormStatus(STATUS_EDITING);
-            if (field.filterKey) {
-                _this6.state.changedData[field.filterKey] = value;
-            } else {
-                _lodash2.default.set(_this6.state.changedData, field.key, value);
-            }
+            _lodash2.default.set(_this6.state.changedData, field.formKey || field.key, value);
             var data = _this6.getData('all');
             if (field.onChange) {
-                var _value = _lodash2.default.get(data, field.key);
+                var _value = _lodash2.default.get(data, field.formKey || field.key);
                 field.onChange(_value, control, _this6);
             }
             if (_this6.props.onChange) {
                 _this6.props.onChange(data, field, control, _this6);
+            }
+            if ((0, _keys2.default)(_this6.state.errorText).length > 0) {
+                var allData = _this6.getData('all');
+                _this6.check(allData);
             }
             _this6.forceUpdate();
             console.log('form change:', _this6.state.changedData);
@@ -466,12 +466,12 @@ var _initialiseProps = function _initialiseProps() {
         var allExtraData = _this6.getData('all-extra');
         var cols = _this6.props.cols || 1;
         return fields.map(function (field, index) {
-            var value = _lodash2.default.get(data, field.key);
+            var value = _lodash2.default.get(data, field.formKey || field.key);
             var isShow = _this6.isShow(field, data);
 
             if (field.convert) value = field.convert(allExtraData);
             var fieldCols = field.cols || 1;
-            var controlProps = _lodash2.default.get(_this6.props.controlProps, field.key, {});
+            var controlProps = _lodash2.default.get(_this6.props.controlProps, field.formKey || field.key, {});
             switch (field.type) {
                 case 'group':
                     return _react2.default.createElement(

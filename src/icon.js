@@ -13,7 +13,7 @@ export default class Icon extends Component {
         classPrefix: 'iconfont icon-',  //样式前缀
         disabled: false,                //是否禁用
         color: 'inherit',               //颜色
-        hoverColor: 'inherit',          //hover颜色
+        hoverColor: undefined,          //hover颜色
         name: undefined,                //iconfont class
         type: undefined,                //button 按钮图标
         onClick: undefined,             //点击事件

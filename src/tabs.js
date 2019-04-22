@@ -15,6 +15,7 @@ export default class Tabs extends Component {
         activeIndex: undefined,     //当前
         transition: 'fade',         //切换效果
         contentStyle: {},
+        tabClassName: undefined
     };
 
     state = {
@@ -76,7 +77,7 @@ export default class Tabs extends Component {
         let Transition = this.transition[this.props.transition];
         let activeIndex = this.getActiveIndex();
         return <div ref="container" className="layout direction-column">
-            <div className="tab" style={this.props.labelStyle}>
+            <div className={"tab " + this.props.tabClassName} style={this.props.labelStyle}>
                 {this.props.dataSource.map((data, index) => {
                     return <div className={`tab-item ${activeIndex == index ? 'active' : ''}`} key={index} style={data.style}
                                 onClick={this.handleChange(index)}>

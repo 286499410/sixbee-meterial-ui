@@ -260,17 +260,15 @@ const utils = {
             if (text !== undefined) {
                 return text;
             }
-            let reg = /\[(\w*)\]/g;
+            let reg = /\[((\w|\w.\w||\w.\w.\w)*)\]/g;
             let textFields = replaceText.match(reg);
             if (_.isArray(textFields)) {
                 let ret = undefined;
                 textFields.map((field) => {
                     let key = field.substr(1, field.length - 2);
-                    let value = _.get(data, key);
-                    if (value !== undefined) {
-                        ret = replaceText.replace(`[${key}]`, value);
-                        replaceText = ret;
-                    }
+                    let value = _.get(data, key, '');
+                    ret = replaceText.replace(`[${key}]`, value);
+                    replaceText = ret;
                 });
                 return ret;
             } else {

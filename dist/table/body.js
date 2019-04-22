@@ -279,16 +279,6 @@ var TableBodyContent = function (_Component2) {
     }
 
     (0, _createClass3.default)(TableBodyContent, [{
-        key: 'componentWillReceiveProps',
-        value: function componentWillReceiveProps(nextProps) {
-            this.handleShowRows(this.context.state.scrollTop);
-        }
-    }, {
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            this.showData(this.context.state.scrollTop);
-        }
-    }, {
         key: 'handleRowHeight',
         value: function handleRowHeight(list) {
             var _this3 = this;
@@ -320,8 +310,10 @@ var TableBodyContent = function (_Component2) {
         }
     }, {
         key: 'handleShowRows',
-        value: function handleShowRows(scrollTop) {
+        value: function handleShowRows() {
             var _this4 = this;
+
+            var scrollTop = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.state.scrollTop;
 
             var state = this.context.state;
             var props = this.context.props;
@@ -425,6 +417,7 @@ var TableBodyContent = function (_Component2) {
                 }
             });
             var list = this.handleCollapsedData();
+            this.handleShowRows();
             this.handleRowHeight(list);
             var topHeight = this.getTopHeight(list);
             var bottomHeight = this.getBottomHeight(list);
@@ -453,6 +446,7 @@ var TableBodyContent = function (_Component2) {
                     if (!_this6.isRowShow(rowIndex)) {
                         return null;
                     }
+                    var checked = _this6.isChecked(data);
                     return _react2.default.createElement(
                         'tr',
                         { key: data[props.primaryKey] + '' + rowIndex,
@@ -463,7 +457,7 @@ var TableBodyContent = function (_Component2) {
                         props.showCheckboxes ? _react2.default.createElement(
                             'td',
                             { className: 'td-checkbox' },
-                            !props.rowCheckboxEnabled || props.rowCheckboxEnabled(data) ? _react2.default.createElement(_Checkbox2.default, (0, _extends3.default)({ checked: _this6.isChecked(data),
+                            !props.rowCheckboxEnabled || props.rowCheckboxEnabled(data) ? _react2.default.createElement(_Checkbox2.default, (0, _extends3.default)({ checked: checked,
                                 onCheck: _this6.handleCheck(data) }, props.checkboxStyle)) : _react2.default.createElement('div', { style: {
                                     display: 'inline-block',
                                     width: 16,

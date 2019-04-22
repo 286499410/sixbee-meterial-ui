@@ -47,7 +47,16 @@ var MaterialList = function (_Component) {
                 _List.List,
                 null,
                 this.props.dataSource.map(function (data, index) {
-                    return _react2.default.createElement(_List.ListItem, { style: { fontSize: 14 }, innerDivStyle: { padding: 12 }, key: index, primaryText: data.label, leftIcon: data.icon, onClick: data.onClick });
+                    return _react2.default.createElement(_List.ListItem, {
+                        className: data.disabled ? "text-disabled" : undefined,
+                        style: { fontSize: 14 },
+                        disabled: data.disabled,
+                        innerDivStyle: { padding: 12 },
+                        key: index,
+                        primaryText: data.label,
+                        leftIcon: data.icon,
+                        onClick: data.onClick
+                    });
                 })
             );
         }

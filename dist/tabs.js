@@ -135,7 +135,7 @@ var Tabs = function (_Component) {
                 { ref: 'container', className: 'layout direction-column' },
                 _react2.default.createElement(
                     'div',
-                    { className: 'tab', style: this.props.labelStyle },
+                    { className: "tab " + this.props.tabClassName, style: this.props.labelStyle },
                     this.props.dataSource.map(function (data, index) {
                         return _react2.default.createElement(
                             'div',
@@ -170,7 +170,8 @@ Tabs.defaultProps = {
     defaultActiveIndex: 0,
     activeIndex: undefined,
     transition: 'fade',
-    contentStyle: {}
+    contentStyle: {},
+    tabClassName: undefined
 };
 exports.default = Tabs;
 

@@ -120,7 +120,7 @@ Icon.defaultProps = {
     classPrefix: 'iconfont icon-',
     disabled: false,
     color: 'inherit',
-    hoverColor: 'inherit',
+    hoverColor: undefined,
     name: undefined,
     type: undefined,
     onClick: undefined,

@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -151,7 +155,7 @@ var SelectTag = function (_Component) {
             var label = this.props.label;
             return _react2.default.createElement(
                 'div',
-                { style: { marginTop: 12 } },
+                { style: (0, _extends3.default)({ marginTop: 12 }, this.props.style) },
                 label === false ? null : _react2.default.createElement(
                     'div',
                     null,
@@ -208,5 +212,7 @@ SelectTag.defaultProps = {
     dataSourceConfig: { text: 'text', value: 'value' },
     multiple: false,
     carryKey: true,
-    disabled: [] };
+    disabled: [],
+    style: {}
+};
 exports.default = SelectTag;

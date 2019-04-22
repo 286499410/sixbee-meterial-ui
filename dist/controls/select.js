@@ -48,6 +48,12 @@ var _Menu = require('material-ui/Menu');
 
 var _Menu2 = _interopRequireDefault(_Menu);
 
+var _reactCustomScrollbars = require('react-custom-scrollbars');
+
+var _TextField = require('material-ui/TextField');
+
+var _TextField2 = _interopRequireDefault(_TextField);
+
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -59,10 +65,6 @@ var _style2 = _interopRequireDefault(_style);
 var _utils = require('../utils');
 
 var _utils2 = _interopRequireDefault(_utils);
-
-var _text = require('./text');
-
-var _text2 = _interopRequireDefault(_text);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -158,9 +160,9 @@ var Select = function (_Component) {
             _this.setValue(data);
         };
 
-        _this.handleFilter = function (value) {
-            _this.state.filterText = value;
-            _this.refs.options.setDataSource(_this.getOptions(_this.state.dataSource, 1, _this.props.indent || _this.indent[_this.props.size]));
+        _this.handleFilter = function (event) {
+            _this.state.filterText = event.target.value;
+            _this.setState({ filterText: event.target.value });
         };
 
         _this.handleRequestClose = function () {
@@ -214,7 +216,7 @@ var Select = function (_Component) {
             }) : value;
             return _react2.default.createElement(
                 'div',
-                { className: 'relative', style: { overflow: 'hidden' } },
+                { className: 'relative', style: (0, _extends3.default)({ overflow: 'hidden' }, this.props.style) },
                 _react2.default.createElement(
                     'div',
                     { className: 'relative cursor-pointer', onClick: function onClick(event) {
@@ -263,10 +265,10 @@ var Select = function (_Component) {
                     this.props.hasFilter ? _react2.default.createElement(
                         'div',
                         { style: { marginTop: 12, paddingLeft: 16, paddingRight: 16 } },
-                        _react2.default.createElement(_text2.default, { hintText: '\u8F93\u5165\u5173\u952E\u5B57\u7B5B\u9009', value: this.state.filterText, onChange: this.handleFilter })
+                        _react2.default.createElement(_TextField2.default, { hintText: '\u8F93\u5165\u5173\u952E\u5B57\u7B5B\u9009', name: 'filterText', fullWidth: true, value: this.state.filterText,
+                            onChange: this.handleFilter })
                     ) : null,
                     _react2.default.createElement(Options, {
-                        ref: 'options',
                         dataSource: options,
                         styleProps: styleProps,
                         onChange: this.handleChange,
@@ -316,7 +318,7 @@ var Options = function (_Component2) {
         _this4.state = {};
 
         _this4.handleItemClick = function (event, menuItem, index) {
-            var data = _this4.state.dataSource[index];
+            var data = _this4.props.dataSource[index];
             if (data) {
                 var value = data.value,
                     originValue = _this4.props.value || [];
@@ -343,16 +345,10 @@ var Options = function (_Component2) {
             }
         };
 
-        _this4.state.dataSource = props.dataSource;
         return _this4;
     }
 
     (0, _createClass3.default)(Options, [{
-        key: 'setDataSource',
-        value: function setDataSource(dataSource) {
-            this.setState({ dataSource: dataSource });
-        }
-    }, {
         key: 'indexOf',
         value: function indexOf(value) {
             var _this5 = this;
@@ -376,30 +372,35 @@ var Options = function (_Component2) {
             var _this6 = this;
 
             return _react2.default.createElement(
-                _Menu2.default,
-                { style: this.props.styleProps.dropDownMenuProps,
-                    listStyle: this.props.styleProps.listStyle,
-                    menuItemStyle: this.props.styleProps.menuItemStyle,
-                    onItemClick: this.handleItemClick },
-                this.state.dataSource.map(function (option, index) {
-                    var style = { textIndent: option.indent };
-                    if (_this6.isChecked(option.value)) {
-                        style.color = '#FF0099';
-                    }
-                    return _react2.default.createElement(_MenuItem2.default, { key: index,
-                        value: option.value,
-                        label: option.text,
-                        primaryText: option.selectText || option.label,
-                        disabled: option.disabled,
-                        innerDivStyle: _this6.props.styleProps.menuItemStyle.innerDivStyle,
-                        style: style
-                    });
-                }),
-                this.props.cancel ? _react2.default.createElement(_MenuItem2.default, { value: null,
-                    primaryText: "取消选择",
-                    innerDivStyle: this.props.styleProps.menuItemStyle.innerDivStyle,
-                    style: { color: '#9b9b9b' }
-                }) : null
+                _reactCustomScrollbars.Scrollbars,
+                { style: { maxHeight: 300 }, autoHeight: true },
+                _react2.default.createElement(
+                    _Menu2.default,
+                    { style: this.props.styleProps.dropDownMenuProps,
+                        listStyle: this.props.styleProps.listStyle,
+                        menuItemStyle: this.props.styleProps.menuItemStyle,
+                        disableAutoFocus: true,
+                        onItemClick: this.handleItemClick },
+                    this.props.dataSource.map(function (option, index) {
+                        var style = { textIndent: option.indent };
+                        if (_this6.isChecked(option.value)) {
+                            style.color = '#FF0099';
+                        }
+                        return _react2.default.createElement(_MenuItem2.default, { key: index,
+                            value: option.value,
+                            label: option.text,
+                            primaryText: option.selectText || option.label,
+                            disabled: option.disabled,
+                            innerDivStyle: _this6.props.styleProps.menuItemStyle.innerDivStyle,
+                            style: style
+                        });
+                    }),
+                    this.props.cancel ? _react2.default.createElement(_MenuItem2.default, { value: null,
+                        primaryText: "取消选择",
+                        innerDivStyle: this.props.styleProps.menuItemStyle.innerDivStyle,
+                        style: { color: '#9b9b9b' }
+                    }) : null
+                )
             );
         }
     }]);

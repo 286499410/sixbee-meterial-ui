@@ -12,10 +12,6 @@ var _values = require('babel-runtime/core-js/object/values');
 
 var _values2 = _interopRequireDefault(_values);
 
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
 var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
 
 var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
@@ -31,6 +27,10 @@ var _getIterator3 = _interopRequireDefault(_getIterator2);
 var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
 
 var _promise = require('babel-runtime/core-js/promise');
 
@@ -219,17 +219,17 @@ var Table = function (_Component) {
             var nextProps = {
                 containerWidth: props.tableWidth,
                 tableWidth: props.tableWidth,
-                columnWidths: props.columnWidths,
+                columnWidths: (0, _extends3.default)({}, props.columnWidths),
                 dataSource: props.dataSource,
                 mode: props.mode,
                 headerColumns: props.headerColumns,
-                checked: props.checked,
+                checked: (0, _extends3.default)({}, props.checked),
                 collapsed: props.collapsed,
-                collapsedHidden: props.collapsedHidden,
+                collapsedHidden: (0, _extends3.default)({}, props.collapsedHidden),
                 iconEvents: props.iconEvents,
                 iconEventsBehavior: props.iconEventsBehavior,
                 filter: props.filter,
-                filterData: props.filterData
+                filterData: (0, _extends3.default)({}, props.filterData)
             };
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
@@ -594,7 +594,7 @@ Table.defaultProps = {
     scrollTop: 0,
     scrollLeft: 0,
     headerRowHeight: undefined,
-    bodyRowHeight: 28,
+    bodyRowHeight: 32,
     dataSource: [],
     onFilter: undefined,
     pager: undefined,

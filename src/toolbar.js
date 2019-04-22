@@ -26,7 +26,7 @@ export default class Toolbar extends Component {
 
     handleClick = (e) => (event) => {
         if (e.onClick) {
-            e.onClick(e, this.props.context);
+            e.onClick(event, e, this.props.context);
         }
     };
 

@@ -225,17 +225,15 @@ var utils = {
         if (text !== undefined) {
             return text;
         }
-        var reg = /\[(\w*)\]/g;
+        var reg = /\[((\w|\w.\w||\w.\w.\w)*)\]/g;
         var textFields = _replaceText.match(reg);
         if (_loadsh2.default.isArray(textFields)) {
             var ret = undefined;
             textFields.map(function (field) {
                 var key = field.substr(1, field.length - 2);
-                var value = _loadsh2.default.get(data, key);
-                if (value !== undefined) {
-                    ret = _replaceText.replace('[' + key + ']', value);
-                    _replaceText = ret;
-                }
+                var value = _loadsh2.default.get(data, key, '');
+                ret = _replaceText.replace('[' + key + ']', value);
+                _replaceText = ret;
             });
             return ret;
         } else {

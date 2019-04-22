@@ -83,7 +83,7 @@ var style = {
             iconStyle: {
                 height: 20 + l * 4,
                 width: 20 + l * 4,
-                top: props.label ? 8 + l * 4 : l * 2 + 4,
+                top: props.label ? 8 + l * 4 : l * 2 + 2,
                 padding: 0,
                 right: -6
             },

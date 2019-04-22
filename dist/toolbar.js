@@ -71,7 +71,7 @@ var Toolbar = function (_Component) {
         return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = Toolbar.__proto__ || (0, _getPrototypeOf2.default)(Toolbar)).call.apply(_ref, [this].concat(args))), _this), _this.state = {}, _this.handleClick = function (e) {
             return function (event) {
                 if (e.onClick) {
-                    e.onClick(e, _this.props.context);
+                    e.onClick(event, e, _this.props.context);
                 }
             };
         }, _this.renderEvent = function (event) {

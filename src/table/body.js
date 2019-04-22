@@ -204,14 +204,6 @@ class TableBodyContent extends Component {
         super(props);
     }
 
-    componentWillReceiveProps(nextProps) {
-        this.handleShowRows(this.context.state.scrollTop);
-    }
-
-    componentDidMount() {
-        this.showData(this.context.state.scrollTop);
-    }
-
     /**
      * 处理行高
      */
@@ -250,7 +242,7 @@ class TableBodyContent extends Component {
      * 处理显示的行数
      * @param scrollTop
      */
-    handleShowRows(scrollTop) {
+    handleShowRows(scrollTop = this.state.scrollTop) {
         let state = this.context.state;
         let props = this.context.props;
         let list = this.handleCollapsedData();
@@ -439,6 +431,7 @@ class TableBodyContent extends Component {
             }
         });
         let list = this.handleCollapsedData();
+        this.handleShowRows();
         this.handleRowHeight(list);
         let topHeight = this.getTopHeight(list);
         let bottomHeight = this.getBottomHeight(list);
@@ -470,6 +463,7 @@ class TableBodyContent extends Component {
                 if (!this.isRowShow(rowIndex)) {
                     return null;
                 }
+                let checked = this.isChecked(data);
                 return <tr key={data[props.primaryKey] + '' + rowIndex}
                            data-key={data[props.primaryKey]}
                            className={`${props.iconEventsBehavior}`}
@@ -480,7 +474,7 @@ class TableBodyContent extends Component {
                             <td className="td-checkbox">
                                 {
                                     (!props.rowCheckboxEnabled || props.rowCheckboxEnabled(data)) ?
-                                        <Checkbox checked={this.isChecked(data)}
+                                        <Checkbox checked={checked}
                                                   onCheck={this.handleCheck(data)} {...props.checkboxStyle}/> :
                                         <div style={{
                                             display: 'inline-block',

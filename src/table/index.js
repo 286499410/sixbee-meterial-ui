@@ -50,7 +50,7 @@ export default class Table extends Component {
         scrollTop: 0,                           //滚动条初始位置
         scrollLeft: 0,                          //滚动条初始位置
         headerRowHeight: undefined,             //表头行高
-        bodyRowHeight: 28,                      //表内容行高
+        bodyRowHeight: 32,                      //表内容行高
         dataSource: [],                         //数据源
         onFilter: undefined,                    //过滤自定义事件
         pager: undefined,                       //分页
@@ -134,17 +134,17 @@ export default class Table extends Component {
         let nextProps = {
             containerWidth: props.tableWidth,
             tableWidth: props.tableWidth,
-            columnWidths: props.columnWidths,
+            columnWidths: {...props.columnWidths},
             dataSource: props.dataSource,
             mode: props.mode,
             headerColumns: props.headerColumns,
-            checked: props.checked,
+            checked: {...props.checked},
             collapsed: props.collapsed,
-            collapsedHidden: props.collapsedHidden,
+            collapsedHidden: {...props.collapsedHidden},
             iconEvents: props.iconEvents,
             iconEventsBehavior: props.iconEventsBehavior,
             filter: props.filter,
-            filterData: props.filterData,
+            filterData: {...props.filterData},
         };
         for (let [key, value] of Object.entries(nextProps)) {
             if (value === undefined) {
