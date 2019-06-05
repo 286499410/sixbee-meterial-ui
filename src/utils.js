@@ -11,11 +11,6 @@ const utils = {
         return uuid.v4();
     },
 
-    strToTime:
-        (str) => {
-            return parseInt(utils.strToDate(str).getTime() / 1000);
-        },
-
     /**
      * 时间戳转日期时间
      * @param format
@@ -40,6 +35,11 @@ const utils = {
             datetime = datetime.replace('i', minute.padStart(2, '0'));
             datetime = datetime.replace('s', second.padStart(2, '0'));
             return datetime;
+        },
+
+    strToTime:
+        (str) => {
+            return parseInt(utils.strToDate(str).getTime() / 1000);
         },
 
     /**

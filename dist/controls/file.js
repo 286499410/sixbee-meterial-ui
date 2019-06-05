@@ -75,6 +75,9 @@ var File = function (_Component) {
                 var xhr = new XMLHttpRequest();
                 var fd = new FormData();
                 fd.append(_this.props.uploader.key || 'file', file);
+                if (_this.props.uploader.append) {
+                    _this.props.uploader.append(fd);
+                }
                 xhr.open(_this.props.uploader.method || 'POST', _this.props.uploader.url);
                 if (_this.props.uploader.header) {
                     var _iteratorNormalCompletion = true;

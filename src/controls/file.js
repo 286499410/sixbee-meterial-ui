@@ -69,6 +69,9 @@ export default class File extends Component {
             let xhr = new XMLHttpRequest();
             let fd = new FormData();
             fd.append(this.props.uploader.key || 'file', file);
+            if(this.props.uploader.append) {
+                this.props.uploader.append(fd);
+            }
             xhr.open(this.props.uploader.method || 'POST', this.props.uploader.url);
             if (this.props.uploader.header) {
                 for (let [key, value] of Object.entries(this.props.uploader.header)) {

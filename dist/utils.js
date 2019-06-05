@@ -42,10 +42,6 @@ var utils = {
         return _uuid.v4();
     },
 
-    strToTime: function strToTime(str) {
-        return parseInt(utils.strToDate(str).getTime() / 1000);
-    },
-
     date: function date() {
         var format = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Y-m-d H:i:s';
         var timestamp = arguments[1];
@@ -66,6 +62,10 @@ var utils = {
         datetime = datetime.replace('i', minute.padStart(2, '0'));
         datetime = datetime.replace('s', second.padStart(2, '0'));
         return datetime;
+    },
+
+    strToTime: function strToTime(str) {
+        return parseInt(utils.strToDate(str).getTime() / 1000);
     },
 
     dateToStr: function dateToStr(date) {

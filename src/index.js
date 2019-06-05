@@ -37,6 +37,8 @@ import Stepper from './stepper';
 import LinearProgress from './linear-progress';
 import Popover from './popover';
 import MaterialList from './material-list';
+import MaterialMenu from './material-menu';
+import MaterialMenuItem from './material-menuitem';
 import RefreshIndicator from './refresh-indicator';
 import {Scrollbars} from 'react-custom-scrollbars';
 import utils from './utils';
@@ -84,6 +86,8 @@ export {
     LinearProgress,
     Popover,
     MaterialList,
+    MaterialMenu,
+    MaterialMenuItem,
     RefreshIndicator,
     utils,
     MuiThemeProvider,
