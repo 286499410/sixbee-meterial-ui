@@ -308,10 +308,12 @@ export default class Auto extends Component {
                              className="flex center">
                             {
                                 this.props.events.map((event) => {
-                                    return <IconButton iconStyle={{color: '#aaa', fontSize: 20, ...event.style}}
+                                    return <IconButton iconStyle={{color: '#aaa', fontSize: 20, ...event.iconStyle}}
                                                        title={event.title}
                                                        iconClassName={"iconfont icon-" + event.icon}
-                                                       onClick={event.onClick.bind(this, this)}/>
+                                                       onClick={event.onClick.bind(this, this)}
+                                                       style={event.style}
+                                    />
                                 })
                             }
                         </div> : null

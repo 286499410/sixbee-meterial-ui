@@ -155,8 +155,8 @@ var DateTime = function (_Component) {
         };
 
         _this.handleClear = function (event) {
-            _this.state.date = undefined;
-            _this.state.time = undefined;
+            _this.state.date = null;
+            _this.state.time = null;
             _this.forceUpdate();
             _this.handleChange();
         };
@@ -191,7 +191,7 @@ var DateTime = function (_Component) {
         key: 'handleChange',
         value: function handleChange() {
             if (this.props.onChange) {
-                var value = this.state.date === undefined || this.state.time === undefined ? '' : this.state.date + ' ' + this.state.time;
+                var value = this.state.date === undefined || this.state.time === undefined || this.state.date === null || this.state.time === null ? '' : this.state.date + ' ' + this.state.time;
                 if (value && value !== '' && this.props.timestamp) {
                     value = _utils2.default.strToTime(value);
                 }
@@ -228,10 +228,15 @@ var DateTime = function (_Component) {
         key: 'getValue',
         value: function getValue() {
             if (this.state.date === undefined && this.state.time === undefined && this.props.defaultValue !== undefined) {
-                var _props$defaultValue$s = this.props.defaultValue.split(' '),
-                    _props$defaultValue$s2 = (0, _slicedToArray3.default)(_props$defaultValue$s, 2),
-                    date = _props$defaultValue$s2[0],
-                    time = _props$defaultValue$s2[1];
+                var defaultValue = this.props.defaultValue;
+                if (this.props.timestamp) {
+                    defaultValue = _utils2.default.date('Y-m-d H:i', defaultValue);
+                }
+
+                var _defaultValue$split = defaultValue.split(' '),
+                    _defaultValue$split2 = (0, _slicedToArray3.default)(_defaultValue$split, 2),
+                    date = _defaultValue$split2[0],
+                    time = _defaultValue$split2[1];
 
                 return {
                     date: date,

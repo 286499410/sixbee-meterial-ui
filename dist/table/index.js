@@ -4,10 +4,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _keys = require('babel-runtime/core-js/object/keys');
-
-var _keys2 = _interopRequireDefault(_keys);
-
 var _values = require('babel-runtime/core-js/object/values');
 
 var _values2 = _interopRequireDefault(_values);
@@ -88,10 +84,6 @@ var _utils = require('../utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
-var _icon = require('../icon');
-
-var _icon2 = _interopRequireDefault(_icon);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var debug = false;
@@ -135,6 +127,7 @@ var Table = function (_Component) {
             iconEventsBehavior: 'columnHover',
             filterConfig: {},
             filterData: {},
+            sortData: {},
             extraColumnWidth: 0,
             scrollTop: 0,
             scrollLeft: 0,
@@ -228,8 +221,9 @@ var Table = function (_Component) {
                 collapsedHidden: (0, _extends3.default)({}, props.collapsedHidden),
                 iconEvents: props.iconEvents,
                 iconEventsBehavior: props.iconEventsBehavior,
-                filter: props.filter,
-                filterData: (0, _extends3.default)({}, props.filterData)
+                filter: props.filter || {},
+                filterData: (0, _extends3.default)({}, props.filterData),
+                sortData: (0, _extends3.default)({}, props.sortData)
             };
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
@@ -283,6 +277,7 @@ var Table = function (_Component) {
                     columnWidths: this.state.columnWidths,
                     checked: this.state.checked,
                     filterData: this.state.filterData,
+                    sortData: this.state.sortData,
                     scrollLeft: this.state.scrollLeft,
                     scrollTop: this.state.scrollTop,
                     collapsed: this.state.collapsed
@@ -591,12 +586,14 @@ Table.defaultProps = {
     columnWidths: {},
     checked: {},
     filterData: {},
+    sortData: {},
     scrollTop: 0,
     scrollLeft: 0,
     headerRowHeight: undefined,
     bodyRowHeight: 32,
     dataSource: [],
     onFilter: undefined,
+    onSort: undefined,
     pager: undefined,
     onCheck: undefined,
     showCheckboxes: true,
@@ -679,131 +676,3 @@ var TableFooter = function (_Component2) {
     }]);
     return TableFooter;
 }(_react.Component);
-
-var Filter = function (_Component3) {
-    (0, _inherits3.default)(Filter, _Component3);
-
-    function Filter(props) {
-        (0, _classCallCheck3.default)(this, Filter);
-
-        var _this7 = (0, _possibleConstructorReturn3.default)(this, (Filter.__proto__ || (0, _getPrototypeOf2.default)(Filter)).call(this, props));
-
-        _this7.state = {
-            open: false,
-            anchorEl: {},
-            formData: {}
-        };
-
-        _this7.initFormData = function () {
-            _this7.props.fields.map(function (field) {
-                if (_this7.tableState.filterData[field.key]) {
-                    _this7.state.formData[field.key] = _lodash2.default.get(_this7.tableState.filterData[field.key], 'like', _this7.tableState.filterData[field.key]);
-                }
-            });
-        };
-
-        _this7.handleOpen = function (event) {
-            _this7.setState({
-                open: true,
-                anchorEl: event.currentTarget
-            });
-        };
-
-        _this7.handleRequestClose = function (event) {
-            _this7.setState({ open: false });
-        };
-
-        _this7.handleReset = function (event) {
-            _this7.refs.form.state.defaultData = {};
-            _this7.refs.form.state.fieldDefaultData = {};
-            _this7.refs.form.reset();
-            _this7.handleSubmit(event);
-        };
-
-        _this7.handleSubmit = function (event) {
-            var data = _this7.refs.form.getData('all');
-            _this7.state.formData = data;
-            _this7.props.fields.map(function (field) {
-                var value = _lodash2.default.get(data, field.dataKey);
-                if (value === '' || value === undefined) {
-                    delete _this7.tableState.filterData[field.key];
-                    delete _this7.state.formData[field.key];
-                } else {
-                    _this7.tableState.filterData[field.key] = function () {
-                        switch (field.type) {
-                            case 'text':
-                            default:
-                                if (field.equal) {
-                                    return value;
-                                }
-                                return { like: value };
-                        }
-                    }();
-                }
-            });
-            if (_this7.tableState.onFilter) {
-                _this7.tableState.onFilter(_this7.tableState.filterData, _this7.tableState.context);
-            } else {
-                _this7.tableState.context.refs.body.forceUpdate();
-            }
-            _this7.handleRequestClose();
-            _this7.tableState.context.handleStateChange();
-        };
-
-        _this7.key = 'filter-' + _this7.props.filterCondKey;
-        _this7.tableState = state[props.stateKey];
-        _this7.initFormData();
-        return _this7;
-    }
-
-    (0, _createClass3.default)(Filter, [{
-        key: 'render',
-        value: function render() {
-            var Popover = App.component('popover');
-            var Form = App.component('form');
-            var Button = App.component('button');
-            return _react2.default.createElement(
-                'div',
-                { ref: 'container', style: { display: 'inline-block', position: 'relative' } },
-                _react2.default.createElement(_icon2.default, { ref: 'filterIcon',
-                    type: 'button',
-                    name: 'filter',
-                    color: (0, _keys2.default)(this.state.formData).length > 0 ? '#1890ff' : undefined,
-                    onClick: this.handleOpen }),
-                _react2.default.createElement(
-                    Popover,
-                    { style: { left: -10000 },
-                        open: this.state.open,
-                        anchorEl: this.state.anchorEl,
-                        onRequestClose: this.handleRequestClose },
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'space-small', style: { width: this.props.width || 260 } },
-                        _react2.default.createElement(Form, {
-                            ref: 'form',
-                            labelFixed: true,
-                            fields: this.props.fields,
-                            defaultData: this.state.formData
-                        }),
-                        _react2.default.createElement(
-                            'div',
-                            { className: 'text-center', style: { marginTop: 16 } },
-                            this.props.reset ? _react2.default.createElement(Button, { label: this.props.resetLabel, onClick: this.handleReset,
-                                style: { width: 100 } }) : null,
-                            this.props.submit ? _react2.default.createElement(Button, { label: this.props.submitLabel, onClick: this.handleSubmit, type: 'primary',
-                                style: { width: 100, marginLeft: 20 } }) : null
-                        )
-                    )
-                )
-            );
-        }
-    }]);
-    return Filter;
-}(_react.Component);
-
-Filter.defaultProps = {
-    reset: true,
-    submit: true,
-    resetLabel: '重置',
-    submitLabel: '确定'
-};

@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types'
 import Checkbox from 'material-ui/Checkbox';
+import Filter from './filter';
+import Sort from './sort';
 import utils from '../utils';
 
 export default class TableHeader extends Component {
@@ -137,9 +139,49 @@ export default class TableHeader extends Component {
         return Object.keys(checked).length == dataRows.length - unCheckNum && dataRows.length - unCheckNum != 0;
     }
 
+    /**
+     * 过滤处理
+     * @param value
+     * @param field
+     */
+    handleFilter = (col) => (value, field) => {
+        let props = this.context.props;
+        let filterData = this.context.state.filterData;
+        if (value === undefined) {
+            delete filterData[col.key];
+        } else {
+            filterData[col.key] = value;
+        }
+        if (props.onFilter) {
+            props.onFilter(filterData);
+        }
+        this.context.setTableState({filterData: filterData});
+    };
+
+    /**
+     * 排序处理
+     * @param col
+     * @returns {Function}
+     */
+    handleSort = (col) => (direction) => {
+        let props = this.context.props;
+        let sortData = {};
+        if (direction !== undefined) {
+            sortData = {
+                field: col,
+                direction: direction
+            };
+        }
+        if(props.onSort) {
+            props.onSort(sortData);
+        }
+        this.context.setTableState({sortData: sortData});
+    };
+
     render() {
         let props = this.context.props;
         let state = this.context.state;
+        let filterData = state.filterData;
         let className = 'table';
         if (props.bordered) className += ' bordered';
         if (props.condensed) className += ' condensed';
@@ -164,7 +206,8 @@ export default class TableHeader extends Component {
                                                 width: props.checkboxColumnWidth,
                                                 height: props.headerRowHeight
                                             }}>
-                                            <Checkbox checked={this.isChecked()} onCheck={this.handleCheck} {...props.checkboxStyle}/>
+                                            <Checkbox checked={this.isChecked()}
+                                                      onCheck={this.handleCheck} {...props.checkboxStyle}/>
                                         </th> : null
                                 }
                                 {
@@ -182,7 +225,13 @@ export default class TableHeader extends Component {
                                             <th key={j} data-key={col.key}
                                                 rowSpan={(col.children && col.children.length > 0) ? 1 : state.headerColumns.length - i}
                                                 colSpan={col.colSpan} style={style}>
-                                                {col.label}
+                                                <div className="flex middle center">
+                                                    <div>{col.label}</div>
+                                                    {col.filter ?
+                                                        <Filter field={col.filter} onFilter={this.handleFilter(col)}
+                                                                value={filterData[col.key]}/> : null}
+                                                    {col.sortable ? <Sort field={col} onSort={this.handleSort(col)}/> : null}
+                                                </div>
                                                 {
                                                     props.resize ?
                                                         <div className="resize"

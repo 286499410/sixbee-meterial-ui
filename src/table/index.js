@@ -10,7 +10,6 @@ import TableBody from './body';
 import Pager from './pager';
 import $ from 'jquery';
 import utils from '../utils';
-import Icon from "../icon";
 
 let debug = false;
 
@@ -47,12 +46,14 @@ export default class Table extends Component {
         columnWidths: {},                       //列宽度
         checked: {},                            //选中项
         filterData: {},                         //过滤条件
+        sortData: {},                           //排序数据
         scrollTop: 0,                           //滚动条初始位置
         scrollLeft: 0,                          //滚动条初始位置
         headerRowHeight: undefined,             //表头行高
         bodyRowHeight: 32,                      //表内容行高
         dataSource: [],                         //数据源
         onFilter: undefined,                    //过滤自定义事件
+        onSort: undefined,                      //排序自定义事件
         pager: undefined,                       //分页
         onCheck: undefined,                     //勾选后触发事件
         showCheckboxes: true,                   //是否显示复选框
@@ -93,6 +94,7 @@ export default class Table extends Component {
         iconEventsBehavior: 'columnHover',      //图标事件出现的方式：columnHover移至当前列后显示，rowHover移至当前行后显示
         filterConfig: {},                       //过滤条件配置
         filterData: {},                         //过滤条件数据
+        sortData: {},                           //排序数据
         extraColumnWidth: 0,                    //扩展列
         scrollTop: 0,                           //滚动条初始位置
         scrollLeft: 0,                          //滚动条初始位置
@@ -143,8 +145,9 @@ export default class Table extends Component {
             collapsedHidden: {...props.collapsedHidden},
             iconEvents: props.iconEvents,
             iconEventsBehavior: props.iconEventsBehavior,
-            filter: props.filter,
+            filter: props.filter || {},
             filterData: {...props.filterData},
+            sortData: {...props.sortData},
         };
         for (let [key, value] of Object.entries(nextProps)) {
             if (value === undefined) {
@@ -172,6 +175,7 @@ export default class Table extends Component {
                 columnWidths: this.state.columnWidths,
                 checked: this.state.checked,
                 filterData: this.state.filterData,
+                sortData: this.state.sortData,
                 scrollLeft: this.state.scrollLeft,
                 scrollTop: this.state.scrollTop,
                 collapsed: this.state.collapsed,
@@ -555,117 +559,3 @@ class TableFooter extends Component {
     }
 }
 
-/**
- * 过滤器
- */
-class Filter extends Component {
-
-    static defaultProps = {
-        reset: true,
-        submit: true,
-        resetLabel: '重置',
-        submitLabel: '确定'
-    };
-
-    state = {
-        open: false,
-        anchorEl: {},
-        formData: {}
-    };
-
-    constructor(props) {
-        super(props);
-        this.key = `filter-${this.props.filterCondKey}`;
-        this.tableState = state[props.stateKey];
-        this.initFormData();
-    }
-
-    initFormData = () => {
-        this.props.fields.map((field) => {
-            if (this.tableState.filterData[field.key]) {
-                this.state.formData[field.key] = _.get(this.tableState.filterData[field.key], 'like', this.tableState.filterData[field.key]);
-            }
-        });
-    };
-
-    handleOpen = (event) => {
-        this.setState({
-            open: true,
-            anchorEl: event.currentTarget
-        });
-    };
-
-    handleRequestClose = (event) => {
-        this.setState({open: false});
-    };
-
-    handleReset = (event) => {
-        this.refs.form.state.defaultData = {};
-        this.refs.form.state.fieldDefaultData = {};
-        this.refs.form.reset();
-        this.handleSubmit(event);
-    };
-
-    handleSubmit = (event) => {
-        let data = this.refs.form.getData('all');
-        this.state.formData = data;
-        this.props.fields.map((field) => {
-            let value = _.get(data, field.dataKey);
-            if (value === '' || value === undefined) {
-                delete this.tableState.filterData[field.key];
-                delete this.state.formData[field.key];
-            } else {
-                this.tableState.filterData[field.key] = (() => {
-                    switch (field.type) {
-                        case 'text':
-                        default:
-                            if (field.equal) {
-                                return value;
-                            }
-                            return {like: value}
-                    }
-                })();
-            }
-        });
-        if (this.tableState.onFilter) {
-            this.tableState.onFilter(this.tableState.filterData, this.tableState.context);
-        } else {
-            this.tableState.context.refs.body.forceUpdate();
-        }
-        this.handleRequestClose();
-        this.tableState.context.handleStateChange();
-    };
-
-    render() {
-        let Popover = App.component('popover');
-        let Form = App.component('form');
-        let Button = App.component('button');
-        return <div ref="container" style={{display: 'inline-block', position: 'relative'}}>
-            <Icon ref="filterIcon"
-                  type="button"
-                  name="filter"
-                  color={Object.keys(this.state.formData).length > 0 ? '#1890ff' : undefined}
-                  onClick={this.handleOpen}/>
-            <Popover style={{left: -10000}}
-                     open={this.state.open}
-                     anchorEl={this.state.anchorEl}
-                     onRequestClose={this.handleRequestClose}>
-                <div className="space-small" style={{width: this.props.width || 260}}>
-                    <Form
-                        ref="form"
-                        labelFixed={true}
-                        fields={this.props.fields}
-                        defaultData={this.state.formData}
-                    />
-                    <div className="text-center" style={{marginTop: 16}}>
-                        {this.props.reset ? <Button label={this.props.resetLabel} onClick={this.handleReset}
-                                                    style={{width: 100}}/> : null}
-                        {this.props.submit ?
-                            <Button label={this.props.submitLabel} onClick={this.handleSubmit} type="primary"
-                                    style={{width: 100, marginLeft: 20}}/> : null}
-                    </div>
-                </div>
-            </Popover>
-        </div>
-    }
-}

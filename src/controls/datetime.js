@@ -108,7 +108,7 @@ export default class DateTime extends Component {
 
     handleChange() {
         if (this.props.onChange) {
-            let value = (this.state.date === undefined || this.state.time === undefined) ? '' : this.state.date + ' ' + this.state.time;
+            let value = (this.state.date === undefined || this.state.time === undefined || this.state.date === null || this.state.time === null) ? '' : this.state.date + ' ' + this.state.time;
             if (value && value !== '' && this.props.timestamp) {
                 value = utils.strToTime(value);
             }
@@ -135,7 +135,11 @@ export default class DateTime extends Component {
 
     getValue() {
         if (this.state.date === undefined && this.state.time === undefined && this.props.defaultValue !== undefined) {
-            let [date, time] = this.props.defaultValue.split(' ');
+            let defaultValue = this.props.defaultValue;
+            if (this.props.timestamp) {
+                defaultValue = utils.date('Y-m-d H:i', defaultValue);
+            }
+            let [date, time] = defaultValue.split(' ');
             return {
                 date: date,
                 time: time
@@ -194,8 +198,8 @@ export default class DateTime extends Component {
      * @param event
      */
     handleClear = (event) => {
-        this.state.date = undefined;
-        this.state.time = undefined;
+        this.state.date = null;
+        this.state.time = null;
         this.forceUpdate();
         this.handleChange();
     };

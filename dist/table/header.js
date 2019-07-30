@@ -44,6 +44,14 @@ var _Checkbox = require('material-ui/Checkbox');
 
 var _Checkbox2 = _interopRequireDefault(_Checkbox);
 
+var _filter = require('./filter');
+
+var _filter2 = _interopRequireDefault(_filter);
+
+var _sort = require('./sort');
+
+var _sort2 = _interopRequireDefault(_sort);
+
 var _utils = require('../utils');
 
 var _utils2 = _interopRequireDefault(_utils);
@@ -114,6 +122,7 @@ var TableHeader = function (_Component) {
 
             var props = this.context.props;
             var state = this.context.state;
+            var filterData = state.filterData;
             var className = 'table';
             if (props.bordered) className += ' bordered';
             if (props.condensed) className += ' condensed';
@@ -143,7 +152,8 @@ var TableHeader = function (_Component) {
                                             width: props.checkboxColumnWidth,
                                             height: props.headerRowHeight
                                         } },
-                                    _react2.default.createElement(_Checkbox2.default, (0, _extends3.default)({ checked: _this3.isChecked(), onCheck: _this3.handleCheck }, props.checkboxStyle))
+                                    _react2.default.createElement(_Checkbox2.default, (0, _extends3.default)({ checked: _this3.isChecked(),
+                                        onCheck: _this3.handleCheck }, props.checkboxStyle))
                                 ) : null,
                                 rows.map(function (col, j) {
                                     var style = {};
@@ -160,7 +170,18 @@ var TableHeader = function (_Component) {
                                         { key: j, 'data-key': col.key,
                                             rowSpan: col.children && col.children.length > 0 ? 1 : state.headerColumns.length - i,
                                             colSpan: col.colSpan, style: style },
-                                        col.label,
+                                        _react2.default.createElement(
+                                            'div',
+                                            { className: 'flex middle center' },
+                                            _react2.default.createElement(
+                                                'div',
+                                                null,
+                                                col.label
+                                            ),
+                                            col.filter ? _react2.default.createElement(_filter2.default, { field: col.filter, onFilter: _this3.handleFilter(col),
+                                                value: filterData[col.key] }) : null,
+                                            col.sortable ? _react2.default.createElement(_sort2.default, { field: col, onSort: _this3.handleSort(col) }) : null
+                                        ),
                                         props.resize ? _react2.default.createElement('div', { className: 'resize',
                                             onMouseDown: _this3.handleResize(col) }) : null
                                     );
@@ -245,6 +266,39 @@ var _initialiseProps = function _initialiseProps() {
             onCheck(checked);
         }
         _this4.context.setTableState({ checked: checked });
+    };
+
+    this.handleFilter = function (col) {
+        return function (value, field) {
+            var props = _this4.context.props;
+            var filterData = _this4.context.state.filterData;
+            if (value === undefined) {
+                delete filterData[col.key];
+            } else {
+                filterData[col.key] = value;
+            }
+            if (props.onFilter) {
+                props.onFilter(filterData);
+            }
+            _this4.context.setTableState({ filterData: filterData });
+        };
+    };
+
+    this.handleSort = function (col) {
+        return function (direction) {
+            var props = _this4.context.props;
+            var sortData = {};
+            if (direction !== undefined) {
+                sortData = {
+                    field: col,
+                    direction: direction
+                };
+            }
+            if (props.onSort) {
+                props.onSort(sortData);
+            }
+            _this4.context.setTableState({ sortData: sortData });
+        };
     };
 };
 

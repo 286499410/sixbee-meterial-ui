@@ -303,10 +303,12 @@ var _initialiseProps = function _initialiseProps() {
                 { style: { position: 'relative', top: 18, width: _this4.props.events.length * 20 },
                     className: 'flex center' },
                 _this4.props.events.map(function (event) {
-                    return _react2.default.createElement(_IconButton2.default, { iconStyle: (0, _extends3.default)({ color: '#aaa', fontSize: 20 }, event.style),
+                    return _react2.default.createElement(_IconButton2.default, { iconStyle: (0, _extends3.default)({ color: '#aaa', fontSize: 20 }, event.iconStyle),
                         title: event.title,
                         iconClassName: "iconfont icon-" + event.icon,
-                        onClick: event.onClick.bind(_this4, _this4) });
+                        onClick: event.onClick.bind(_this4, _this4),
+                        style: event.style
+                    });
                 })
             ) : null
         );
