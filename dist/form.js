@@ -457,7 +457,6 @@ var _initialiseProps = function _initialiseProps() {
                 _this6.check(allData);
             }
             _this6.forceUpdate();
-            console.log('form change:', _this6.state.changedData);
         };
     };
 

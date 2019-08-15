@@ -5,12 +5,14 @@
 
 import React, {Component} from 'react';
 import Auto from './controls/auto';
-import Calendar from './controls/calendar';
+import Date2 from './controls/date2';
 import Checkbox from './controls/checkbox';
 import Date from './controls/date';
 import DateTime from './controls/datetime';
+import DateRange from './controls/date-range';
 import File from './controls/file';
 import Money from './controls/money';
+import MoneyRange from './controls/money-range';
 import Radio from './controls/radio';
 import Select from './controls/select';
 import Text from './controls/text';
@@ -35,9 +37,11 @@ export default class Control extends Component {
         money: Money,
         select: Select,
         date: Date,
+        'date-range': DateRange,
+        'money-range': MoneyRange,
         datetime: DateTime,
         time: Time,
-        calendar: Calendar,
+        date2: Date2,
         auto: Auto,
         checkbox: Checkbox,
         radio: Radio,

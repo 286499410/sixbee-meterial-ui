@@ -32,37 +32,31 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _DatePicker = require('material-ui/DatePicker');
+var _TextField = require('material-ui/TextField');
 
-var _DatePicker2 = _interopRequireDefault(_DatePicker);
+var _TextField2 = _interopRequireDefault(_TextField);
 
-var _style = require('../style');
+var _Popover = require('material-ui/Popover');
 
-var _style2 = _interopRequireDefault(_style);
-
-var _intlLocalesSupported = require('intl-locales-supported');
-
-var _intlLocalesSupported2 = _interopRequireDefault(_intlLocalesSupported);
+var _Popover2 = _interopRequireDefault(_Popover);
 
 var _IconButton = require('material-ui/IconButton');
 
 var _IconButton2 = _interopRequireDefault(_IconButton);
+
+var _reactCalendar = require('react-calendar');
+
+var _reactCalendar2 = _interopRequireDefault(_reactCalendar);
+
+var _style = require('../style');
+
+var _style2 = _interopRequireDefault(_style);
 
 var _utils = require('../utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var DateTimeFormat = void 0;
-
-if ((0, _intlLocalesSupported2.default)(['zh'])) {
-    DateTimeFormat = global.Intl.DateTimeFormat;
-} else {
-    var IntlPolyfill = require('intl');
-    DateTimeFormat = IntlPolyfill.DateTimeFormat;
-    require('intl/locale-data/jsonp/zh');
-}
 
 var Date = function (_Component) {
     (0, _inherits3.default)(Date, _Component);
@@ -73,18 +67,56 @@ var Date = function (_Component) {
         var _this = (0, _possibleConstructorReturn3.default)(this, (Date.__proto__ || (0, _getPrototypeOf2.default)(Date)).call(this, props));
 
         _this.state = {
-            value: undefined
+            anchorEl: {},
+            value: undefined,
+            open: false
         };
 
-        _this.handleChange = function (nul, date) {
-            if (!_this.props.immutable) {
-                var value = _utils2.default.dateToStr(date);
-                _this.setValue(value);
+        _this.handleTextChange = function (event) {
+            if (event.target.value === '') {
+                _this.setValue('');
+            }
+        };
+
+        _this.handleChange = function (date) {
+            var value = _utils2.default.dateToStr(date);
+            if (_this.props.onChange) {
+                _this.props.onChange(value, _this);
+            }
+            _this.setState({
+                value: value,
+                open: false
+            });
+        };
+
+        _this.handleBlur = function (event) {
+            if (_this.props.onBlur) {
+                _this.props.onBlur(event, _this);
+            }
+        };
+
+        _this.handleFocus = function (event) {
+            _this.setState({
+                open: true,
+                anchorEl: _this.refs.container
+            });
+            if (_this.props.onFocus) {
+                _this.props.onFocus(event, _this);
+            }
+        };
+
+        _this.handleKeyUp = function (event) {
+            if (_this.props.onKeyUp) {
+                _this.props.onKeyUp(event, _this);
             }
         };
 
         _this.handleClear = function (event) {
             _this.setValue('');
+        };
+
+        _this.handleRequestClose = function (event) {
+            _this.setState({ open: false });
         };
 
         _this.initData(props);
@@ -100,11 +132,7 @@ var Date = function (_Component) {
         key: 'initData',
         value: function initData(props) {
             if (props.value !== undefined) {
-                var value = props.value;
-                if (this.props.timestamp) {
-                    value = _utils2.default.date('Y-m-d', value);
-                }
-                this.state.value = value;
+                this.state.value = props.value;
             }
         }
     }, {
@@ -112,9 +140,6 @@ var Date = function (_Component) {
         value: function setValue(value) {
             this.setState({ value: value });
             if (this.props.onChange) {
-                if (value && this.props.timestamp) {
-                    value = _utils2.default.strToTime(value);
-                }
                 this.props.onChange(value, this);
             }
         }
@@ -128,43 +153,65 @@ var Date = function (_Component) {
         value: function render() {
             var value = this.getValue();
             var label = this.props.label;
-            var styleProps = _style2.default.getStyle('date', this.props);
+            var styleProps = _style2.default.getStyle('calender', this.props);
             return _react2.default.createElement(
                 'div',
-                { style: { position: 'relative' } },
-                _react2.default.createElement(_DatePicker2.default, {
-                    ref: 'picker',
+                { ref: 'container', style: { position: 'relative' } },
+                _react2.default.createElement(_TextField2.default, {
+                    ref: 'text',
                     name: this.props.name || this.props.dataKey || _utils2.default.uuid(),
                     fullWidth: this.props.fullWidth,
-                    value: _utils2.default.strToDate(value),
-                    defaultDate: _utils2.default.strToDate(value),
                     floatingLabelText: label,
-                    floatingLabelFixed: this.props.labelFixed,
-                    onChange: this.handleChange,
-                    autoOk: this.props.autoOk,
-                    DateTimeFormat: DateTimeFormat,
-                    locale: 'zh',
+                    type: 'text',
+                    value: value,
                     disabled: this.props.disabled,
-                    cancelLabel: this.props.cancelLabel,
-                    okLabel: this.props.okLabel,
-                    minDate: this.props.minDate ? _utils2.default.strToDate(this.props.minDate) : null,
-                    maxDate: this.props.maxDate ? _utils2.default.strToDate(this.props.maxDate) : null,
-                    formatDate: _utils2.default.dateToStr,
-                    textFieldStyle: (0, _extends3.default)({}, styleProps.style, { cursor: 'pointer' }),
+                    onChange: this.handleTextChange,
+                    onBlur: this.handleBlur,
+                    onFocus: this.handleFocus,
+                    onKeyUp: this.handleKeyUp,
+                    multiLine: this.props.multiLine,
+                    rows: this.props.rows,
+                    hintText: this.props.hintText,
+                    errorText: this.props.errorText,
+                    floatingLabelFixed: this.props.labelFixed,
+                    underlineShow: this.props.borderShow,
+                    autoComplete: 'off',
+                    textareaStyle: styleProps.textareaStyle,
                     floatingLabelStyle: styleProps.floatingLabelStyle,
                     floatingLabelFocusStyle: styleProps.floatingLabelFocusStyle,
                     floatingLabelShrinkStyle: styleProps.floatingLabelShrinkStyle,
                     errorStyle: styleProps.errorStyle,
                     hintStyle: styleProps.hintStyle,
-                    underlineShow: this.props.borderShow,
                     underlineStyle: styleProps.underlineStyle,
                     inputStyle: styleProps.inputStyle,
-                    container: this.props.container,
-                    errorText: this.props.errorText
+                    style: styleProps.style
                 }),
-                value && this.props.hasClear && !this.props.disabled ? _react2.default.createElement(_IconButton2.default, { iconClassName: 'iconfont icon-close-circle-fill', onClick: this.handleClear,
+                value !== undefined && value !== null && value !== '' && this.props.hasClear && !this.props.disabled && !this.props.immutable ? _react2.default.createElement(_IconButton2.default, { iconClassName: 'iconfont icon-close-circle-fill', onClick: this.handleClear,
                     style: (0, _extends3.default)({ position: 'absolute', right: 0 }, styleProps.iconStyle.style),
-                    iconStyle: (0, _extends3.default)({ color: '#e0e0e0' }, styleProps.iconStyle.iconStyle) }) : null
+                    iconStyle: (0, _extends3.default)({ color: '#e0e0e0' }, styleProps.iconStyle.iconStyle)
+
+                }) : null,
+                _react2.default.createElement(
+                    _Popover2.default,
+                    {
+                        ref: 'popover',
+                        style: styleProps.popoverStyle,
+                        open: this.state.open,
+                        anchorEl: this.state.anchorEl,
+                        onRequestClose: this.handleRequestClose
+                    },
+                    _react2.default.createElement(
+                        'div',
+                        null,
+                        _react2.default.createElement(_reactCalendar2.default, {
+                            onChange: this.handleChange,
+                            value: _utils2.default.strToDate(value),
+                            activeStartDate: this.props.activeStartDate ? _utils2.default.strToDate(this.props.activeStartDate) : null,
+                            minDate: this.props.minDate ? _utils2.default.strToDate(this.props.minDate) : null,
+                            maxDate: this.props.maxDate ? _utils2.default.strToDate(this.props.maxDate) : null
+                        })
+                    )
+                )
             );
         }
     }]);
@@ -172,11 +219,6 @@ var Date = function (_Component) {
 }(_react.Component);
 
 Date.defaultProps = {
-    autoOk: true,
-    okLabel: "确认",
-    cancelLabel: "取消",
-    timestamp: false,
-    container: "dialog",
     label: undefined,
     borderShow: true,
     hasClear: true,

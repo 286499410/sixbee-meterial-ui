@@ -192,7 +192,6 @@ export default class Form extends Component {
             this.check(allData);
         }
         this.forceUpdate();
-        console.log('form change:', this.state.changedData);
     };
 
     /**

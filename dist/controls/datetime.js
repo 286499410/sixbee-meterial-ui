@@ -64,6 +64,14 @@ var _style = require('../style');
 
 var _style2 = _interopRequireDefault(_style);
 
+var _date = require('./date');
+
+var _date2 = _interopRequireDefault(_date);
+
+var _time = require('./time');
+
+var _time2 = _interopRequireDefault(_time);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var DateTimeFormat = void 0;
@@ -285,6 +293,12 @@ var DateTime = function (_Component) {
                 _react2.default.createElement(
                     'div',
                     { style: { display: 'none' } },
+                    _react2.default.createElement(_date2.default, {
+                        value: _utils2.default.strToTime(date),
+                        minDate: this.props.minDate || null,
+                        maxDate: this.props.maxDate || null
+                    }),
+                    _react2.default.createElement(_time2.default, null),
                     _react2.default.createElement(_DatePicker2.default, {
                         name: 'date',
                         ref: 'date',

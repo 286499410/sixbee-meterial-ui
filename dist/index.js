@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.getMuiTheme = exports.MuiThemeProvider = exports.utils = exports.RefreshIndicator = exports.MaterialMenuItem = exports.MaterialMenu = exports.MaterialList = exports.Popover = exports.LinearProgress = exports.Stepper = exports.Scrollbars = exports.Tabs = exports.Nav = exports.Button = exports.List = exports.DropDown = exports.Toolbar = exports.Dialog = exports.Layout = exports.Drawer = exports.Badge = exports.Avatar = exports.Paper = exports.Detail = exports.SvgIcon = exports.Icon = exports.TableHeader = exports.Table = exports.Form = exports.Editor = exports.Calendar = exports.Control = exports.Image = exports.FormTable = exports.Time = exports.Text = exports.SelectTag = exports.Select = exports.Radio = exports.Money = exports.File = exports.DateTime = exports.Date = exports.Checkbox = exports.Auto = exports.Alert = undefined;
+exports.getMuiTheme = exports.MuiThemeProvider = exports.utils = exports.RefreshIndicator = exports.MaterialMenuItem = exports.MaterialMenu = exports.MaterialList = exports.Popover = exports.LinearProgress = exports.Stepper = exports.Scrollbars = exports.Tabs = exports.Nav = exports.Button = exports.List = exports.DropDown = exports.Toolbar = exports.Dialog = exports.Layout = exports.Drawer = exports.Badge = exports.Avatar = exports.Paper = exports.Detail = exports.SvgIcon = exports.Icon = exports.TableHeader = exports.Table = exports.Form = exports.Editor = exports.Control = exports.Image = exports.FormTable = exports.Time = exports.Text = exports.SelectTag = exports.Select = exports.Radio = exports.MoneyRange = exports.Money = exports.File = exports.DateRange = exports.DateTime = exports.Date = exports.Checkbox = exports.Auto = exports.Alert = undefined;
 
 var _auto = require('./controls/auto');
 
@@ -17,6 +17,10 @@ var _date = require('./controls/date');
 
 var _date2 = _interopRequireDefault(_date);
 
+var _dateRange = require('./controls/date-range');
+
+var _dateRange2 = _interopRequireDefault(_dateRange);
+
 var _datetime = require('./controls/datetime');
 
 var _datetime2 = _interopRequireDefault(_datetime);
@@ -28,6 +32,10 @@ var _file2 = _interopRequireDefault(_file);
 var _money = require('./controls/money');
 
 var _money2 = _interopRequireDefault(_money);
+
+var _moneyRange = require('./controls/money-range');
+
+var _moneyRange2 = _interopRequireDefault(_moneyRange);
 
 var _radio = require('./controls/radio');
 
@@ -56,10 +64,6 @@ var _formTable2 = _interopRequireDefault(_formTable);
 var _control = require('./control');
 
 var _control2 = _interopRequireDefault(_control);
-
-var _calendar = require('./controls/calendar');
-
-var _calendar2 = _interopRequireDefault(_calendar);
 
 var _form = require('./form');
 
@@ -194,8 +198,10 @@ exports.Auto = _auto2.default;
 exports.Checkbox = _checkbox2.default;
 exports.Date = _date2.default;
 exports.DateTime = _datetime2.default;
+exports.DateRange = _dateRange2.default;
 exports.File = _file2.default;
 exports.Money = _money2.default;
+exports.MoneyRange = _moneyRange2.default;
 exports.Radio = _radio2.default;
 exports.Select = _select2.default;
 exports.SelectTag = _selectTag2.default;
@@ -204,7 +210,6 @@ exports.Time = _time2.default;
 exports.FormTable = _formTable2.default;
 exports.Image = _image2.default;
 exports.Control = _control2.default;
-exports.Calendar = _calendar2.default;
 exports.Editor = _editor2.default;
 exports.Form = _form2.default;
 exports.Table = _table2.default;

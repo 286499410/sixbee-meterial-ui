@@ -10,6 +10,8 @@ import Text from './text';
 import areIntlLocalesSupported from 'intl-locales-supported';
 import utils from '../utils';
 import style from "../style";
+import Date from './date';
+import Time from './time';
 
 let DateTimeFormat;
 
@@ -231,6 +233,14 @@ export default class DateTime extends Component {
                         /> : null
                 }
                 <div style={{display: 'none'}}>
+                    <Date
+                        value={utils.strToTime(date)}
+                        minDate={this.props.minDate || null}
+                        maxDate={this.props.maxDate || null}
+                    />
+                    <Time
+
+                    />
                     <DatePicker
                         name="date"
                         ref="date"

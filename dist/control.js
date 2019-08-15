@@ -36,21 +36,25 @@ var _auto = require('./controls/auto');
 
 var _auto2 = _interopRequireDefault(_auto);
 
-var _calendar = require('./controls/calendar');
+var _date = require('./controls/date2');
 
-var _calendar2 = _interopRequireDefault(_calendar);
+var _date2 = _interopRequireDefault(_date);
 
 var _checkbox = require('./controls/checkbox');
 
 var _checkbox2 = _interopRequireDefault(_checkbox);
 
-var _date = require('./controls/date');
+var _date3 = require('./controls/date');
 
-var _date2 = _interopRequireDefault(_date);
+var _date4 = _interopRequireDefault(_date3);
 
 var _datetime = require('./controls/datetime');
 
 var _datetime2 = _interopRequireDefault(_datetime);
+
+var _dateRange = require('./controls/date-range');
+
+var _dateRange2 = _interopRequireDefault(_dateRange);
 
 var _file = require('./controls/file');
 
@@ -59,6 +63,10 @@ var _file2 = _interopRequireDefault(_file);
 var _money = require('./controls/money');
 
 var _money2 = _interopRequireDefault(_money);
+
+var _moneyRange = require('./controls/money-range');
+
+var _moneyRange2 = _interopRequireDefault(_moneyRange);
 
 var _radio = require('./controls/radio');
 
@@ -106,10 +114,12 @@ var Control = function (_Component) {
             textarea: _text2.default,
             money: _money2.default,
             select: _select2.default,
-            date: _date2.default,
+            date: _date4.default,
+            'date-range': _dateRange2.default,
+            'money-range': _moneyRange2.default,
             datetime: _datetime2.default,
             time: _time2.default,
-            calendar: _calendar2.default,
+            date2: _date2.default,
             auto: _auto2.default,
             checkbox: _checkbox2.default,
             radio: _radio2.default,

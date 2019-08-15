@@ -1,9 +1,11 @@
 import Auto from './controls/auto';
 import Checkbox from './controls/checkbox';
 import Date from './controls/date';
+import DateRange from './controls/date-range';
 import DateTime from './controls/datetime';
 import File from './controls/file';
 import Money from './controls/money';
+import MoneyRange from './controls/money-range';
 import Radio from './controls/radio';
 import Select from './controls/select';
 import SelectTag from './controls/select-tag';
@@ -11,7 +13,6 @@ import Text from './controls/text';
 import Time from './controls/time';
 import FormTable from './controls/form-table';
 import Control from './control';
-import Calendar from './controls/calendar';
 import Form from './form';
 import Table from './table';
 import TableHeader from './table/header';
@@ -51,8 +52,10 @@ export {
     Checkbox,
     Date,
     DateTime,
+    DateRange,
     File,
     Money,
+    MoneyRange,
     Radio,
     Select,
     SelectTag,
@@ -61,7 +64,6 @@ export {
     FormTable,
     Image,
     Control,
-    Calendar,
     Editor,
     Form,
     Table,
