@@ -3,28 +3,12 @@
  */
 
 import React, {Component} from 'react';
-import DatePicker from 'material-ui/DatePicker';
-import TimePicker from 'material-ui/TimePicker';
 import IconButton from 'material-ui/IconButton';
-import Text from './text';
-import areIntlLocalesSupported from 'intl-locales-supported';
 import utils from '../utils';
 import style from "../style";
 import Date from './date';
 import Time from './time';
-
-let DateTimeFormat;
-
-/**
- * Use the native Intl.DateTimeFormat if available, or a polyfill if not.
- */
-if (areIntlLocalesSupported(['zh'])) {
-    DateTimeFormat = global.Intl.DateTimeFormat;
-} else {
-    const IntlPolyfill = require('intl');
-    DateTimeFormat = IntlPolyfill.DateTimeFormat;
-    require('intl/locale-data/jsonp/zh');
-}
+import Text from './text';
 
 export default class DateTime extends Component {
 
@@ -49,44 +33,14 @@ export default class DateTime extends Component {
         activeStartDate: undefined, //开始日期
         minDate: undefined,         //最小日期
         maxDate: undefined,         //最大日期
-    };
-
-    dateClickDiv = {
-        small: {
-            top: 20,
-            width: 70
-        },
-        default: {
-            top: 20,
-            width: 80
-        },
-        large: {
-            top: 30,
-            width: 90
-        }
-    };
-    timeClickDiv = {
-        small: {
-            top: 20,
-            left: 74,
-            width: 32
-        },
-        default: {
-            top: 20,
-            left: 83,
-            width: 38
-        },
-        large: {
-            top: 30,
-            left: 95,
-            width: 40
-        }
+        defaultDate: undefined,     //默认日期
+        defaultTime: undefined,     //默认时间
+        minuteStep: 15,             //时间增量
     };
 
     state = {
         date: undefined,
-        time: undefined,
-        clickType: 'datetime'
+        time: undefined
     };
 
     constructor(props) {
@@ -99,24 +53,33 @@ export default class DateTime extends Component {
     }
 
     initData(props) {
-        if (props.value !== undefined && props.value !== '' && props.value !== null) {
+        if (!this.isEmpty(props.value)) {
             let value = props.value;
             if (this.props.timestamp) {
                 value = utils.date('Y-m-d H:i', value);
             }
             [this.state.date, this.state.time] = value.split(' ');
+        } else if ((props.value === '' || props.value === null) && !this.isEmpty(this.state.date) && !this.isEmpty(this.state.time)) {
+            this.state.date = null;
+            this.state.time = null;
         }
     }
 
-    handleChange() {
-        if (this.props.onChange) {
-            let value = (this.state.date === undefined || this.state.time === undefined || this.state.date === null || this.state.time === null) ? '' : this.state.date + ' ' + this.state.time;
-            if (value && value !== '' && this.props.timestamp) {
-                value = utils.strToTime(value);
-            }
-            this.props.onChange(value, this);
+    handleChange = (type) => (value) => {
+        switch (type) {
+            case 'date':
+                this.state.date = value;
+                break;
+            case 'time':
+                this.state.time = value;
+                break;
         }
-    }
+        let {date, time} = this.getValue();
+        if (type === 'date' && this.isEmpty(time)) {
+            this.refs.time.focus();
+        }
+        this.setValue((date || '') + ' ' + (time || ''));
+    };
 
     setDate(date) {
         this.state.date = date;
@@ -131,8 +94,27 @@ export default class DateTime extends Component {
     }
 
     setValue(value) {
-        [this.state.date, this.state.time] = value.split(' ');
-        this.handleChange();
+        if (this.isEmpty(value)) {
+            this.state.date = null;
+            this.state.time = null;
+        } else {
+            [this.state.date, this.state.time] = value.split(' ');
+        }
+        this.forceUpdate();
+        if (this.props.onChange) {
+            let value = (
+                this.isEmpty(this.state.date) ||
+                this.isEmpty(this.state.time)
+            ) ? '' : this.state.date + ' ' + this.state.time;
+            if (value && value !== '' && this.props.timestamp) {
+                value = utils.strToTime(value);
+            }
+            this.props.onChange(value, this);
+        }
+    }
+
+    isEmpty(value) {
+        return value === undefined || value === null || value === '';
     }
 
     getValue() {
@@ -143,129 +125,85 @@ export default class DateTime extends Component {
             }
             let [date, time] = defaultValue.split(' ');
             return {
-                date: date,
-                time: time
+                date: date !== undefined ? date : this.props.defaultDate,
+                time: time !== undefined ? time : this.props.defaultTime
             }
         } else {
             return {
-                date: this.state.date,
-                time: this.state.time
+                date: this.state.date !== undefined ? this.state.date : this.props.defaultDate,
+                time: this.state.time !== undefined ? this.state.time : this.props.defaultTime
             };
         }
     }
-
-    /**
-     * 选择日期触发
-     * @param nul
-     * @param date
-     */
-    handleDataChange = (nul, date) => {
-        let value = utils.dateToStr(date);
-        this.setDate(value);
-        this.refs.time.focus();
-    };
-
-    /**
-     * 选择时间触发
-     * @param nul
-     * @param date
-     */
-    handleTimeChange = (nul, date) => {
-        let value = utils.dateToTimeStr(date);
-        this.setTime(value);
-    };
-
-    handleClick = (type) => (event) => {
-        event.stopPropagation();
-        let value = this.getValue();
-        if (value.date === undefined && value.time === undefined) {
-            type = 'datetime';
-        }
-        this.state.clickType = type;
-        switch (type) {
-            case 'datetime':
-                this.refs.date.focus();
-                break;
-            case 'date':
-                this.refs.date.focus();
-                break;
-            case 'time':
-                this.refs.time.focus();
-                break;
-        }
-    };
 
     /**
      * 清除
      * @param event
      */
     handleClear = (event) => {
-        this.state.date = null;
-        this.state.time = null;
-        this.forceUpdate();
-        this.handleChange();
+        this.setValue(null);
     };
 
     render() {
         let {date, time} = this.getValue();
-        let value = (date || '--/--/--') + ' ' + (time || '--:--');
-        let clickDivStyle = {position: 'absolute', top: 30, bottom: 0, left: 0, width: 75, cursor: 'pointer'};
-        let size = this.props.size || 'default';
         let styleProps = style.getStyle('date', this.props);
+        let label = this.props.label;
         return (
             <div style={{position: 'relative'}}>
-                <Text {...this.props} value={value} name={this.props.name || this.props.dataKey || utils.uuid()}/>
-                <div style={{position: 'absolute', top: 0, bottom: 0, left: 0, right: 0}}
-                     onClick={this.handleClick('datetime')}>
-                    <div>
-                        <div style={{...clickDivStyle, ...this.dateClickDiv[size]}}
-                             onClick={this.handleClick('date')}></div>
-                        <div style={{...clickDivStyle, ...this.timeClickDiv[size]}}
-                             onClick={this.handleClick('time')}></div>
+                {
+                    label === false ? null : <div>
+                        <span style={{
+                            transform: "scale(0.75)",
+                            transformOrigin: 'left top 0px',
+                            color: 'rgba(0,0,0,0.3)',
+                            fontSize: 15,
+                            display: 'inline-block',
+                            position: 'relative',
+                            top: 12
+                        }}>{label}</span>
+                    </div>
+                }
+                <div className="flex">
+                    <div style={{width: 100}}>
+                        <Date
+                            ref="date"
+                            hintText="日期"
+                            value={date || ''}
+                            minDate={this.props.minDate || null}
+                            maxDate={this.props.maxDate || null}
+                            hasClear={false}
+                            onChange={this.handleChange('date')}
+                            errorText={this.props.errorText}
+                        />
+                    </div>
+                    <div style={{width: 80}}>
+                        <Time
+                            ref="time"
+                            hintText="时间"
+                            value={time || ''}
+                            hasClear={false}
+                            errorText={this.props.errorText ? ' ' : undefined}
+                            onChange={this.handleChange('time')}
+                            minuteStep={this.props.minuteStep}
+                        />
+                    </div>
+                    <div className="relative" style={{flexGrow: 1}}>
+                        <Text
+                            errorText={this.props.errorText ? ' ' : undefined}
+                        />
+                        <div className="full-screen" onClick={() => {
+                            this.refs.date.focus();
+                        }}></div>
                     </div>
                 </div>
                 {
-                    (date !== undefined || time !== undefined) && this.props.hasClear && !this.props.disabled && !this.props.immutable ?
+                    (!this.isEmpty(date) || !this.isEmpty(time)) && this.props.hasClear && !this.props.disabled && !this.props.immutable ?
                         <IconButton iconClassName="iconfont icon-close-circle-fill" onClick={this.handleClear}
                                     style={{position: 'absolute', right: 0, ...styleProps.iconStyle.style}}
                                     iconStyle={{color: '#e0e0e0', ...styleProps.iconStyle.iconStyle}}
 
                         /> : null
                 }
-                <div style={{display: 'none'}}>
-                    <Date
-                        value={utils.strToTime(date)}
-                        minDate={this.props.minDate || null}
-                        maxDate={this.props.maxDate || null}
-                    />
-                    <Time
-
-                    />
-                    <DatePicker
-                        name="date"
-                        ref="date"
-                        defaultDate={utils.strToDate(date)}
-                        onChange={this.handleDataChange}
-                        autoOk={this.props.autoOk == false ? false : true}
-                        DateTimeFormat={DateTimeFormat}
-                        locale="zh"
-                        cancelLabel="取消"
-                        okLabel="确定"
-                        minDate={this.props.minDate || null}
-                        maxDate={this.props.maxDate || null}
-                    />
-                    <TimePicker
-                        name="time"
-                        ref="time"
-                        defaultTime={utils.strToDate(time ? `1970-01-01 ${time}` : undefined)}
-                        format="24hr"
-                        onChange={this.handleTimeChange}
-                        autoOk={this.props.autoOk == false ? false : true}
-                        minutesStep={this.props.minutesStep || 5}
-                        cancelLabel="取消"
-                        okLabel="确定"
-                    />
-                </div>
             </div>
         )
     }

@@ -145,6 +145,10 @@ export default class Date extends Component {
         this.setState({open: false});
     };
 
+    focus = () => {
+        this.refs.text.focus();
+    };
+
     render() {
         let value = this.getValue();
         let label = this.props.label;

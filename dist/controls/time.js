@@ -4,10 +4,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -32,17 +28,13 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _TimePicker = require('material-ui/TimePicker');
+var _Popover = require('material-ui/Popover');
 
-var _TimePicker2 = _interopRequireDefault(_TimePicker);
+var _Popover2 = _interopRequireDefault(_Popover);
 
-var _IconButton = require('material-ui/IconButton');
+var _text = require('./text');
 
-var _IconButton2 = _interopRequireDefault(_IconButton);
-
-var _lodash = require('lodash');
-
-var _lodash2 = _interopRequireDefault(_lodash);
+var _text2 = _interopRequireDefault(_text);
 
 var _style = require('../style');
 
@@ -51,6 +43,12 @@ var _style2 = _interopRequireDefault(_style);
 var _utils = require('../utils');
 
 var _utils2 = _interopRequireDefault(_utils);
+
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _reactCustomScrollbars = require('react-custom-scrollbars');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -64,27 +62,62 @@ var Time = function (_Component) {
 
         _this.state = {
             value: undefined,
-            date: undefined
+            open: false,
+            popoverWidth: 100
         };
 
-        _this.handleChange = function (event, date) {
-            var value = _utils2.default.dateToTimeStr(date);
-            _this.setValue(value);
+        _this.handleChange = function (type, value) {
+            return function (event) {
+                var hour = _this.getHour();
+                var minute = _this.getMinute();
+                switch (type) {
+                    case 'hour':
+                        _this.refs.hour.scrollTop(_this.refs.hour.getScrollTop() + (0, _jquery2.default)(_this.refs['hour' + value]).position().top);
+                        hour = value;
+                        break;
+                    case 'minute':
+                        _this.refs.minute.scrollTop(_this.refs.minute.getScrollTop() + (0, _jquery2.default)(_this.refs['minute' + value]).position().top);
+                        minute = value;
+                        break;
+                }
+                _this.setValue(hour + ':' + minute);
+            };
         };
 
-        _this.toTime = function (str) {
-            if (str === undefined || str === '') {
-                return undefined;
-            } else if (_lodash2.default.isDate(str)) {
-                return str;
-            } else {
-                str = '1970/01/01 ' + str;
-                return new Date(str);
+        _this.handleFocus = function (event) {
+            _this.setState({
+                open: true,
+                anchorEl: _this.refs.container,
+                width: (0, _jquery2.default)(_this.refs.container).width()
+            });
+            setTimeout(function () {
+                var hour = _this.getHour();
+                var minute = _this.getMinute();
+                _this.refs.hour.scrollTop(_this.refs.hour.getScrollTop() + (0, _jquery2.default)(_this.refs['hour' + hour]).position().top);
+                _this.refs.minute.scrollTop(_this.refs.minute.getScrollTop() + (0, _jquery2.default)(_this.refs['minute' + minute]).position().top);
+            }, 50);
+            if (_this.props.onFocus) {
+                _this.props.onFocus(event, _this);
             }
+        };
+
+        _this.handleBlur = function (event) {
+            var value = event.target.value;
+            if (_this.state.value !== value) {
+                _this.setValue(value);
+            }
+        };
+
+        _this.handleRequestClose = function (event) {
+            _this.setState({ open: false });
         };
 
         _this.handleClear = function (event) {
             _this.setValue('');
+        };
+
+        _this.focus = function () {
+            _this.refs.text.focus();
         };
 
         _this.initData(props);
@@ -99,17 +132,47 @@ var Time = function (_Component) {
     }, {
         key: 'initData',
         value: function initData(props) {
-            if (props.value !== undefined) {
-                this.state.value = props.value;
-                if (this.props.onChange) {
-                    this.props.onChange(value, this);
-                }
+            this.state.value = props.value;
+        }
+    }, {
+        key: 'getHours',
+        value: function getHours() {
+            var hours = [];
+            for (var i = 0; i < 24; i++) {
+                hours.push(i.toString().padStart(2, '0'));
             }
+            return hours;
+        }
+    }, {
+        key: 'getMinutes',
+        value: function getMinutes() {
+            var minutes = [];
+            for (var i = 0; i < 60; i += this.props.minuteStep) {
+                minutes.push(i.toString().padStart(2, '0'));
+            }
+            return minutes;
+        }
+    }, {
+        key: 'getHour',
+        value: function getHour() {
+            var value = this.state.value || '';
+            return value.split(':')[0] || this.props.defaultHour;
+        }
+    }, {
+        key: 'getMinute',
+        value: function getMinute() {
+            var value = this.state.value || '';
+            return value.split(':')[1] || this.props.defaultMinute;
         }
     }, {
         key: 'setValue',
         value: function setValue(value) {
-            this.setState({ value: value });
+            if (value !== undefined && value !== '' && /^[0-5]\d:[0-5]\d$/.test(value)) {
+                this.setState({ value: value });
+                if (this.props.onChange) {
+                    this.props.onChange(value);
+                }
+            }
         }
     }, {
         key: 'getValue',
@@ -119,37 +182,91 @@ var Time = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            var value = this.getValue();
+            var _this2 = this;
+
             var label = this.props.label;
-            var styleProps = _style2.default.getStyle('date', this.props);
+            var styleProps = _style2.default.getStyle('text', this.props);
+            var currentHour = this.getHour();
+            var currentMinute = this.getMinute();
+            var value = this.getValue();
             return _react2.default.createElement(
                 'div',
-                { style: { position: 'relative' } },
-                _react2.default.createElement(_TimePicker2.default, {
+                { ref: 'container', style: { position: 'relative' } },
+                _react2.default.createElement(_text2.default, {
+                    ref: 'text',
                     name: this.props.name || this.props.dataKey || _utils2.default.uuid(),
                     fullWidth: this.props.fullWidth,
-                    value: this.toTime(value),
+                    value: value,
                     floatingLabelText: label,
                     floatingLabelFixed: this.props.labelFixed,
                     onChange: this.handleChange,
-                    autoOk: this.props.autoOk,
                     disabled: this.props.disabled,
-                    format: this.props.format,
-                    minutesStep: this.props.minutesStep,
-                    cancelLabel: this.props.cancelLabel,
-                    okLabel: this.props.okLabel,
-                    textFieldStyle: (0, _extends3.default)({}, styleProps.style, { cursor: 'pointer' }),
                     floatingLabelStyle: styleProps.floatingLabelStyle,
                     floatingLabelFocusStyle: styleProps.floatingLabelFocusStyle,
                     floatingLabelShrinkStyle: styleProps.floatingLabelShrinkStyle,
                     errorStyle: styleProps.errorStyle,
                     hintStyle: styleProps.hintStyle,
                     underlineStyle: styleProps.underlineStyle,
-                    inputStyle: styleProps.inputStyle
+                    inputStyle: styleProps.inputStyle,
+                    hintText: this.props.hintText,
+                    onFocus: this.handleFocus,
+                    onBlur: this.handleBlur,
+                    errorText: this.props.errorText
                 }),
-                value && this.props.hasClear && !this.props.disabled ? _react2.default.createElement(_IconButton2.default, { iconClassName: 'iconfont icon-close-circle-fill', onClick: this.handleClear,
-                    style: (0, _extends3.default)({ position: 'absolute', right: 0 }, styleProps.iconStyle.style),
-                    iconStyle: (0, _extends3.default)({ color: '#e0e0e0' }, styleProps.iconStyle.iconStyle) }) : null
+                _react2.default.createElement(
+                    _Popover2.default,
+                    {
+                        ref: 'popover',
+                        style: styleProps.popoverStyle,
+                        open: this.state.open,
+                        anchorEl: this.state.anchorEl,
+                        onRequestClose: this.handleRequestClose
+                    },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'flex', style: { width: this.state.popoverWidth } },
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'relative', style: { maxHeight: 210, height: 210, width: 'calc(50% + 1px)', borderRight: '1px solid #e5e5e5' } },
+                            _react2.default.createElement(
+                                _reactCustomScrollbars.Scrollbars,
+                                { ref: 'hour', autoHide: true },
+                                this.getHours().map(function (hour) {
+                                    var selected = currentHour == hour;
+                                    return _react2.default.createElement(
+                                        'div',
+                                        { key: hour,
+                                            ref: 'hour' + hour,
+                                            className: "space-small text-center hover-bg cursor-pointer" + (selected ? " bg-gray" : ""),
+                                            onClick: _this2.handleChange('hour', hour) },
+                                        hour
+                                    );
+                                }),
+                                _react2.default.createElement('div', { style: { height: 210 - 35 } })
+                            )
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'relative', style: { maxHeight: 210, height: 210, width: '50%' } },
+                            _react2.default.createElement(
+                                _reactCustomScrollbars.Scrollbars,
+                                { ref: 'minute', autoHide: true },
+                                this.getMinutes().map(function (minute) {
+                                    var selected = currentMinute == minute;
+                                    return _react2.default.createElement(
+                                        'div',
+                                        { key: minute,
+                                            ref: 'minute' + minute,
+                                            className: "space-small text-center hover-bg cursor-pointer" + (selected ? " bg-gray" : ""),
+                                            onClick: _this2.handleChange('minute', minute) },
+                                        minute
+                                    );
+                                }),
+                                _react2.default.createElement('div', { style: { height: 210 - 35 } })
+                            )
+                        )
+                    )
+                )
             );
         }
     }]);
@@ -158,8 +275,6 @@ var Time = function (_Component) {
 
 Time.defaultProps = {
     autoOk: true,
-    okLabel: "确认",
-    cancelLabel: "取消",
     format: "24hr",
     minutesStep: 5,
     label: undefined,
@@ -168,13 +283,11 @@ Time.defaultProps = {
     disabled: false,
     immutable: false,
     fullWidth: true,
-    multiLine: false,
-    rows: 1,
     labelFixed: false,
     hintText: undefined,
     errorText: undefined,
     defaultValue: undefined,
-    activeStartDate: undefined,
-    minDate: undefined,
-    maxDate: undefined };
+    defaultHour: '12',
+    defaultMinute: '00',
+    minuteStep: 15 };
 exports.default = Time;

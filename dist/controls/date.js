@@ -119,6 +119,10 @@ var Date = function (_Component) {
             _this.setState({ open: false });
         };
 
+        _this.focus = function () {
+            _this.refs.text.focus();
+        };
+
         _this.initData(props);
         return _this;
     }

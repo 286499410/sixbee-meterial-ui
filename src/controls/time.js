@@ -3,18 +3,17 @@
  */
 
 import React, {Component} from 'react';
-import TimePicker from 'material-ui/TimePicker';
-import IconButton from 'material-ui/IconButton';
-import _ from 'lodash';
+import Popover from 'material-ui/Popover';
+import Text from './text';
 import style from '../style';
 import utils from '../utils';
+import $ from 'jquery';
+import {Scrollbars} from 'react-custom-scrollbars';
 
 export default class Time extends Component {
 
     static defaultProps = {
         autoOk: true,               //选择日期后是否自动关闭日历
-        okLabel: "确认",
-        cancelLabel: "取消",
         format: "24hr",             //时间格式
         minutesStep: 5,             //最小分钟间隔
         label: undefined,           //标签
@@ -23,20 +22,19 @@ export default class Time extends Component {
         disabled: false,            //是否禁止输入
         immutable: false,           //是否不可更改
         fullWidth: true,            //宽度100%
-        multiLine: false,           //是否多行显示
-        rows: 1,                    //行数
         labelFixed: false,          //是否固定标签
         hintText: undefined,        //输入提示
         errorText: undefined,       //错误提示
         defaultValue: undefined,    //默认值
-        activeStartDate: undefined, //开始日期
-        minDate: undefined,         //最小日期
-        maxDate: undefined,         //最大日期
+        defaultHour: '12',
+        defaultMinute: '00',
+        minuteStep: 15,             //分钟增量
     };
 
     state = {
         value: undefined,
-        date: undefined
+        open: false,
+        popoverWidth: 100
     };
 
     constructor(props) {
@@ -49,12 +47,33 @@ export default class Time extends Component {
     }
 
     initData(props) {
-        if (props.value !== undefined) {
-            this.state.value = props.value;
-            if (this.props.onChange) {
-                this.props.onChange(value, this);
-            }
+        this.state.value = props.value;
+    }
+
+    getHours() {
+        let hours = [];
+        for (let i = 0; i < 24; i++) {
+            hours.push(i.toString().padStart(2, '0'));
         }
+        return hours;
+    }
+
+    getMinutes() {
+        let minutes = [];
+        for (let i = 0; i < 60; i+= this.props.minuteStep) {
+            minutes.push(i.toString().padStart(2, '0'));
+        }
+        return minutes;
+    }
+
+    getHour() {
+        let value = this.state.value || '';
+        return value.split(':')[0] || this.props.defaultHour;
+    }
+
+    getMinute() {
+        let value = this.state.value || '';
+        return value.split(':')[1] || this.props.defaultMinute;
     }
 
     /**
@@ -62,7 +81,12 @@ export default class Time extends Component {
      * @param value
      */
     setValue(value) {
-        this.setState({value: value});
+        if (value !== undefined && value !== '' && /^[0-5]\d:[0-5]\d$/.test(value)) {
+            this.setState({value: value});
+            if (this.props.onChange) {
+                this.props.onChange(value);
+            }
+        }
     }
 
     /**
@@ -78,20 +102,52 @@ export default class Time extends Component {
      * @param event
      * @param date
      */
-    handleChange = (event, date) => {
-        let value = utils.dateToTimeStr(date);
-        this.setValue(value);
+    handleChange = (type, value) => (event) => {
+        let hour = this.getHour();
+        let minute = this.getMinute();
+        switch (type) {
+            case 'hour':
+                this.refs.hour.scrollTop(this.refs.hour.getScrollTop() + $(this.refs['hour' + value]).position().top);
+                hour = value;
+                break;
+            case 'minute':
+                this.refs.minute.scrollTop(this.refs.minute.getScrollTop() + $(this.refs['minute' + value]).position().top);
+                minute = value;
+                break;
+        }
+        this.setValue(hour + ':' + minute);
     };
 
-    toTime = (str) => {
-        if (str === undefined || str === '') {
-            return undefined;
-        } else if (_.isDate(str)) {
-            return str;
-        } else {
-            str = '1970/01/01 ' + str;
-            return new Date(str);
+    handleFocus = (event) => {
+        this.setState({
+            open: true,
+            anchorEl: this.refs.container,
+            width: $(this.refs.container).width()
+        });
+        setTimeout(() => {
+            let hour = this.getHour();
+            let minute = this.getMinute();
+            this.refs.hour.scrollTop(this.refs.hour.getScrollTop() + $(this.refs['hour' + hour]).position().top);
+            this.refs.minute.scrollTop(this.refs.minute.getScrollTop() + $(this.refs['minute' + minute]).position().top);
+        }, 50);
+        if (this.props.onFocus) {
+            this.props.onFocus(event, this);
         }
+    };
+
+    handleBlur = (event) => {
+        let value = event.target.value;
+        if(this.state.value !== value) {
+            this.setValue(value);
+        }
+    };
+
+    /**
+     * 关闭时间控件
+     * @param event
+     */
+    handleRequestClose = (event) => {
+        this.setState({open: false});
     };
 
     /**
@@ -102,26 +158,27 @@ export default class Time extends Component {
         this.setValue('');
     };
 
+    focus = () => {
+        this.refs.text.focus();
+    };
+
     render() {
-        let value = this.getValue();
         let label = this.props.label;
-        let styleProps = style.getStyle('date', this.props);
+        let styleProps = style.getStyle('text', this.props);
+        let currentHour = this.getHour();
+        let currentMinute = this.getMinute();
+        let value = this.getValue();
         return (
-            <div style={{position: 'relative'}}>
-                <TimePicker
+            <div ref="container" style={{position: 'relative'}}>
+                <Text
+                    ref="text"
                     name={this.props.name || this.props.dataKey || utils.uuid()}
                     fullWidth={this.props.fullWidth}
-                    value={this.toTime(value)}
+                    value={value}
                     floatingLabelText={label}
                     floatingLabelFixed={this.props.labelFixed}
                     onChange={this.handleChange}
-                    autoOk={this.props.autoOk}
                     disabled={this.props.disabled}
-                    format={this.props.format}
-                    minutesStep={this.props.minutesStep}
-                    cancelLabel={this.props.cancelLabel}
-                    okLabel={this.props.okLabel}
-                    textFieldStyle={{...styleProps.style, cursor: 'pointer'}}
                     floatingLabelStyle={styleProps.floatingLabelStyle}
                     floatingLabelFocusStyle={styleProps.floatingLabelFocusStyle}
                     floatingLabelShrinkStyle={styleProps.floatingLabelShrinkStyle}
@@ -129,13 +186,53 @@ export default class Time extends Component {
                     hintStyle={styleProps.hintStyle}
                     underlineStyle={styleProps.underlineStyle}
                     inputStyle={styleProps.inputStyle}
+                    hintText={this.props.hintText}
+                    onFocus={this.handleFocus}
+                    onBlur={this.handleBlur}
+                    errorText={this.props.errorText}
                 />
-                {
-                    value && this.props.hasClear && !this.props.disabled ?
-                        <IconButton iconClassName="iconfont icon-close-circle-fill" onClick={this.handleClear}
-                                    style={{position: 'absolute', right: 0, ...styleProps.iconStyle.style}}
-                                    iconStyle={{color: '#e0e0e0', ...styleProps.iconStyle.iconStyle}}/> : null
-                }
+                <Popover
+                    ref="popover"
+                    style={styleProps.popoverStyle}
+                    open={this.state.open}
+                    anchorEl={this.state.anchorEl}
+                    onRequestClose={this.handleRequestClose}
+                >
+                    <div className="flex" style={{width: this.state.popoverWidth}}>
+                        <div className="relative" style={{maxHeight: 210, height: 210, width: 'calc(50% + 1px)', borderRight: '1px solid #e5e5e5'}}>
+                            <Scrollbars ref="hour" autoHide>
+                                {
+                                    this.getHours().map(hour => {
+                                        let selected = currentHour == hour;
+                                        return <div key={hour}
+                                                    ref={'hour' + hour}
+                                                    className={"space-small text-center hover-bg cursor-pointer" + (selected ? " bg-gray" : "")}
+                                                    onClick={this.handleChange('hour', hour)}>
+                                            {hour}
+                                        </div>
+                                    })
+                                }
+                                <div style={{height: 210 - 35}}></div>
+                            </Scrollbars>
+                        </div>
+                        <div className="relative" style={{maxHeight: 210, height: 210, width: '50%'}}>
+                            <Scrollbars ref="minute" autoHide>
+                                {
+                                    this.getMinutes().map(minute => {
+                                        let selected = currentMinute == minute;
+                                        return <div key={minute}
+                                                    ref={'minute' + minute}
+                                                    className={"space-small text-center hover-bg cursor-pointer" + (selected ? " bg-gray" : "")}
+                                                    onClick={this.handleChange('minute', minute)}>
+                                            {minute}
+                                        </div>
+                                    })
+                                }
+                                <div style={{height: 210 - 35}}></div>
+                            </Scrollbars>
+                        </div>
+                    </div>
+                </Popover>
             </div>
         )
     }

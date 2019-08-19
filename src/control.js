@@ -67,6 +67,9 @@ export default class Control extends Component {
         let props = {...this.props};
         let type = props.type;
         let Component = this.controls[type];
+        if(typeof props.disabled === 'function') {
+            props.disabled = props.disabled(props.data, props.context);
+        }
         delete props.type;
         switch (type) {
             case 'text':

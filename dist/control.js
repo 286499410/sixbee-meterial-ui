@@ -147,6 +147,9 @@ var Control = function (_Component) {
             var props = (0, _extends3.default)({}, this.props);
             var type = props.type;
             var Component = this.controls[type];
+            if (typeof props.disabled === 'function') {
+                props.disabled = props.disabled(props.data, props.context);
+            }
             delete props.type;
             switch (type) {
                 case 'text':

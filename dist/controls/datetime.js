@@ -36,25 +36,9 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _DatePicker = require('material-ui/DatePicker');
-
-var _DatePicker2 = _interopRequireDefault(_DatePicker);
-
-var _TimePicker = require('material-ui/TimePicker');
-
-var _TimePicker2 = _interopRequireDefault(_TimePicker);
-
 var _IconButton = require('material-ui/IconButton');
 
 var _IconButton2 = _interopRequireDefault(_IconButton);
-
-var _text = require('./text');
-
-var _text2 = _interopRequireDefault(_text);
-
-var _intlLocalesSupported = require('intl-locales-supported');
-
-var _intlLocalesSupported2 = _interopRequireDefault(_intlLocalesSupported);
 
 var _utils = require('../utils');
 
@@ -72,17 +56,11 @@ var _time = require('./time');
 
 var _time2 = _interopRequireDefault(_time);
 
+var _text = require('./text');
+
+var _text2 = _interopRequireDefault(_text);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var DateTimeFormat = void 0;
-
-if ((0, _intlLocalesSupported2.default)(['zh'])) {
-    DateTimeFormat = global.Intl.DateTimeFormat;
-} else {
-    var IntlPolyfill = require('intl');
-    DateTimeFormat = IntlPolyfill.DateTimeFormat;
-    require('intl/locale-data/jsonp/zh');
-}
 
 var DateTime = function (_Component) {
     (0, _inherits3.default)(DateTime, _Component);
@@ -92,81 +70,35 @@ var DateTime = function (_Component) {
 
         var _this = (0, _possibleConstructorReturn3.default)(this, (DateTime.__proto__ || (0, _getPrototypeOf2.default)(DateTime)).call(this, props));
 
-        _this.dateClickDiv = {
-            small: {
-                top: 20,
-                width: 70
-            },
-            default: {
-                top: 20,
-                width: 80
-            },
-            large: {
-                top: 30,
-                width: 90
-            }
-        };
-        _this.timeClickDiv = {
-            small: {
-                top: 20,
-                left: 74,
-                width: 32
-            },
-            default: {
-                top: 20,
-                left: 83,
-                width: 38
-            },
-            large: {
-                top: 30,
-                left: 95,
-                width: 40
-            }
-        };
         _this.state = {
             date: undefined,
-            time: undefined,
-            clickType: 'datetime'
+            time: undefined
         };
 
-        _this.handleDataChange = function (nul, date) {
-            var value = _utils2.default.dateToStr(date);
-            _this.setDate(value);
-            _this.refs.time.focus();
-        };
-
-        _this.handleTimeChange = function (nul, date) {
-            var value = _utils2.default.dateToTimeStr(date);
-            _this.setTime(value);
-        };
-
-        _this.handleClick = function (type) {
-            return function (event) {
-                event.stopPropagation();
-                var value = _this.getValue();
-                if (value.date === undefined && value.time === undefined) {
-                    type = 'datetime';
-                }
-                _this.state.clickType = type;
+        _this.handleChange = function (type) {
+            return function (value) {
                 switch (type) {
-                    case 'datetime':
-                        _this.refs.date.focus();
-                        break;
                     case 'date':
-                        _this.refs.date.focus();
+                        _this.state.date = value;
                         break;
                     case 'time':
-                        _this.refs.time.focus();
+                        _this.state.time = value;
                         break;
                 }
+
+                var _this$getValue = _this.getValue(),
+                    date = _this$getValue.date,
+                    time = _this$getValue.time;
+
+                if (type === 'date' && _this.isEmpty(time)) {
+                    _this.refs.time.focus();
+                }
+                _this.setValue((date || '') + ' ' + (time || ''));
             };
         };
 
         _this.handleClear = function (event) {
-            _this.state.date = null;
-            _this.state.time = null;
-            _this.forceUpdate();
-            _this.handleChange();
+            _this.setValue(null);
         };
 
         _this.initData(props);
@@ -181,7 +113,7 @@ var DateTime = function (_Component) {
     }, {
         key: 'initData',
         value: function initData(props) {
-            if (props.value !== undefined && props.value !== '' && props.value !== null) {
+            if (!this.isEmpty(props.value)) {
                 var value = props.value;
                 if (this.props.timestamp) {
                     value = _utils2.default.date('Y-m-d H:i', value);
@@ -193,17 +125,9 @@ var DateTime = function (_Component) {
 
                 this.state.date = _value$split2[0];
                 this.state.time = _value$split2[1];
-            }
-        }
-    }, {
-        key: 'handleChange',
-        value: function handleChange() {
-            if (this.props.onChange) {
-                var value = this.state.date === undefined || this.state.time === undefined || this.state.date === null || this.state.time === null ? '' : this.state.date + ' ' + this.state.time;
-                if (value && value !== '' && this.props.timestamp) {
-                    value = _utils2.default.strToTime(value);
-                }
-                this.props.onChange(value, this);
+            } else if ((props.value === '' || props.value === null) && !this.isEmpty(this.state.date) && !this.isEmpty(this.state.time)) {
+                this.state.date = null;
+                this.state.time = null;
             }
         }
     }, {
@@ -223,14 +147,30 @@ var DateTime = function (_Component) {
     }, {
         key: 'setValue',
         value: function setValue(value) {
-            var _value$split3 = value.split(' ');
+            if (this.isEmpty(value)) {
+                this.state.date = null;
+                this.state.time = null;
+            } else {
+                var _value$split3 = value.split(' ');
 
-            var _value$split4 = (0, _slicedToArray3.default)(_value$split3, 2);
+                var _value$split4 = (0, _slicedToArray3.default)(_value$split3, 2);
 
-            this.state.date = _value$split4[0];
-            this.state.time = _value$split4[1];
-
-            this.handleChange();
+                this.state.date = _value$split4[0];
+                this.state.time = _value$split4[1];
+            }
+            this.forceUpdate();
+            if (this.props.onChange) {
+                var _value = this.isEmpty(this.state.date) || this.isEmpty(this.state.time) ? '' : this.state.date + ' ' + this.state.time;
+                if (_value && _value !== '' && this.props.timestamp) {
+                    _value = _utils2.default.strToTime(_value);
+                }
+                this.props.onChange(_value, this);
+            }
+        }
+    }, {
+        key: 'isEmpty',
+        value: function isEmpty(value) {
+            return value === undefined || value === null || value === '';
         }
     }, {
         key: 'getValue',
@@ -247,83 +187,93 @@ var DateTime = function (_Component) {
                     time = _defaultValue$split2[1];
 
                 return {
-                    date: date,
-                    time: time
+                    date: date !== undefined ? date : this.props.defaultDate,
+                    time: time !== undefined ? time : this.props.defaultTime
                 };
             } else {
                 return {
-                    date: this.state.date,
-                    time: this.state.time
+                    date: this.state.date !== undefined ? this.state.date : this.props.defaultDate,
+                    time: this.state.time !== undefined ? this.state.time : this.props.defaultTime
                 };
             }
         }
     }, {
         key: 'render',
         value: function render() {
+            var _this2 = this;
+
             var _getValue = this.getValue(),
                 date = _getValue.date,
                 time = _getValue.time;
 
-            var value = (date || '--/--/--') + ' ' + (time || '--:--');
-            var clickDivStyle = { position: 'absolute', top: 30, bottom: 0, left: 0, width: 75, cursor: 'pointer' };
-            var size = this.props.size || 'default';
             var styleProps = _style2.default.getStyle('date', this.props);
+            var label = this.props.label;
             return _react2.default.createElement(
                 'div',
                 { style: { position: 'relative' } },
-                _react2.default.createElement(_text2.default, (0, _extends3.default)({}, this.props, { value: value, name: this.props.name || this.props.dataKey || _utils2.default.uuid() })),
-                _react2.default.createElement(
+                label === false ? null : _react2.default.createElement(
                     'div',
-                    { style: { position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 },
-                        onClick: this.handleClick('datetime') },
+                    null,
                     _react2.default.createElement(
-                        'div',
-                        null,
-                        _react2.default.createElement('div', { style: (0, _extends3.default)({}, clickDivStyle, this.dateClickDiv[size]),
-                            onClick: this.handleClick('date') }),
-                        _react2.default.createElement('div', { style: (0, _extends3.default)({}, clickDivStyle, this.timeClickDiv[size]),
-                            onClick: this.handleClick('time') })
+                        'span',
+                        { style: {
+                                transform: "scale(0.75)",
+                                transformOrigin: 'left top 0px',
+                                color: 'rgba(0,0,0,0.3)',
+                                fontSize: 15,
+                                display: 'inline-block',
+                                position: 'relative',
+                                top: 12
+                            } },
+                        label
                     )
                 ),
-                (date !== undefined || time !== undefined) && this.props.hasClear && !this.props.disabled && !this.props.immutable ? _react2.default.createElement(_IconButton2.default, { iconClassName: 'iconfont icon-close-circle-fill', onClick: this.handleClear,
+                _react2.default.createElement(
+                    'div',
+                    { className: 'flex' },
+                    _react2.default.createElement(
+                        'div',
+                        { style: { width: 100 } },
+                        _react2.default.createElement(_date2.default, {
+                            ref: 'date',
+                            hintText: '\u65E5\u671F',
+                            value: date || '',
+                            minDate: this.props.minDate || null,
+                            maxDate: this.props.maxDate || null,
+                            hasClear: false,
+                            onChange: this.handleChange('date'),
+                            errorText: this.props.errorText
+                        })
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { style: { width: 80 } },
+                        _react2.default.createElement(_time2.default, {
+                            ref: 'time',
+                            hintText: '\u65F6\u95F4',
+                            value: time || '',
+                            hasClear: false,
+                            errorText: this.props.errorText ? ' ' : undefined,
+                            onChange: this.handleChange('time'),
+                            minuteStep: this.props.minuteStep
+                        })
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'relative', style: { flexGrow: 1 } },
+                        _react2.default.createElement(_text2.default, {
+                            errorText: this.props.errorText ? ' ' : undefined
+                        }),
+                        _react2.default.createElement('div', { className: 'full-screen', onClick: function onClick() {
+                                _this2.refs.date.focus();
+                            } })
+                    )
+                ),
+                (!this.isEmpty(date) || !this.isEmpty(time)) && this.props.hasClear && !this.props.disabled && !this.props.immutable ? _react2.default.createElement(_IconButton2.default, { iconClassName: 'iconfont icon-close-circle-fill', onClick: this.handleClear,
                     style: (0, _extends3.default)({ position: 'absolute', right: 0 }, styleProps.iconStyle.style),
                     iconStyle: (0, _extends3.default)({ color: '#e0e0e0' }, styleProps.iconStyle.iconStyle)
 
-                }) : null,
-                _react2.default.createElement(
-                    'div',
-                    { style: { display: 'none' } },
-                    _react2.default.createElement(_date2.default, {
-                        value: _utils2.default.strToTime(date),
-                        minDate: this.props.minDate || null,
-                        maxDate: this.props.maxDate || null
-                    }),
-                    _react2.default.createElement(_time2.default, null),
-                    _react2.default.createElement(_DatePicker2.default, {
-                        name: 'date',
-                        ref: 'date',
-                        defaultDate: _utils2.default.strToDate(date),
-                        onChange: this.handleDataChange,
-                        autoOk: this.props.autoOk == false ? false : true,
-                        DateTimeFormat: DateTimeFormat,
-                        locale: 'zh',
-                        cancelLabel: '\u53D6\u6D88',
-                        okLabel: '\u786E\u5B9A',
-                        minDate: this.props.minDate || null,
-                        maxDate: this.props.maxDate || null
-                    }),
-                    _react2.default.createElement(_TimePicker2.default, {
-                        name: 'time',
-                        ref: 'time',
-                        defaultTime: _utils2.default.strToDate(time ? '1970-01-01 ' + time : undefined),
-                        format: '24hr',
-                        onChange: this.handleTimeChange,
-                        autoOk: this.props.autoOk == false ? false : true,
-                        minutesStep: this.props.minutesStep || 5,
-                        cancelLabel: '\u53D6\u6D88',
-                        okLabel: '\u786E\u5B9A'
-                    })
-                )
+                }) : null
             );
         }
     }]);
@@ -350,5 +300,8 @@ DateTime.defaultProps = {
     defaultValue: undefined,
     activeStartDate: undefined,
     minDate: undefined,
-    maxDate: undefined };
+    maxDate: undefined,
+    defaultDate: undefined,
+    defaultTime: undefined,
+    minuteStep: 15 };
 exports.default = DateTime;

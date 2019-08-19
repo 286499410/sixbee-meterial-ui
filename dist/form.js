@@ -577,7 +577,8 @@ var _initialiseProps = function _initialiseProps() {
                         errorText: _lodash2.default.get(_this6.state.errorText, field.key),
                         validate: _this6.props.validate ? _this6.state.validate : false,
                         onChange: _this6.handleChange(field),
-                        data: allExtraData
+                        data: allExtraData,
+                        context: _this6
                     }, controlProps));
                     if (_this6.props.inline) {
                         return _react2.default.createElement(

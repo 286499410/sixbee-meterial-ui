@@ -132,6 +132,10 @@ export default class Text extends Component {
         }
     };
 
+    focus = () => {
+        this.refs.text.focus();
+    };
+
     render() {
         let value = this.getValue();
         let label = this.props.label;
@@ -142,6 +146,7 @@ export default class Text extends Component {
         }
         return (
             <TextField
+                ref="text"
                 name={this.props.name || this.props.dataKey || utils.uuid()}
                 fullWidth={this.props.fullWidth}
                 floatingLabelText={label}

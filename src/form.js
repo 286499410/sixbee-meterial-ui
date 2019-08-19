@@ -427,6 +427,7 @@ export default class Form extends Component {
                                            validate={this.props.validate ? this.state.validate : false}
                                            onChange={this.handleChange(field)}
                                            data={allExtraData}
+                                           context={this}
                                            {...controlProps}
                     />;
                     if (this.props.inline) {

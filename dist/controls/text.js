@@ -111,6 +111,10 @@ var Text = function (_Component) {
             }
         };
 
+        _this.focus = function () {
+            _this.refs.text.focus();
+        };
+
         _this.initData(props);
         return _this;
     }
@@ -152,6 +156,7 @@ var Text = function (_Component) {
                 type = 'text';
             }
             return _react2.default.createElement(_TextField2.default, (0, _extends3.default)({
+                ref: 'text',
                 name: this.props.name || this.props.dataKey || _utils2.default.uuid(),
                 fullWidth: this.props.fullWidth,
                 floatingLabelText: label,
