@@ -36,17 +36,13 @@ var _auto = require('./controls/auto');
 
 var _auto2 = _interopRequireDefault(_auto);
 
-var _date = require('./controls/date2');
-
-var _date2 = _interopRequireDefault(_date);
-
 var _checkbox = require('./controls/checkbox');
 
 var _checkbox2 = _interopRequireDefault(_checkbox);
 
-var _date3 = require('./controls/date');
+var _date = require('./controls/date');
 
-var _date4 = _interopRequireDefault(_date3);
+var _date2 = _interopRequireDefault(_date);
 
 var _datetime = require('./controls/datetime');
 
@@ -114,12 +110,11 @@ var Control = function (_Component) {
             textarea: _text2.default,
             money: _money2.default,
             select: _select2.default,
-            date: _date4.default,
+            date: _date2.default,
             'date-range': _dateRange2.default,
             'money-range': _moneyRange2.default,
             datetime: _datetime2.default,
             time: _time2.default,
-            date2: _date2.default,
             auto: _auto2.default,
             checkbox: _checkbox2.default,
             radio: _radio2.default,

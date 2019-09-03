@@ -42,6 +42,7 @@ import MaterialMenu from './material-menu';
 import MaterialMenuItem from './material-menuitem';
 import RefreshIndicator from './refresh-indicator';
 import {Scrollbars} from 'react-custom-scrollbars';
+import ContextMenu from './context-menu';
 import utils from './utils';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -50,6 +51,7 @@ export {
     Alert,
     Auto,
     Checkbox,
+    ContextMenu,
     Date,
     DateTime,
     DateRange,

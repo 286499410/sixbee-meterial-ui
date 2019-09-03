@@ -16,9 +16,9 @@ var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
 
 var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 
-var _loadsh = require('loadsh');
+var _lodash = require('lodash');
 
-var _loadsh2 = _interopRequireDefault(_loadsh);
+var _lodash2 = _interopRequireDefault(_lodash);
 
 var _tag = require('./tag');
 
@@ -82,11 +82,11 @@ var utils = {
     },
 
     strToDate: function strToDate(str) {
-        if (_loadsh2.default.isDate(str)) {
+        if (_lodash2.default.isDate(str)) {
             return str;
         } else if (str === '') {
             return undefined;
-        } else if (_loadsh2.default.isString(str)) {
+        } else if (_lodash2.default.isString(str)) {
             str = str.replace(/-/g, '/');
             return new Date(str);
         } else {
@@ -195,15 +195,15 @@ var utils = {
             return dataSource;
         };
         return new _promise2.default(function (resolve, reject) {
-            if (_loadsh2.default.isFunction(dataSource)) {
+            if (_lodash2.default.isFunction(dataSource)) {
                 dataSource = dataSource(searchText, context);
             }
-            if (_loadsh2.default.isArray(dataSource)) {
+            if (_lodash2.default.isArray(dataSource)) {
                 resolve(preprocessing(dataSource));
             }
             if (dataSource instanceof _promise2.default) {
                 dataSource.then(function (data) {
-                    if (_loadsh2.default.isArray(data)) {
+                    if (_lodash2.default.isArray(data)) {
                         resolve(preprocessing(data));
                     }
                 });
@@ -221,17 +221,17 @@ var utils = {
     },
 
     replaceText: function replaceText(_replaceText, data) {
-        var text = _loadsh2.default.get(data, _replaceText);
+        var text = _lodash2.default.get(data, _replaceText);
         if (text !== undefined) {
             return text;
         }
         var reg = /\[((\w|\w.\w||\w.\w.\w)*)\]/g;
         var textFields = _replaceText.match(reg);
-        if (_loadsh2.default.isArray(textFields)) {
+        if (_lodash2.default.isArray(textFields)) {
             var ret = undefined;
             textFields.map(function (field) {
                 var key = field.substr(1, field.length - 2);
-                var value = _loadsh2.default.get(data, key, '');
+                var value = _lodash2.default.get(data, key, '');
                 ret = _replaceText.replace('[' + key + ']', value);
                 _replaceText = ret;
             });
@@ -245,7 +245,7 @@ var utils = {
         var defaultValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
 
         var key = column.dataKey || column.key;
-        var value = _loadsh2.default.get(data, key, defaultValue);
+        var value = _lodash2.default.get(data, key, defaultValue);
         switch (column.type) {
             case 'date':
                 return (/^\d+$/.test(value) ? utils.date(column.format || 'Y-m-d', value) : value
@@ -260,7 +260,7 @@ var utils = {
                 return value == 0 && column.showZero !== true ? '' : utils.parseMoney(value, column.float);
             case 'select':
             case 'radio':
-                if (_loadsh2.default.isArray(column.dataSource)) {
+                if (_lodash2.default.isArray(column.dataSource)) {
                     var dataSource = column.dataSource;
                     var dataSourceConfig = column.dataSourceConfig || { text: 'text', value: 'value' };
                     var map = {};
@@ -275,18 +275,18 @@ var utils = {
                 if (column.multiple) {
                     var _dataSourceConfig = column.dataSourceConfig || { text: 'text', value: 'value' };
                     var texts = [];
-                    if (_loadsh2.default.isArray(value)) {
+                    if (_lodash2.default.isArray(value)) {
                         value.map(function (row) {
                             return texts.push(row[_dataSourceConfig.text]);
                         });
                     }
                     return texts.join(' ');
-                } else if (_loadsh2.default.isArray(column.dataSource) && column.dataSource.length > 0) {} else {
+                } else if (_lodash2.default.isArray(column.dataSource) && column.dataSource.length > 0) {} else {
                     return value ? '是' : '否';
                 }
             case 'auto':
                 if (column.withKey) {
-                    var withData = _loadsh2.default.get(data, column.withKey, {});
+                    var withData = _lodash2.default.get(data, column.withKey, {});
                     var _dataSourceConfig2 = column.dataSourceConfig || { text: 'text', value: 'value' };
                     return utils.replaceText(_dataSourceConfig2.text, withData);
                 } else {
@@ -300,7 +300,7 @@ var utils = {
                     overflow: 'hidden'
                 }, column.renderStyle);
                 var isBase64OrUrl = function isBase64OrUrl(str) {
-                    return _loadsh2.default.isString(str) ? str.substr(0, 4) === 'http' || str.substr(0, 10) === 'data:image' : false;
+                    return _lodash2.default.isString(str) ? str.substr(0, 4) === 'http' || str.substr(0, 10) === 'data:image' : false;
                 };
                 return value ? _react2.default.createElement(
                     'div',
@@ -323,10 +323,10 @@ var utils = {
                     )
                 ) : _react2.default.createElement('div', { style: renderStyle });
             case 'editor':
-                return _loadsh2.default.isString(value) ? value.replace(/<[^<>]+>/g, "") : '';
+                return _lodash2.default.isString(value) ? value.replace(/<[^<>]+>/g, "") : '';
             case 'textarea':
                 return _react2.default.createElement('div', {
-                    dangerouslySetInnerHTML: { __html: _loadsh2.default.isString(value) ? value.replace(/[\r\n]|[\n]|[\r]/g, "<br/>") : '' } });
+                    dangerouslySetInnerHTML: { __html: _lodash2.default.isString(value) ? value.replace(/[\r\n]|[\n]|[\r]/g, "<br/>") : '' } });
             default:
                 return value;
         }

@@ -5,7 +5,6 @@
 
 import React, {Component} from 'react';
 import Auto from './controls/auto';
-import Date2 from './controls/date2';
 import Checkbox from './controls/checkbox';
 import Date from './controls/date';
 import DateTime from './controls/datetime';
@@ -41,7 +40,6 @@ export default class Control extends Component {
         'money-range': MoneyRange,
         datetime: DateTime,
         time: Time,
-        date2: Date2,
         auto: Auto,
         checkbox: Checkbox,
         radio: Radio,

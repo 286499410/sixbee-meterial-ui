@@ -80,11 +80,8 @@ var Date = function (_Component) {
 
         _this.handleChange = function (date) {
             var value = _utils2.default.dateToStr(date);
-            if (_this.props.onChange) {
-                _this.props.onChange(value, _this);
-            }
+            _this.setValue(value);
             _this.setState({
-                value: value,
                 open: false
             });
         };
@@ -136,7 +133,11 @@ var Date = function (_Component) {
         key: 'initData',
         value: function initData(props) {
             if (props.value !== undefined) {
-                this.state.value = props.value;
+                var value = props.value;
+                if (this.props.timestamp) {
+                    value = _utils2.default.date('Y-m-d', value);
+                }
+                this.state.value = value;
             }
         }
     }, {
@@ -144,6 +145,9 @@ var Date = function (_Component) {
         value: function setValue(value) {
             this.setState({ value: value });
             if (this.props.onChange) {
+                if (value && this.props.timestamp) {
+                    value = _utils2.default.strToTime(value);
+                }
                 this.props.onChange(value, this);
             }
         }
@@ -225,6 +229,7 @@ var Date = function (_Component) {
 Date.defaultProps = {
     label: undefined,
     borderShow: true,
+    timestamp: false,
     hasClear: true,
     disabled: false,
     immutable: false,

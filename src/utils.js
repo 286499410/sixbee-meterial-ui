@@ -1,4 +1,4 @@
-import _ from 'loadsh';
+import _ from 'lodash';
 import Tag from "./tag";
 import React from 'react';
 import $ from 'jquery';

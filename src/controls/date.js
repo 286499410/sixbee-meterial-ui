@@ -15,6 +15,7 @@ export default class Date extends Component {
     static defaultProps = {
         label: undefined,           //标签
         borderShow: true,           //是否显示下划线
+        timestamp: false,           //value是否为时间戳
         hasClear: true,             //最右边是否显示清除按钮
         disabled: false,            //是否禁止输入
         immutable: false,           //是否不可更改
@@ -47,7 +48,11 @@ export default class Date extends Component {
 
     initData(props) {
         if (props.value !== undefined) {
-            this.state.value = props.value;
+            let value = props.value;
+            if (this.props.timestamp) {
+                value = utils.date('Y-m-d', value);
+            }
+            this.state.value = value;
         }
     }
 
@@ -58,6 +63,9 @@ export default class Date extends Component {
     setValue(value) {
         this.setState({value: value});
         if (this.props.onChange) {
+            if (value && this.props.timestamp) {
+                value = utils.strToTime(value);
+            }
             this.props.onChange(value, this);
         }
     }
@@ -86,11 +94,8 @@ export default class Date extends Component {
      */
     handleChange = (date) => {
         let value = utils.dateToStr(date);
-        if (this.props.onChange) {
-            this.props.onChange(value, this);
-        }
+        this.setValue(value);
         this.setState({
-            value: value,
             open: false
         });
     };
