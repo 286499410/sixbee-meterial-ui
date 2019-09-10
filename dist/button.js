@@ -28,6 +28,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 var _FontIcon = require('material-ui/FontIcon');
 
 var _FontIcon2 = _interopRequireDefault(_FontIcon);
@@ -88,4 +92,7 @@ Button.defaultProps = {
     size: 'default',
     labelPosition: 'after',
     iconStyle: undefined };
+Button.contextTypes = {
+    muiTheme: _propTypes2.default.object
+};
 exports.default = Button;

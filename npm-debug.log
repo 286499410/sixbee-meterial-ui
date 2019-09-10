@@ -19,26 +19,26 @@
 7 silly cache add   spec:
 7 silly cache add    '/Applications/XAMPP/xamppfiles/htdocs/sqline/ysv2/sixbee-material-ui',
 7 silly cache add   type: 'directory' }
-8 verbose addLocalDirectory /Users/zhengzhaowei/.npm/sixbee-material-ui/1.0.1/package.tgz not in flight; packing
+8 verbose addLocalDirectory /Users/zhengzhaowei/.npm/sixbee-material-ui/1.0.12/package.tgz not in flight; packing
 9 verbose correctMkdir /Users/zhengzhaowei/.npm correctMkdir not in flight; initializing
-10 info lifecycle sixbee-material-ui@1.0.1~prepublish: sixbee-material-ui@1.0.1
-11 verbose lifecycle sixbee-material-ui@1.0.1~prepublish: unsafe-perm in lifecycle true
-12 verbose lifecycle sixbee-material-ui@1.0.1~prepublish: PATH: /usr/local/lib/node_modules/cnpm/node_modules/npm/bin/node-gyp-bin:/Applications/XAMPP/xamppfiles/htdocs/sqline/ysv2/sixbee-material-ui/node_modules/.bin:/Applications/XAMPP/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-13 verbose lifecycle sixbee-material-ui@1.0.1~prepublish: CWD: /Applications/XAMPP/xamppfiles/htdocs/sqline/ysv2/sixbee-material-ui
-14 silly lifecycle sixbee-material-ui@1.0.1~prepublish: Args: [ '-c', 'npm run build' ]
-15 silly lifecycle sixbee-material-ui@1.0.1~prepublish: Returned: code: 0  signal: null
-16 verbose tar pack [ '/Users/zhengzhaowei/.npm/sixbee-material-ui/1.0.1/package.tgz',
+10 info lifecycle sixbee-material-ui@1.0.12~prepublish: sixbee-material-ui@1.0.12
+11 verbose lifecycle sixbee-material-ui@1.0.12~prepublish: unsafe-perm in lifecycle true
+12 verbose lifecycle sixbee-material-ui@1.0.12~prepublish: PATH: /usr/local/lib/node_modules/cnpm/node_modules/npm/bin/node-gyp-bin:/Applications/XAMPP/xamppfiles/htdocs/sqline/ysv2/sixbee-material-ui/node_modules/.bin:/Applications/XAMPP/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+13 verbose lifecycle sixbee-material-ui@1.0.12~prepublish: CWD: /Applications/XAMPP/xamppfiles/htdocs/sqline/ysv2/sixbee-material-ui
+14 silly lifecycle sixbee-material-ui@1.0.12~prepublish: Args: [ '-c', 'npm run build' ]
+15 silly lifecycle sixbee-material-ui@1.0.12~prepublish: Returned: code: 0  signal: null
+16 verbose tar pack [ '/Users/zhengzhaowei/.npm/sixbee-material-ui/1.0.12/package.tgz',
 16 verbose tar pack   '/Applications/XAMPP/xamppfiles/htdocs/sqline/ysv2/sixbee-material-ui' ]
-17 verbose tarball /Users/zhengzhaowei/.npm/sixbee-material-ui/1.0.1/package.tgz
+17 verbose tarball /Users/zhengzhaowei/.npm/sixbee-material-ui/1.0.12/package.tgz
 18 verbose folder /Applications/XAMPP/xamppfiles/htdocs/sqline/ysv2/sixbee-material-ui
-19 verbose addLocalTarball adding from inside cache /Users/zhengzhaowei/.npm/sixbee-material-ui/1.0.1/package.tgz
+19 verbose addLocalTarball adding from inside cache /Users/zhengzhaowei/.npm/sixbee-material-ui/1.0.12/package.tgz
 20 verbose correctMkdir /Users/zhengzhaowei/.npm correctMkdir not in flight; initializing
-21 silly cache afterAdd sixbee-material-ui@1.0.1
-22 verbose afterAdd /Users/zhengzhaowei/.npm/sixbee-material-ui/1.0.1/package/package.json not in flight; writing
+21 silly cache afterAdd sixbee-material-ui@1.0.12
+22 verbose afterAdd /Users/zhengzhaowei/.npm/sixbee-material-ui/1.0.12/package/package.json not in flight; writing
 23 verbose correctMkdir /Users/zhengzhaowei/.npm correctMkdir not in flight; initializing
-24 verbose afterAdd /Users/zhengzhaowei/.npm/sixbee-material-ui/1.0.1/package/package.json written
+24 verbose afterAdd /Users/zhengzhaowei/.npm/sixbee-material-ui/1.0.12/package/package.json written
 25 silly publish { name: 'sixbee-material-ui',
-25 silly publish   version: '1.0.1',
+25 silly publish   version: '1.0.12',
 25 silly publish   description: 'model & view',
 25 silly publish   author: { name: 'joey' },
 25 silly publish   license: 'ISC',
@@ -63,7 +63,8 @@
 25 silly publish      lodash: '^4.17.11',
 25 silly publish      mocha: '^5.2.0' },
 25 silly publish   dependencies:
-25 silly publish    { 'intl-locales-supported': '^1.0.0',
+25 silly publish    { 'get-user-locale': '^1.1.1',
+25 silly publish      'intl-locales-supported': '^1.0.0',
 25 silly publish      'material-ui': '^0.20.2',
 25 silly publish      'material-ui-persian-date-picker-utils': '^0.1.2',
 25 silly publish      'react-calendar': '^2.18.1',
@@ -74,12 +75,12 @@
 25 silly publish   peerDependencies: { react: '>=15', 'react-dom': '>=15', lodash: '>=4.17.0' },
 25 silly publish   readme: '# sixbee-meterial-ui',
 25 silly publish   readmeFilename: 'README.md',
-25 silly publish   gitHead: '95c7451873ee5459fbcbaac49f0c8a8e2fdafa12',
+25 silly publish   gitHead: '3f96d960ffc07ef35a16c60d19499cf22ef4b0f4',
 25 silly publish   bugs:
 25 silly publish    { url: 'https://github.com/286499410/sixbee-meterial-ui/issues' },
 25 silly publish   homepage: 'https://github.com/286499410/sixbee-meterial-ui#readme',
-25 silly publish   _id: 'sixbee-material-ui@1.0.1',
-25 silly publish   _shasum: 'b079cd71d52021e6894a875928e8452905f11a46',
+25 silly publish   _id: 'sixbee-material-ui@1.0.12',
+25 silly publish   _shasum: '865915a1ec78298292c8a023cde2e76ca51084fc',
 25 silly publish   _from: '.' }
 26 verbose getPublishConfig undefined
 27 silly mapToRegistry name sixbee-material-ui
@@ -95,24 +96,29 @@
 30 silly mapToRegistry   type: 'tag' }
 31 silly mapToRegistry uri https://registry.npm.taobao.org/sixbee-material-ui
 32 verbose publish registryBase https://registry.npm.taobao.org/
-33 silly publish uploading /Users/zhengzhaowei/.npm/sixbee-material-ui/1.0.1/package.tgz
+33 silly publish uploading /Users/zhengzhaowei/.npm/sixbee-material-ui/1.0.12/package.tgz
 34 verbose request uri https://registry.npm.taobao.org/sixbee-material-ui
 35 verbose request sending authorization for write operation
-36 info attempt registry request try #1 at 15:56:54
-37 verbose request id 203d665471743f8a
+36 info attempt registry request try #1 at 16:20:09
+37 verbose request id 95c6de6ff10ad5e5
 38 http request PUT https://registry.npm.taobao.org/sixbee-material-ui
 39 http 403 https://registry.npm.taobao.org/sixbee-material-ui
-40 verbose headers { date: 'Mon, 25 Mar 2019 07:56:54 GMT',
+40 verbose headers { server: 'Tengine',
 40 verbose headers   'content-type': 'application/json; charset=utf-8',
 40 verbose headers   'transfer-encoding': 'chunked',
 40 verbose headers   connection: 'keep-alive',
+40 verbose headers   date: 'Tue, 10 Sep 2019 08:20:10 GMT',
 40 verbose headers   'x-current-requests': '1',
 40 verbose headers   vary: 'Origin',
-40 verbose headers   'x-readtime': '6',
-40 verbose headers   'content-encoding': 'gzip' }
+40 verbose headers   'x-readtime': '4',
+40 verbose headers   'content-encoding': 'gzip',
+40 verbose headers   'x-alicdn-da-ups-status': 'endOs,0,403',
+40 verbose headers   via: 'cache20.l2et2-1[187,0], kunlun3.cn462[227,0]',
+40 verbose headers   'timing-allow-origin': '*',
+40 verbose headers   eagleid: 'b739529715681036104465704e' }
 41 verbose request invalidating /Users/zhengzhaowei/.npm/registry.npm.taobao.org/sixbee-material-ui on PUT
 42 error publish Failed PUT 403
-43 verbose stack Error: no_perms Private mode enable, only admin can publish this module: sixbee-material-ui
+43 verbose stack Error: [no_perms] Private mode enable, only admin can publish this module [no_perms] Private mode enable, only admin can publish this module: sixbee-material-ui
 43 verbose stack     at makeError (/usr/local/lib/node_modules/cnpm/node_modules/npm/node_modules/npm-registry-client/lib/request.js:302:12)
 43 verbose stack     at CachingRegistryClient.<anonymous> (/usr/local/lib/node_modules/cnpm/node_modules/npm/node_modules/npm-registry-client/lib/request.js:290:14)
 43 verbose stack     at Gunzip.cb (/usr/local/lib/node_modules/cnpm/node_modules/npm/node_modules/npm-registry-client/lib/request.js:216:7)
@@ -128,7 +134,7 @@
 49 error node v10.12.0
 50 error npm  v3.10.9
 51 error code E403
-52 error no_perms Private mode enable, only admin can publish this module: sixbee-material-ui
+52 error [no_perms] Private mode enable, only admin can publish this module [no_perms] Private mode enable, only admin can publish this module: sixbee-material-ui
 53 error If you need help, you may report this error at:
 53 error     <https://github.com/npm/npm/issues>
 54 verbose exit [ 1, true ]

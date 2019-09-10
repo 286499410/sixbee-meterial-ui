@@ -22,6 +22,7 @@ import Button from './button';
 import Alert from './alert';
 import List from './list';
 import Nav from './nav';
+import Nav2 from './nav2';
 import Dialog from './dialog';
 import Toolbar from './toolbar';
 import DropDown from './dropdown';
@@ -84,6 +85,7 @@ export {
     List,
     Button,
     Nav,
+    Nav2,
     Tabs,
     Scrollbars,
     Stepper,

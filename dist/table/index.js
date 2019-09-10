@@ -544,6 +544,7 @@ var Table = function (_Component) {
                     className: className,
                     style: (0, _extends3.default)({
                         overflow: 'hidden',
+                        position: 'relative',
                         width: this.props.containerWidth,
                         height: this.props.containerHeight
                     }, this.props.style) },

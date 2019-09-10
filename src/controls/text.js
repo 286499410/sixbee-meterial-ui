@@ -3,6 +3,7 @@
  */
 
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import TextField from 'material-ui/TextField';
 import _ from 'lodash';
 import style from '../style';
@@ -26,6 +27,11 @@ export default class Text extends Component {
         autoComplete: "off",        //自动完成
         textAlign: undefined,       //文本对齐方式
         styleProps: {},             //样式
+        borderStyle: undefined,     //边框风格，border，underline
+    };
+
+    static contextTypes = {
+        muiTheme: PropTypes.object,
     };
 
     state = {
@@ -137,6 +143,7 @@ export default class Text extends Component {
     };
 
     render() {
+        let borderStyle = this.props.borderStyle || this.context.controlBorderStyle || 'underline';
         let value = this.getValue();
         let label = this.props.label;
         let styleProps = this.getStyleProps();
@@ -144,29 +151,32 @@ export default class Text extends Component {
         if(type == 'number' || type == 'mobile') {
             type = 'text';
         }
-        return (
-            <TextField
-                ref="text"
-                name={this.props.name || this.props.dataKey || utils.uuid()}
-                fullWidth={this.props.fullWidth}
-                floatingLabelText={label}
-                type={type}
-                value={value == null ? '' : value}
-                disabled={this.props.disabled}
-                onChange={this.handleChange}
-                onBlur={this.handleBlur}
-                onFocus={this.handleFocus}
-                onKeyUp={this.handleKeyUp}
-                multiLine={this.props.multiLine}
-                rows={this.props.rows}
-                hintText={this.props.hintText}
-                errorText={this.props.errorText}
-                floatingLabelFixed={this.props.labelFixed}
-                underlineShow={this.props.borderShow}
-                autoComplete={this.props.autoComplete}
-                {...styleProps}
-            />
-        )
+        let textField = <TextField
+            ref="text"
+            name={this.props.name || this.props.dataKey || utils.uuid()}
+            fullWidth={this.props.fullWidth}
+            floatingLabelText={label}
+            type={type}
+            value={value == null ? '' : value}
+            disabled={this.props.disabled}
+            onChange={this.handleChange}
+            onBlur={this.handleBlur}
+            onFocus={this.handleFocus}
+            onKeyUp={this.handleKeyUp}
+            multiLine={this.props.multiLine}
+            rows={this.props.rows}
+            hintText={this.props.hintText}
+            errorText={this.props.errorText}
+            floatingLabelFixed={this.props.labelFixed}
+            underlineShow={borderStyle === 'underline' && this.props.borderShow}
+            autoComplete={this.props.autoComplete}
+            {...styleProps}
+        />;
+        if(borderStyle === 'border') {
+            return <div className="control-border">{textField}</div>
+        } else {
+            return textField;
+        }
     }
 
 }

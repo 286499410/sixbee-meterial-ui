@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.getMuiTheme = exports.MuiThemeProvider = exports.utils = exports.RefreshIndicator = exports.MaterialMenuItem = exports.MaterialMenu = exports.MaterialList = exports.Popover = exports.LinearProgress = exports.Stepper = exports.Scrollbars = exports.Tabs = exports.Nav = exports.Button = exports.List = exports.DropDown = exports.Toolbar = exports.Dialog = exports.Layout = exports.Drawer = exports.Badge = exports.Avatar = exports.Paper = exports.Detail = exports.SvgIcon = exports.Icon = exports.TableHeader = exports.Table = exports.Form = exports.Editor = exports.Control = exports.Image = exports.FormTable = exports.Time = exports.Text = exports.SelectTag = exports.Select = exports.Radio = exports.MoneyRange = exports.Money = exports.File = exports.DateRange = exports.DateTime = exports.Date = exports.ContextMenu = exports.Checkbox = exports.Auto = exports.Alert = undefined;
+exports.getMuiTheme = exports.MuiThemeProvider = exports.utils = exports.RefreshIndicator = exports.MaterialMenuItem = exports.MaterialMenu = exports.MaterialList = exports.Popover = exports.LinearProgress = exports.Stepper = exports.Scrollbars = exports.Tabs = exports.Nav2 = exports.Nav = exports.Button = exports.List = exports.DropDown = exports.Toolbar = exports.Dialog = exports.Layout = exports.Drawer = exports.Badge = exports.Avatar = exports.Paper = exports.Detail = exports.SvgIcon = exports.Icon = exports.TableHeader = exports.Table = exports.Form = exports.Editor = exports.Control = exports.Image = exports.FormTable = exports.Time = exports.Text = exports.SelectTag = exports.Select = exports.Radio = exports.MoneyRange = exports.Money = exports.File = exports.DateRange = exports.DateTime = exports.Date = exports.ContextMenu = exports.Checkbox = exports.Auto = exports.Alert = undefined;
 
 var _auto = require('./controls/auto');
 
@@ -100,6 +100,10 @@ var _list2 = _interopRequireDefault(_list);
 var _nav = require('./nav');
 
 var _nav2 = _interopRequireDefault(_nav);
+
+var _nav3 = require('./nav2');
+
+var _nav4 = _interopRequireDefault(_nav3);
 
 var _dialog = require('./dialog');
 
@@ -233,6 +237,7 @@ exports.DropDown = _dropdown2.default;
 exports.List = _list2.default;
 exports.Button = _button2.default;
 exports.Nav = _nav2.default;
+exports.Nav2 = _nav4.default;
 exports.Tabs = _tabs2.default;
 exports.Scrollbars = _reactCustomScrollbars.Scrollbars;
 exports.Stepper = _stepper2.default;

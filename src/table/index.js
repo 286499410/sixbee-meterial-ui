@@ -506,6 +506,7 @@ export default class Table extends Component {
                  className={className}
                  style={{
                      overflow: 'hidden',
+                     position: 'relative',
                      width: this.props.containerWidth,
                      height: this.props.containerHeight,
                      ...this.props.style

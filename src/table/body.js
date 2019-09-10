@@ -78,7 +78,7 @@ export default class TableBody extends Component {
                     className="table-body"
                     style={{
                         overflow: 'hidden',
-                        position: 'relative',
+                        //position: 'relative',
                         width: state.containerWidth,
                         height: state.bodyHeight,
                         marginTop: -1,
@@ -99,15 +99,13 @@ export default class TableBody extends Component {
                     </div>
                 </div> : null
             }
-
             {
-                state.dataSource.length == 0 && !props.loading ?
-                    <div className="position-center text-center">
-                        <div>
-                            <div><img src={props.emptyDataImage} style={{width: 200}}/></div>
-                            <div style={{marginLeft: -8}}>{props.emptyDataTip}</div>
-                        </div>
-                    </div> : null
+                state.dataSource.length == 0 && !props.loading ? <div className="position-center text-center" style={{zIndex: 1}}>
+                    <div>
+                        <div><img src={props.emptyDataImage} style={{width: 200}}/></div>
+                        <div style={{marginLeft: -8}}>{props.emptyDataTip}</div>
+                    </div>
+                </div> : null
             }
             {
                 props.containerHeight || state.bodyHeight ?
@@ -497,9 +495,15 @@ class TableBodyContent extends Component {
                                     return <div style={{width: '100%', overflow: 'hidden'}}>
                                         {group.map((row, index) => {
                                             if (rowIndex < this.state.showMinRows || rowIndex > this.state.showMaxRows) {
-                                                return <div key={index} className="td" style={{height: props.bodyRowHeight, lineHeight: (props.bodyRowHeight - 12) + 'px'}}></div>;
+                                                return <div key={index} className="td" style={{
+                                                    height: props.bodyRowHeight,
+                                                    lineHeight: (props.bodyRowHeight - 12) + 'px'
+                                                }}></div>;
                                             }
-                                            return <div key={index} className="td" style={{height: props.bodyRowHeight, lineHeight: (props.bodyRowHeight - 12) + 'px'}}>
+                                            return <div key={index} className="td" style={{
+                                                height: props.bodyRowHeight,
+                                                lineHeight: (props.bodyRowHeight - 12) + 'px'
+                                            }}>
                                                 {column.render ? column.render(row, column, this.context.Table) : this.context.cellRender(row, column)}
                                             </div>
                                         })}

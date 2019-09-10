@@ -36,6 +36,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 var _TextField = require('material-ui/TextField');
 
 var _TextField2 = _interopRequireDefault(_TextField);
@@ -148,6 +152,7 @@ var Text = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
+            var borderStyle = this.props.borderStyle || this.context.controlBorderStyle || 'underline';
             var value = this.getValue();
             var label = this.props.label;
             var styleProps = this.getStyleProps();
@@ -155,7 +160,7 @@ var Text = function (_Component) {
             if (type == 'number' || type == 'mobile') {
                 type = 'text';
             }
-            return _react2.default.createElement(_TextField2.default, (0, _extends3.default)({
+            var textField = _react2.default.createElement(_TextField2.default, (0, _extends3.default)({
                 ref: 'text',
                 name: this.props.name || this.props.dataKey || _utils2.default.uuid(),
                 fullWidth: this.props.fullWidth,
@@ -172,9 +177,18 @@ var Text = function (_Component) {
                 hintText: this.props.hintText,
                 errorText: this.props.errorText,
                 floatingLabelFixed: this.props.labelFixed,
-                underlineShow: this.props.borderShow,
+                underlineShow: borderStyle === 'underline' && this.props.borderShow,
                 autoComplete: this.props.autoComplete
             }, styleProps));
+            if (borderStyle === 'border') {
+                return _react2.default.createElement(
+                    'div',
+                    { className: 'control-border' },
+                    textField
+                );
+            } else {
+                return textField;
+            }
         }
     }]);
     return Text;
@@ -195,5 +209,9 @@ Text.defaultProps = {
     labelFixed: false,
     autoComplete: "off",
     textAlign: undefined,
-    styleProps: {} };
+    styleProps: {},
+    borderStyle: undefined };
+Text.contextTypes = {
+    muiTheme: _propTypes2.default.object
+};
 exports.default = Text;

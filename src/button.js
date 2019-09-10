@@ -4,6 +4,7 @@
 
 
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import FontIcon from 'material-ui/FontIcon';
 import RaisedButton from 'material-ui/RaisedButton';
 import _ from 'lodash';
@@ -18,6 +19,10 @@ export default class Button extends Component {
         size: 'default',
         labelPosition: 'after',
         iconStyle: undefined,           //图标样式
+    };
+
+    static contextTypes = {
+        muiTheme: PropTypes.object,
     };
 
     type = [

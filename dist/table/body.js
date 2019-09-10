@@ -136,7 +136,7 @@ var TableBody = function (_Component) {
                     className: 'table-body',
                     style: (0, _extends3.default)({
                         overflow: 'hidden',
-                        position: 'relative',
+
                         width: state.containerWidth,
                         height: state.bodyHeight,
                         marginTop: -1
@@ -160,7 +160,7 @@ var TableBody = function (_Component) {
                 ) : null,
                 state.dataSource.length == 0 && !props.loading ? _react2.default.createElement(
                     'div',
-                    { className: 'position-center text-center' },
+                    { className: 'position-center text-center', style: { zIndex: 1 } },
                     _react2.default.createElement(
                         'div',
                         null,
@@ -478,11 +478,17 @@ var TableBodyContent = function (_Component2) {
                                         { style: { width: '100%', overflow: 'hidden' } },
                                         group.map(function (row, index) {
                                             if (rowIndex < _this6.state.showMinRows || rowIndex > _this6.state.showMaxRows) {
-                                                return _react2.default.createElement('div', { key: index, className: 'td', style: { height: props.bodyRowHeight, lineHeight: props.bodyRowHeight - 12 + 'px' } });
+                                                return _react2.default.createElement('div', { key: index, className: 'td', style: {
+                                                        height: props.bodyRowHeight,
+                                                        lineHeight: props.bodyRowHeight - 12 + 'px'
+                                                    } });
                                             }
                                             return _react2.default.createElement(
                                                 'div',
-                                                { key: index, className: 'td', style: { height: props.bodyRowHeight, lineHeight: props.bodyRowHeight - 12 + 'px' } },
+                                                { key: index, className: 'td', style: {
+                                                        height: props.bodyRowHeight,
+                                                        lineHeight: props.bodyRowHeight - 12 + 'px'
+                                                    } },
                                                 column.render ? column.render(row, column, _this6.context.Table) : _this6.context.cellRender(row, column)
                                             );
                                         })
