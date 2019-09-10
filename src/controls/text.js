@@ -36,7 +36,8 @@ export default class Text extends Component {
 
     state = {
         value: undefined,
-        errorText: ''
+        errorText: '',
+        focus: false
     };
 
     constructor(props) {
@@ -99,7 +100,7 @@ export default class Text extends Component {
                     }
                     break;
                 case 'mobile':
-                    if(!(/^\d*$/.test(value))) {
+                    if (!(/^\d*$/.test(value))) {
                         return;
                     }
                     break;
@@ -113,6 +114,7 @@ export default class Text extends Component {
      * @param event
      */
     handleBlur = (event) => {
+        this.setState({focus: false});
         if (this.props.onBlur) {
             this.props.onBlur(event, this);
         }
@@ -123,6 +125,7 @@ export default class Text extends Component {
      * @param event
      */
     handleFocus = (event) => {
+        this.setState({focus: true});
         if (this.props.onFocus) {
             this.props.onFocus(event, this)
         }
@@ -143,12 +146,12 @@ export default class Text extends Component {
     };
 
     render() {
-        let borderStyle = this.props.borderStyle || this.context.controlBorderStyle || 'underline';
+        let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
         let value = this.getValue();
         let label = this.props.label;
         let styleProps = this.getStyleProps();
         let type = this.props.type;
-        if(type == 'number' || type == 'mobile') {
+        if (type == 'number' || type == 'mobile') {
             type = 'text';
         }
         let textField = <TextField
@@ -172,8 +175,8 @@ export default class Text extends Component {
             autoComplete={this.props.autoComplete}
             {...styleProps}
         />;
-        if(borderStyle === 'border') {
-            return <div className="control-border">{textField}</div>
+        if (borderStyle === 'border' && this.props.borderShow) {
+            return <div className={"control-border" + (this.state.focus ? ' focus' : '')}>{textField}</div>
         } else {
             return textField;
         }

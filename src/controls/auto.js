@@ -3,6 +3,7 @@
  */
 
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import _ from 'lodash';
 import AutoComplete from 'material-ui/AutoComplete';
 import IconButton from 'material-ui/IconButton';
@@ -43,6 +44,10 @@ export default class Auto extends Component {
         textFields: [],             //数据配置text解析的参数
         anchorOrigin: {vertical: 'bottom', horizontal: 'left'},
         targetOrigin: {vertical: 'top', horizontal: 'left'}
+    };
+
+    static contextTypes = {
+        muiTheme: PropTypes.object,
     };
 
     constructor(props) {
@@ -243,56 +248,61 @@ export default class Auto extends Component {
     };
 
     render = () => {
+        let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
         let value = this.getValue();
         let searchText = this.getSearchText();
         let styleProps = _.merge(style.getStyle('auto', this.props), this.props.styleProps);
         let label = this.props.label;
+        let autoComplete = <AutoComplete
+            ref={"auto"}
+            filter={this.props.filter || this.filter}
+            name={this.props.name || this.props.dataKey || utils.uuid()}
+            fullWidth={this.props.fullWidth}
+            floatingLabelText={label}
+            value={value}
+            searchText={searchText}
+            disabled={this.props.disabled}
+            hintText={this.props.hintText}
+            errorText={this.props.errorText}
+            floatingLabelFixed={this.props.labelFixed}
+            underlineShow={borderStyle === 'underline' && this.props.borderShow}
+            dataSource={this.state.dataSource}
+            dataSourceConfig={this.props.dataSourceConfig}
+            maxSearchResults={this.props.maxSearchResults}
+            openOnFocus={this.props.openOnFocus}
+            onClose={this.handleClose}
+            onFocus={this.handleFocus}
+            onBlur={this.handleBlur}
+            onKeyUp={this.handleKeyUp}
+            onNewRequest={this.handleNewRequest}
+            onUpdateInput={this.handleUpdateInput}
+            multiLine={this.props.multiLine}
+            rows={this.props.rows}
+            rowsMax={this.props.rowsMax}
+            textFieldStyle={{...styleProps.style, ...this.props.style}}
+            textareaStyle={styleProps.textareaStyle}
+            floatingLabelStyle={styleProps.floatingLabelStyle}
+            floatingLabelFocusStyle={styleProps.floatingLabelFocusStyle}
+            floatingLabelShrinkStyle={styleProps.floatingLabelShrinkStyle}
+            errorStyle={styleProps.errorStyle}
+            hintStyle={styleProps.hintStyle}
+            underlineStyle={styleProps.underlineStyle}
+            inputStyle={styleProps.inputStyle}
+            menuProps={styleProps.menuProps}
+            menuStyle={styleProps.menuStyle}
+            disableFocusRipple={true}
+            style={styleProps.style}
+            anchorOrigin={this.state.anchorOrigin}
+            targetOrigin={this.state.targetOrigin}
+            popoverProps={styleProps.popoverProps}
+        />;
         return (
             <div className="flex between" ref={"container"}>
                 <div style={{flexGrow: 1, position: 'relative'}}>
-                    <AutoComplete
-                        ref={"auto"}
-                        filter={this.props.filter || this.filter}
-                        name={this.props.name || this.props.dataKey || utils.uuid()}
-                        fullWidth={this.props.fullWidth}
-                        floatingLabelText={label}
-                        value={value}
-                        searchText={searchText}
-                        disabled={this.props.disabled}
-                        hintText={this.props.hintText}
-                        errorText={this.props.errorText}
-                        floatingLabelFixed={this.props.labelFixed}
-                        underlineShow={this.props.borderShow}
-                        dataSource={this.state.dataSource}
-                        dataSourceConfig={this.props.dataSourceConfig}
-                        maxSearchResults={this.props.maxSearchResults}
-                        openOnFocus={this.props.openOnFocus}
-                        onClose={this.handleClose}
-                        onFocus={this.handleFocus}
-                        onBlur={this.handleBlur}
-                        onKeyUp={this.handleKeyUp}
-                        onNewRequest={this.handleNewRequest}
-                        onUpdateInput={this.handleUpdateInput}
-                        multiLine={this.props.multiLine}
-                        rows={this.props.rows}
-                        rowsMax={this.props.rowsMax}
-                        textFieldStyle={{...styleProps.style, ...this.props.style}}
-                        textareaStyle={styleProps.textareaStyle}
-                        floatingLabelStyle={styleProps.floatingLabelStyle}
-                        floatingLabelFocusStyle={styleProps.floatingLabelFocusStyle}
-                        floatingLabelShrinkStyle={styleProps.floatingLabelShrinkStyle}
-                        errorStyle={styleProps.errorStyle}
-                        hintStyle={styleProps.hintStyle}
-                        underlineStyle={styleProps.underlineStyle}
-                        inputStyle={styleProps.inputStyle}
-                        menuProps={styleProps.menuProps}
-                        menuStyle={styleProps.menuStyle}
-                        disableFocusRipple={true}
-                        style={styleProps.style}
-                        anchorOrigin={this.state.anchorOrigin}
-                        targetOrigin={this.state.targetOrigin}
-                        popoverProps={styleProps.popoverProps}
-                    />
+                    {
+                        borderStyle === 'border' && this.props.borderShow ? <div className="control-border">{autoComplete}</div> : autoComplete
+                    }
+
                     {
                         (value !== undefined && value !== null && value !== '') && this.props.hasClear && !this.props.disabled && !this.props.immutable ?
                             <IconButton iconClassName="iconfont icon-close-circle-fill" onClick={this.handleClear}

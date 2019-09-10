@@ -3,6 +3,7 @@
  */
 
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
 import SelectField from 'material-ui/SelectField';
@@ -49,6 +50,10 @@ export default class Select extends Component {
         filterText: '',
         open: false,
         anchorEl: undefined
+    };
+
+    static contextTypes = {
+        muiTheme: PropTypes.object,
     };
 
     constructor(props) {
@@ -183,11 +188,35 @@ export default class Select extends Component {
     };
 
     render() {
+        let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
         let value = this.getValue();
         let styleProps = _.merge(style.getStyle('select', this.props), this.props.styleProps);
         let label = this.props.label;
         let options = this.getOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]);
         let selectValue = (this.props.multiple && this.props.carryKey) ? (value || []).map((n) => (_.get(n, this.props.dataSourceConfig.value))) : value;
+        let selectField = <SelectField value={selectValue}
+                                       name={this.props.name || this.props.dataKey || utils.uuid()}
+                                       floatingLabelText={label}
+                                       multiple={this.props.multiple}
+                                       fullWidth={this.props.fullWidth}
+                                       disabled={this.props.disabled}
+                                       hintText={this.props.hintText}
+                                       errorText={this.props.errorText}
+                                       floatingLabelFixed={this.props.labelFixed}
+                                       underlineShow={borderStyle === 'underline' && this.props.borderShow}
+                                       {...styleProps}
+        >
+            {this.getAllOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]).map((option, index) => {
+                return <MenuItem key={index}
+                                 value={option.value}
+                                 label={option.text}
+                                 primaryText={option.selectText || option.label}
+                                 disabled={option.disabled}
+                                 innerDivStyle={styleProps.menuItemStyle.innerDivStyle}
+                                 style={{textIndent: option.indent}}
+                />
+            })}
+        </SelectField>;
         return <div className="relative" style={{overflow: 'hidden', ...this.props.style}}>
             <div className="relative cursor-pointer" onClick={(event) => {
                 if (!this.props.disabled) {
@@ -197,29 +226,9 @@ export default class Select extends Component {
                     })
                 }
             }}>
-                <SelectField value={selectValue}
-                             name={this.props.name || this.props.dataKey || utils.uuid()}
-                             floatingLabelText={label}
-                             multiple={this.props.multiple}
-                             fullWidth={this.props.fullWidth}
-                             disabled={this.props.disabled}
-                             hintText={this.props.hintText}
-                             errorText={this.props.errorText}
-                             floatingLabelFixed={this.props.labelFixed}
-                             underlineShow={this.props.borderShow}
-                             {...styleProps}
-                >
-                    {this.getAllOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]).map((option, index) => {
-                        return <MenuItem key={index}
-                                         value={option.value}
-                                         label={option.text}
-                                         primaryText={option.selectText || option.label}
-                                         disabled={option.disabled}
-                                         innerDivStyle={styleProps.menuItemStyle.innerDivStyle}
-                                         style={{textIndent: option.indent}}
-                        />
-                    })}
-                </SelectField>
+                {
+                    borderStyle === 'border' && this.props.borderShow ? <div className="control-border">{selectField}</div> : selectField
+                }
                 <div className="full-screen"></div>
             </div>
             <Popover

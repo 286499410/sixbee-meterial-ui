@@ -45,7 +45,7 @@ export default class Body extends Component {
      * @returns {*}
      */
     getData(value) {
-        let index = _.findIndex(this.state.dataSource, (o) => {
+        let index = _.findIndex(this.context.props.dataSource, (o) => {
             return _.get(o, this.context.props.dataSourceConfig.value) == value;
         });
         return index >= 0 ? this.context.props.dataSource[index] : undefined;

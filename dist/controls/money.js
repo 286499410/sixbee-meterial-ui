@@ -32,6 +32,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 var _TextField = require('material-ui/TextField');
 
 var _TextField2 = _interopRequireDefault(_TextField);
@@ -60,7 +64,7 @@ var Money = function (_Component) {
 
         _this.state = {
             value: undefined,
-            isFocus: false
+            focus: false
         };
 
         _this.setValue = function (value) {
@@ -85,14 +89,14 @@ var Money = function (_Component) {
 
         _this.handleBlur = function (event) {
             _this.state.value = _this.state.value !== '' && _this.state.value !== undefined ? _utils2.default.parseNumber(_this.state.value) : _this.state.value;
-            _this.setState({ isFocus: false });
+            _this.setState({ focus: false });
             if (_this.props.onBlur) {
                 _this.props.onBlur(event, _this);
             }
         };
 
         _this.handleFocus = function (event) {
-            _this.setState({ isFocus: true });
+            _this.setState({ focus: true });
             if (_this.props.onFocus) {
                 _this.props.onFocus(event, _this);
             }
@@ -134,7 +138,7 @@ var Money = function (_Component) {
                     textAlign: this.props.textAlign
                 });
             }
-            if (!this.state.isFocus && this.state.value < 0) {
+            if (!this.state.focus && this.state.value < 0) {
                 styleProps.inputStyle = (0, _extends3.default)({}, styleProps.inputStyle, this.props.deficitStyle);
             }
             return styleProps;
@@ -142,17 +146,18 @@ var Money = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
+            var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
             var value = this.getValue();
             var label = this.props.label;
             var styleProps = this.getStyleProps();
-            if (!this.state.isFocus) {
+            if (!this.state.focus) {
                 if (!this.props.showZero && value == 0) {
                     value = '';
                 } else {
                     value = value !== '' ? _utils2.default.parseMoney(value, this.props.float) : '';
                 }
             }
-            return _react2.default.createElement(_TextField2.default, (0, _extends3.default)({
+            var textField = _react2.default.createElement(_TextField2.default, (0, _extends3.default)({
                 name: this.props.name || this.props.dataKey || _utils2.default.uuid(),
                 fullWidth: this.props.fullWidth,
                 floatingLabelText: label,
@@ -166,9 +171,18 @@ var Money = function (_Component) {
                 hintText: this.props.hintText,
                 errorText: this.props.errorText,
                 floatingLabelFixed: this.props.labelFixed,
-                underlineShow: this.props.borderShow,
+                underlineShow: borderStyle === 'underline' && this.props.borderShow,
                 autoComplete: this.props.autoComplete
             }, styleProps));
+            if (borderStyle === 'border' && this.props.borderShow) {
+                return _react2.default.createElement(
+                    'div',
+                    { className: "control-border" + (this.state.focus ? ' focus' : '') },
+                    textField
+                );
+            } else {
+                return textField;
+            }
         }
     }]);
     return Money;
@@ -191,4 +205,7 @@ Money.defaultProps = {
     float: 2,
     deficitStyle: { color: 'red' },
     showZero: true };
+Money.contextTypes = {
+    muiTheme: _propTypes2.default.object
+};
 exports.default = Money;

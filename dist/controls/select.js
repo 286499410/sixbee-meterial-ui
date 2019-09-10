@@ -32,6 +32,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 var _MenuItem = require('material-ui/MenuItem');
 
 var _MenuItem2 = _interopRequireDefault(_MenuItem);
@@ -207,6 +211,7 @@ var Select = function (_Component) {
         value: function render() {
             var _this3 = this;
 
+            var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
             var value = this.getValue();
             var styleProps = _lodash2.default.merge(_style2.default.getStyle('select', this.props), this.props.styleProps);
             var label = this.props.label;
@@ -214,6 +219,30 @@ var Select = function (_Component) {
             var selectValue = this.props.multiple && this.props.carryKey ? (value || []).map(function (n) {
                 return _lodash2.default.get(n, _this3.props.dataSourceConfig.value);
             }) : value;
+            var selectField = _react2.default.createElement(
+                _SelectField2.default,
+                (0, _extends3.default)({ value: selectValue,
+                    name: this.props.name || this.props.dataKey || _utils2.default.uuid(),
+                    floatingLabelText: label,
+                    multiple: this.props.multiple,
+                    fullWidth: this.props.fullWidth,
+                    disabled: this.props.disabled,
+                    hintText: this.props.hintText,
+                    errorText: this.props.errorText,
+                    floatingLabelFixed: this.props.labelFixed,
+                    underlineShow: borderStyle === 'underline' && this.props.borderShow
+                }, styleProps),
+                this.getAllOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]).map(function (option, index) {
+                    return _react2.default.createElement(_MenuItem2.default, { key: index,
+                        value: option.value,
+                        label: option.text,
+                        primaryText: option.selectText || option.label,
+                        disabled: option.disabled,
+                        innerDivStyle: styleProps.menuItemStyle.innerDivStyle,
+                        style: { textIndent: option.indent }
+                    });
+                })
+            );
             return _react2.default.createElement(
                 'div',
                 { className: 'relative', style: (0, _extends3.default)({ overflow: 'hidden' }, this.props.style) },
@@ -227,30 +256,11 @@ var Select = function (_Component) {
                                 });
                             }
                         } },
-                    _react2.default.createElement(
-                        _SelectField2.default,
-                        (0, _extends3.default)({ value: selectValue,
-                            name: this.props.name || this.props.dataKey || _utils2.default.uuid(),
-                            floatingLabelText: label,
-                            multiple: this.props.multiple,
-                            fullWidth: this.props.fullWidth,
-                            disabled: this.props.disabled,
-                            hintText: this.props.hintText,
-                            errorText: this.props.errorText,
-                            floatingLabelFixed: this.props.labelFixed,
-                            underlineShow: this.props.borderShow
-                        }, styleProps),
-                        this.getAllOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]).map(function (option, index) {
-                            return _react2.default.createElement(_MenuItem2.default, { key: index,
-                                value: option.value,
-                                label: option.text,
-                                primaryText: option.selectText || option.label,
-                                disabled: option.disabled,
-                                innerDivStyle: styleProps.menuItemStyle.innerDivStyle,
-                                style: { textIndent: option.indent }
-                            });
-                        })
-                    ),
+                    borderStyle === 'border' && this.props.borderShow ? _react2.default.createElement(
+                        'div',
+                        { className: 'control-border' },
+                        selectField
+                    ) : selectField,
                     _react2.default.createElement('div', { className: 'full-screen' })
                 ),
                 _react2.default.createElement(
@@ -305,6 +315,9 @@ Select.defaultProps = {
     fullWidth: true,
     size: 'default',
     cancel: false };
+Select.contextTypes = {
+    muiTheme: _propTypes2.default.object
+};
 exports.default = Select;
 
 var Options = function (_Component2) {

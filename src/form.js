@@ -360,7 +360,8 @@ export default class Form extends Component {
                                     field.label ? <div className="col col-full"
                                                        style={{
                                                            color: 'cadetblue',
-                                                           marginTop: 16
+                                                           marginTop: 16,
+                                                           marginBottom: this.props.inline ? 16: 0
                                                        }}>{field.label}</div> : null
                                 }
                                 {this.renderControls(field.fields)}

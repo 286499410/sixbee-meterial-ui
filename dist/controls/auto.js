@@ -32,6 +32,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -152,6 +156,9 @@ Auto.defaultProps = {
     fullWidth: true,
     events: undefined
 };
+Auto.contextTypes = {
+    muiTheme: _propTypes2.default.object
+};
 
 var _initialiseProps = function _initialiseProps() {
     var _this4 = this;
@@ -239,59 +246,65 @@ var _initialiseProps = function _initialiseProps() {
     };
 
     this.render = function () {
+        var borderStyle = _this4.props.borderStyle || _this4.context.muiTheme.controlBorderStyle || 'underline';
         var value = _this4.getValue();
         var searchText = _this4.getSearchText();
         var styleProps = _lodash2.default.merge(_style2.default.getStyle('auto', _this4.props), _this4.props.styleProps);
         var label = _this4.props.label;
+        var autoComplete = _react2.default.createElement(_AutoComplete2.default, {
+            ref: "auto",
+            filter: _this4.props.filter || _this4.filter,
+            name: _this4.props.name || _this4.props.dataKey || _utils2.default.uuid(),
+            fullWidth: _this4.props.fullWidth,
+            floatingLabelText: label,
+            value: value,
+            searchText: searchText,
+            disabled: _this4.props.disabled,
+            hintText: _this4.props.hintText,
+            errorText: _this4.props.errorText,
+            floatingLabelFixed: _this4.props.labelFixed,
+            underlineShow: borderStyle === 'underline' && _this4.props.borderShow,
+            dataSource: _this4.state.dataSource,
+            dataSourceConfig: _this4.props.dataSourceConfig,
+            maxSearchResults: _this4.props.maxSearchResults,
+            openOnFocus: _this4.props.openOnFocus,
+            onClose: _this4.handleClose,
+            onFocus: _this4.handleFocus,
+            onBlur: _this4.handleBlur,
+            onKeyUp: _this4.handleKeyUp,
+            onNewRequest: _this4.handleNewRequest,
+            onUpdateInput: _this4.handleUpdateInput,
+            multiLine: _this4.props.multiLine,
+            rows: _this4.props.rows,
+            rowsMax: _this4.props.rowsMax,
+            textFieldStyle: (0, _extends3.default)({}, styleProps.style, _this4.props.style),
+            textareaStyle: styleProps.textareaStyle,
+            floatingLabelStyle: styleProps.floatingLabelStyle,
+            floatingLabelFocusStyle: styleProps.floatingLabelFocusStyle,
+            floatingLabelShrinkStyle: styleProps.floatingLabelShrinkStyle,
+            errorStyle: styleProps.errorStyle,
+            hintStyle: styleProps.hintStyle,
+            underlineStyle: styleProps.underlineStyle,
+            inputStyle: styleProps.inputStyle,
+            menuProps: styleProps.menuProps,
+            menuStyle: styleProps.menuStyle,
+            disableFocusRipple: true,
+            style: styleProps.style,
+            anchorOrigin: _this4.state.anchorOrigin,
+            targetOrigin: _this4.state.targetOrigin,
+            popoverProps: styleProps.popoverProps
+        });
         return _react2.default.createElement(
             'div',
             { className: 'flex between', ref: "container" },
             _react2.default.createElement(
                 'div',
                 { style: { flexGrow: 1, position: 'relative' } },
-                _react2.default.createElement(_AutoComplete2.default, {
-                    ref: "auto",
-                    filter: _this4.props.filter || _this4.filter,
-                    name: _this4.props.name || _this4.props.dataKey || _utils2.default.uuid(),
-                    fullWidth: _this4.props.fullWidth,
-                    floatingLabelText: label,
-                    value: value,
-                    searchText: searchText,
-                    disabled: _this4.props.disabled,
-                    hintText: _this4.props.hintText,
-                    errorText: _this4.props.errorText,
-                    floatingLabelFixed: _this4.props.labelFixed,
-                    underlineShow: _this4.props.borderShow,
-                    dataSource: _this4.state.dataSource,
-                    dataSourceConfig: _this4.props.dataSourceConfig,
-                    maxSearchResults: _this4.props.maxSearchResults,
-                    openOnFocus: _this4.props.openOnFocus,
-                    onClose: _this4.handleClose,
-                    onFocus: _this4.handleFocus,
-                    onBlur: _this4.handleBlur,
-                    onKeyUp: _this4.handleKeyUp,
-                    onNewRequest: _this4.handleNewRequest,
-                    onUpdateInput: _this4.handleUpdateInput,
-                    multiLine: _this4.props.multiLine,
-                    rows: _this4.props.rows,
-                    rowsMax: _this4.props.rowsMax,
-                    textFieldStyle: (0, _extends3.default)({}, styleProps.style, _this4.props.style),
-                    textareaStyle: styleProps.textareaStyle,
-                    floatingLabelStyle: styleProps.floatingLabelStyle,
-                    floatingLabelFocusStyle: styleProps.floatingLabelFocusStyle,
-                    floatingLabelShrinkStyle: styleProps.floatingLabelShrinkStyle,
-                    errorStyle: styleProps.errorStyle,
-                    hintStyle: styleProps.hintStyle,
-                    underlineStyle: styleProps.underlineStyle,
-                    inputStyle: styleProps.inputStyle,
-                    menuProps: styleProps.menuProps,
-                    menuStyle: styleProps.menuStyle,
-                    disableFocusRipple: true,
-                    style: styleProps.style,
-                    anchorOrigin: _this4.state.anchorOrigin,
-                    targetOrigin: _this4.state.targetOrigin,
-                    popoverProps: styleProps.popoverProps
-                }),
+                borderStyle === 'border' && _this4.props.borderShow ? _react2.default.createElement(
+                    'div',
+                    { className: 'control-border' },
+                    autoComplete
+                ) : autoComplete,
                 value !== undefined && value !== null && value !== '' && _this4.props.hasClear && !_this4.props.disabled && !_this4.props.immutable ? _react2.default.createElement(_IconButton2.default, { iconClassName: 'iconfont icon-close-circle-fill', onClick: _this4.handleClear,
                     style: (0, _extends3.default)({ position: 'absolute', right: 0 }, styleProps.iconStyle.style),
                     iconStyle: (0, _extends3.default)({ color: '#e0e0e0' }, styleProps.iconStyle.iconStyle)

@@ -68,7 +68,8 @@ var Text = function (_Component) {
 
         _this.state = {
             value: undefined,
-            errorText: ''
+            errorText: '',
+            focus: false
         };
 
         _this.setValue = function (value) {
@@ -98,12 +99,14 @@ var Text = function (_Component) {
         };
 
         _this.handleBlur = function (event) {
+            _this.setState({ focus: false });
             if (_this.props.onBlur) {
                 _this.props.onBlur(event, _this);
             }
         };
 
         _this.handleFocus = function (event) {
+            _this.setState({ focus: true });
             if (_this.props.onFocus) {
                 _this.props.onFocus(event, _this);
             }
@@ -152,7 +155,7 @@ var Text = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            var borderStyle = this.props.borderStyle || this.context.controlBorderStyle || 'underline';
+            var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
             var value = this.getValue();
             var label = this.props.label;
             var styleProps = this.getStyleProps();
@@ -180,10 +183,10 @@ var Text = function (_Component) {
                 underlineShow: borderStyle === 'underline' && this.props.borderShow,
                 autoComplete: this.props.autoComplete
             }, styleProps));
-            if (borderStyle === 'border') {
+            if (borderStyle === 'border' && this.props.borderShow) {
                 return _react2.default.createElement(
                     'div',
-                    { className: 'control-border' },
+                    { className: "control-border" + (this.state.focus ? ' focus' : '') },
                     textField
                 );
             } else {

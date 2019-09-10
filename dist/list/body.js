@@ -159,7 +159,7 @@ var Body = function (_Component) {
         value: function getData(value) {
             var _this2 = this;
 
-            var index = _.findIndex(this.state.dataSource, function (o) {
+            var index = _.findIndex(this.context.props.dataSource, function (o) {
                 return _.get(o, _this2.context.props.dataSourceConfig.value) == value;
             });
             return index >= 0 ? this.context.props.dataSource[index] : undefined;

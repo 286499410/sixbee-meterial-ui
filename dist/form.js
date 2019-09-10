@@ -490,7 +490,8 @@ var _initialiseProps = function _initialiseProps() {
                                     { className: 'col col-full',
                                         style: {
                                             color: 'cadetblue',
-                                            marginTop: 16
+                                            marginTop: 16,
+                                            marginBottom: _this6.props.inline ? 16 : 0
                                         } },
                                     field.label
                                 ) : null,

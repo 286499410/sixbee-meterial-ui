@@ -3,6 +3,7 @@
  */
 
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import TextField from 'material-ui/TextField';
 import _ from 'lodash';
 import style from '../style';
@@ -31,7 +32,11 @@ export default class Money extends Component {
 
     state = {
         value: undefined,
-        isFocus: false,
+        focus: false,
+    };
+
+    static contextTypes = {
+        muiTheme: PropTypes.object,
     };
 
     constructor(props) {
@@ -91,7 +96,7 @@ export default class Money extends Component {
      */
     handleBlur = (event) => {
         this.state.value = this.state.value !== '' && this.state.value !== undefined ? utils.parseNumber(this.state.value) : this.state.value;
-        this.setState({isFocus: false});
+        this.setState({focus: false});
         if (this.props.onBlur) {
             this.props.onBlur(event, this)
         }
@@ -102,7 +107,7 @@ export default class Money extends Component {
      * @param event
      */
     handleFocus = (event) => {
-        this.setState({isFocus: true});
+        this.setState({focus: true});
         if (this.props.onFocus) {
             this.props.onFocus(event, this)
         }
@@ -126,7 +131,7 @@ export default class Money extends Component {
                 textAlign: this.props.textAlign
             };
         }
-        if (!this.state.isFocus && this.state.value < 0) {
+        if (!this.state.focus && this.state.value < 0) {
             styleProps.inputStyle = {
                 ...styleProps.inputStyle,
                 ...this.props.deficitStyle
@@ -136,36 +141,40 @@ export default class Money extends Component {
     };
 
     render() {
+        let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
         let value = this.getValue();
         let label = this.props.label;
         let styleProps = this.getStyleProps();
-        if(!this.state.isFocus) {
+        if(!this.state.focus) {
             if(!this.props.showZero && value == 0) {
                 value = '';
             } else {
                 value = value !== '' ? utils.parseMoney(value, this.props.float) : '';
             }
         }
-        return (
-            <TextField
-                name={this.props.name || this.props.dataKey || utils.uuid()}
-                fullWidth={this.props.fullWidth}
-                floatingLabelText={label}
-                type={'text'}
-                value={value}
-                disabled={this.props.disabled}
-                onChange={this.handleChange}
-                onBlur={this.handleBlur}
-                onFocus={this.handleFocus}
-                onKeyUp={this.handleKeyUp}
-                hintText={this.props.hintText}
-                errorText={this.props.errorText}
-                floatingLabelFixed={this.props.labelFixed}
-                underlineShow={this.props.borderShow}
-                autoComplete={this.props.autoComplete}
-                {...styleProps}
-            />
-        )
+        let textField = <TextField
+            name={this.props.name || this.props.dataKey || utils.uuid()}
+            fullWidth={this.props.fullWidth}
+            floatingLabelText={label}
+            type={'text'}
+            value={value}
+            disabled={this.props.disabled}
+            onChange={this.handleChange}
+            onBlur={this.handleBlur}
+            onFocus={this.handleFocus}
+            onKeyUp={this.handleKeyUp}
+            hintText={this.props.hintText}
+            errorText={this.props.errorText}
+            floatingLabelFixed={this.props.labelFixed}
+            underlineShow={borderStyle === 'underline' && this.props.borderShow}
+            autoComplete={this.props.autoComplete}
+            {...styleProps}
+        />;
+        if (borderStyle === 'border' && this.props.borderShow) {
+            return <div className={"control-border" + (this.state.focus ? ' focus' : '')}>{textField}</div>
+        } else {
+            return textField;
+        }
     }
 
 }
