@@ -164,7 +164,7 @@ export default class DateTime extends Component {
                     </div>
                 }
                 <div className="flex">
-                    <div style={{width: 100}}>
+                    <div style={{width: 90, minWidth: 90}}>
                         <Date
                             ref="date"
                             hintText="日期"
@@ -174,9 +174,10 @@ export default class DateTime extends Component {
                             hasClear={false}
                             onChange={this.handleChange('date')}
                             errorText={this.props.errorText}
+                            errorStyle={{whiteSpace: 'nowrap'}}
                         />
                     </div>
-                    <div style={{width: 80}}>
+                    <div style={{width: 70, minWidth: 70}}>
                         <Time
                             ref="time"
                             hintText="时间"

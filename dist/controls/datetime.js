@@ -233,7 +233,7 @@ var DateTime = function (_Component) {
                     { className: 'flex' },
                     _react2.default.createElement(
                         'div',
-                        { style: { width: 100 } },
+                        { style: { width: 90, minWidth: 90 } },
                         _react2.default.createElement(_date2.default, {
                             ref: 'date',
                             hintText: '\u65E5\u671F',
@@ -242,12 +242,13 @@ var DateTime = function (_Component) {
                             maxDate: this.props.maxDate || null,
                             hasClear: false,
                             onChange: this.handleChange('date'),
-                            errorText: this.props.errorText
+                            errorText: this.props.errorText,
+                            errorStyle: { whiteSpace: 'nowrap' }
                         })
                     ),
                     _react2.default.createElement(
                         'div',
-                        { style: { width: 80 } },
+                        { style: { width: 70, minWidth: 70 } },
                         _react2.default.createElement(_time2.default, {
                             ref: 'time',
                             hintText: '\u65F6\u95F4',

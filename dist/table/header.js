@@ -178,8 +178,9 @@ var TableHeader = function (_Component) {
                                                 null,
                                                 col.label
                                             ),
-                                            col.filter ? _react2.default.createElement(_filter2.default, { field: col.filter, onFilter: _this3.handleFilter(col),
-                                                value: filterData[col.key] }) : null,
+                                            col.filter ? _react2.default.createElement(_filter2.default, { field: col.filter === true ? col : col.filter,
+                                                onFilter: _this3.handleFilter(col),
+                                                value: _.get(filterData, col.formKey || col.key) }) : null,
                                             col.sortable ? _react2.default.createElement(_sort2.default, { field: col, onSort: _this3.handleSort(col) }) : null
                                         ),
                                         props.resize ? _react2.default.createElement('div', { className: 'resize',
@@ -272,10 +273,23 @@ var _initialiseProps = function _initialiseProps() {
         return function (value, field) {
             var props = _this4.context.props;
             var filterData = _this4.context.state.filterData;
+            var key = col.formKey || col.key;
             if (value === undefined) {
-                delete filterData[col.key];
+                var keys = key.split('.');
+                var len = keys.length;
+                if (len == 1) {
+                    delete filterData[keys[0]];
+                } else if (len == 2) {
+                    delete filterData[keys[0]][keys[1]];
+                } else if (len == 3) {
+                    delete filterData[keys[0]][keys[1]][keys[2]];
+                } else if (len == 4) {
+                    delete filterData[keys[0]][keys[1]][keys[2]][keys[3]];
+                } else if (len == 5) {
+                    delete filterData[keys[0]][keys[1]][keys[2]][keys[3]][keys[4]];
+                }
             } else {
-                filterData[col.key] = value;
+                _.set(filterData, key, value);
             }
             if (props.onFilter) {
                 props.onFilter(filterData);

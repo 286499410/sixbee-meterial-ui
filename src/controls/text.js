@@ -60,10 +60,11 @@ export default class Text extends Component {
      * @param value
      */
     setValue = (value) => {
+        this.state.value = value;
         if (this.props.onChange) {
             this.props.onChange(value, this);
         }
-        this.setState({value: value});
+        this.forceUpdate();
     };
 
     /**

@@ -95,10 +95,9 @@ export default class Auto extends Component {
     setValue(value) {
         let data = this.getData(value) || {};
         let searchText = this.props.supportSearchText ? value : _.get(data, this.props.dataSourceConfig.text, '');
-        this.setState({
-            searchText: searchText,
-            value: value
-        });
+        this.state.searchText = searchText;
+        this.state.value = value;
+        this.forceUpdate();
         if (this.props.onChange) {
             this.props.onChange(value, this);
         }

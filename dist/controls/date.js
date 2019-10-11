@@ -188,7 +188,7 @@ var Date = function (_Component) {
                     floatingLabelStyle: styleProps.floatingLabelStyle,
                     floatingLabelFocusStyle: styleProps.floatingLabelFocusStyle,
                     floatingLabelShrinkStyle: styleProps.floatingLabelShrinkStyle,
-                    errorStyle: styleProps.errorStyle,
+                    errorStyle: (0, _extends3.default)({}, styleProps.errorStyle, this.props.errorStyle),
                     hintStyle: styleProps.hintStyle,
                     underlineStyle: styleProps.underlineStyle,
                     inputStyle: styleProps.inputStyle,

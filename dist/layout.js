@@ -65,8 +65,8 @@ var Container = function (_Component) {
 
 Container.defaultProps = {
     fullScreen: false,
-    direction: 'row'
-};
+    direction: 'row',
+    scrollbar: 'custom' };
 
 var Header = function (_Component2) {
     (0, _inherits3.default)(Header, _Component2);
@@ -175,9 +175,12 @@ var Content = function (_Component4) {
             }
             return _react2.default.createElement(
                 'div',
-                { ref: 'container', className: 'content',
-                    style: (0, _extends3.default)({}, this.props.style, style) },
-                _react2.default.createElement(
+                { ref: 'container', className: 'content', style: (0, _extends3.default)({}, this.props.style, style) },
+                this.props.scrollbar == 'default' ? _react2.default.createElement(
+                    'div',
+                    { className: 'full-height ' + this.props.className },
+                    this.props.children
+                ) : _react2.default.createElement(
                     _reactCustomScrollbars.Scrollbars,
                     null,
                     _react2.default.createElement(

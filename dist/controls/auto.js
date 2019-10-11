@@ -93,10 +93,9 @@ var Auto = function (_Component) {
         value: function setValue(value) {
             var data = this.getData(value) || {};
             var searchText = this.props.supportSearchText ? value : _lodash2.default.get(data, this.props.dataSourceConfig.text, '');
-            this.setState({
-                searchText: searchText,
-                value: value
-            });
+            this.state.searchText = searchText;
+            this.state.value = value;
+            this.forceUpdate();
             if (this.props.onChange) {
                 this.props.onChange(value, this);
             }

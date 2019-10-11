@@ -78,6 +78,7 @@ var Time = function (_Component) {
                     case 'minute':
                         _this.refs.minute.scrollTop(_this.refs.minute.getScrollTop() + (0, _jquery2.default)(_this.refs['minute' + value]).position().top);
                         minute = value;
+                        _this.state.open = false;
                         break;
                 }
                 _this.setValue(hour + ':' + minute);

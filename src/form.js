@@ -187,7 +187,7 @@ export default class Form extends Component {
         if (this.props.onChange) {
             this.props.onChange(data, field, control, this);
         }
-        if(Object.keys(this.state.errorText).length > 0) {
+        if (Object.keys(this.state.errorText).length > 0) {
             let allData = this.getData('all');
             this.check(allData);
         }
@@ -361,7 +361,7 @@ export default class Form extends Component {
                                                        style={{
                                                            color: 'cadetblue',
                                                            marginTop: 16,
-                                                           marginBottom: this.props.inline ? 16: 0
+                                                           marginBottom: this.props.inline ? 16 : 0
                                                        }}>{field.label}</div> : null
                                 }
                                 {this.renderControls(field.fields)}
@@ -440,8 +440,8 @@ export default class Form extends Component {
                                 {
                                     field.label ? <div
                                         style={{
-                                            width: this.props.labelWidth,
-                                            minWidth: this.props.labelWidth
+                                            width: field.labelWidth || this.props.labelWidth,
+                                            minWidth: field.labelWidth || this.props.labelWidth
                                         }}>{field.label}：</div> : null
                                 }
                                 <div style={{flexGrow: 1, width: 0}}>
@@ -490,18 +490,25 @@ export default class Form extends Component {
             <div className={"relative " + this.props.className}
                  style={{
                      width: this.props.width,
-                     height: _.isNumber(this.props.height) ? this.props.height : `calc(${this.props.height})`
+                     height: _.isNumber(this.props.height) ? this.props.height : `calc(${this.props.height})`,
+                     ...this.props.style
                  }}>
                 {
                     this.props.tabs ?
-                        <div style={{width: this.props.width, height: contentHeight}}>
+                        <div style={{height: contentHeight}}>
                             <Tabs dataSource={this.getTabDataSource()}
                                   labelStyle={{justifyContent: 'center', margin: 12}}/>
                         </div> :
-                        <Scrollbars style={{width: this.props.width, height: contentHeight}}
+                        <Scrollbars style={{height: contentHeight}}
                                     autoHeight={this.props.height == 'auto'}
                                     autoHeightMax={contentHeight}>
-                            <div className="space" style={{width: '100%', overflowX: 'hidden', ...this.props.style}}>
+                            <div className="space" style={{
+                                width: '100%',
+                                overflowX: 'hidden',
+                                paddingLeft: 20,
+                                paddingRight: 20,
+                                ...this.props.style
+                            }}>
                                 <div className="form row-space" cols={this.props.cols}>
                                     {this.renderControls(this.props.fields)}
                                 </div>

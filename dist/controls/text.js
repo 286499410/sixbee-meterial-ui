@@ -73,10 +73,11 @@ var Text = function (_Component) {
         };
 
         _this.setValue = function (value) {
+            _this.state.value = value;
             if (_this.props.onChange) {
                 _this.props.onChange(value, _this);
             }
-            _this.setState({ value: value });
+            _this.forceUpdate();
         };
 
         _this.handleChange = function (event) {

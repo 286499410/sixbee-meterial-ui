@@ -113,6 +113,7 @@ export default class Time extends Component {
             case 'minute':
                 this.refs.minute.scrollTop(this.refs.minute.getScrollTop() + $(this.refs['minute' + value]).position().top);
                 minute = value;
+                this.state.open = false;
                 break;
         }
         this.setValue(hour + ':' + minute);

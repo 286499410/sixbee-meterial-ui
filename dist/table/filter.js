@@ -84,10 +84,21 @@ var Filter = function (_Component) {
             _this.filter();
         };
 
+        _this.initData(props);
         return _this;
     }
 
     (0, _createClass3.default)(Filter, [{
+        key: 'componentWillReceiveProps',
+        value: function componentWillReceiveProps(nextProps) {
+            this.initData(nextProps);
+        }
+    }, {
+        key: 'initData',
+        value: function initData(props) {
+            this.state.value = props.value;
+        }
+    }, {
         key: 'filter',
         value: function filter() {
             this.setState({ open: false });
@@ -103,11 +114,13 @@ var Filter = function (_Component) {
 
             return _react2.default.createElement(
                 'div',
-                { ref: 'container', style: { display: 'inline-block', position: 'relative' } },
+                { ref: 'container', style: { display: 'inline-block', position: 'relative', lineHeight: 1 } },
                 _react2.default.createElement(_icon2.default, { type: 'button',
                     name: 'filter-fill',
                     color: this.state.value ? this.props.filterColor : this.props.color,
                     hoverColor: this.props.hoverColor,
+                    padding: 2,
+                    size: 14,
                     onClick: this.handleOpen }),
                 _react2.default.createElement(
                     _popover2.default,
@@ -118,7 +131,16 @@ var Filter = function (_Component) {
                     _react2.default.createElement(
                         'div',
                         { className: 'space-small' },
-                        _react2.default.createElement(_control2.default, (0, _extends3.default)({ ref: 'control' }, this.props.field, { value: this.state.value, onChange: function onChange(value) {
+                        _react2.default.createElement(_control2.default, (0, _extends3.default)({
+                            ref: 'control',
+                            hintText: '\u8F93\u5165\u5173\u952E\u5B57\u67E5\u8BE2'
+                        }, this.props.field, {
+                            label: false,
+                            value: this.state.value,
+                            filter: undefined,
+                            hasClear: false,
+                            defaultValue: undefined,
+                            onChange: function onChange(value) {
                                 _this2.state.value = value;
                                 if (_this2.props.field.onChange) {
                                     _this2.props.field.onChange(value);

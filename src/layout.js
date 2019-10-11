@@ -11,7 +11,8 @@ class Container extends Component {
 
     static defaultProps = {
         fullScreen: false,
-        direction: 'row'
+        direction: 'row',
+        scrollbar: 'custom', //default | custom
     };
 
     constructor(props) {
@@ -110,13 +111,16 @@ class Content extends Component {
                 style.opacity = 0.1;
                 break;
         }
-        return <div ref="container" className="content"
-                    style={{...this.props.style, ...style}}>
-            <Scrollbars>
-                <div className={`full-height ${this.props.className}`}>
+        return <div ref="container" className="content" style={{...this.props.style, ...style}}>
+            {
+                this.props.scrollbar == 'default' ? <div className={`full-height ${this.props.className}`}>
                     {this.props.children}
-                </div>
-            </Scrollbars>
+                </div> : <Scrollbars>
+                    <div className={`full-height ${this.props.className}`}>
+                        {this.props.children}
+                    </div>
+                </Scrollbars>
+            }
         </div>
     }
 }

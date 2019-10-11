@@ -182,7 +182,7 @@ export default class Date extends Component {
                 floatingLabelStyle={styleProps.floatingLabelStyle}
                 floatingLabelFocusStyle={styleProps.floatingLabelFocusStyle}
                 floatingLabelShrinkStyle={styleProps.floatingLabelShrinkStyle}
-                errorStyle={styleProps.errorStyle}
+                errorStyle={{...styleProps.errorStyle, ...this.props.errorStyle}}
                 hintStyle={styleProps.hintStyle}
                 underlineStyle={styleProps.underlineStyle}
                 inputStyle={styleProps.inputStyle}

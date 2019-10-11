@@ -186,7 +186,7 @@ export default class Nav extends Component {
                     <div>
                         {row.children.map((child, j) => {
                             let index = this.findIndex(child);
-                            return <div key={j} className="flex middle hover-bg hover cursor-pointer relative text-small"
+                            return <div key={j} auth-key={child.dataKey} className="flex middle hover-bg hover cursor-pointer relative text-small"
                                         style={{padding: 8, userSelect: 'none'}}
                                         onClick={this.handleClick(child)}
                             >
@@ -263,7 +263,7 @@ export default class Nav extends Component {
                 <Sortable onChange={this.handleOrder}>
                     {
                         this.state.customs.map((custom, index) => {
-                            return <div key={index} className="flex middle cursor-pointer hover hover-bg"
+                            return <div key={index} auth-key={custom.dataKey} className="flex middle cursor-pointer hover hover-bg"
                                         data-id={custom.id}
                                         style={{height: this.props.itemHeight, width: this.props.itemWidth}}
                                         onClick={this.handleClick(custom)}>

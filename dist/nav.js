@@ -224,7 +224,7 @@ var Nav = function (_Component) {
                                 var index = _this2.findIndex(child);
                                 return _react2.default.createElement(
                                     'div',
-                                    { key: j, className: 'flex middle hover-bg hover cursor-pointer relative text-small',
+                                    { key: j, 'auth-key': child.dataKey, className: 'flex middle hover-bg hover cursor-pointer relative text-small',
                                         style: { padding: 8, userSelect: 'none' },
                                         onClick: _this2.handleClick(child)
                                     },
@@ -317,7 +317,7 @@ var Nav = function (_Component) {
                         this.state.customs.map(function (custom, index) {
                             return _react2.default.createElement(
                                 'div',
-                                { key: index, className: 'flex middle cursor-pointer hover hover-bg',
+                                { key: index, 'auth-key': custom.dataKey, className: 'flex middle cursor-pointer hover hover-bg',
                                     'data-id': custom.id,
                                     style: { height: _this3.props.itemHeight, width: _this3.props.itemWidth },
                                     onClick: _this3.handleClick(custom) },

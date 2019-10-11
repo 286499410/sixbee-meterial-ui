@@ -147,10 +147,23 @@ export default class TableHeader extends Component {
     handleFilter = (col) => (value, field) => {
         let props = this.context.props;
         let filterData = this.context.state.filterData;
-        if (value === undefined) {
-            delete filterData[col.key];
+        let key = col.formKey || col.key;
+        if(value === undefined) {
+            let keys = key.split('.');
+            let len = keys.length;
+            if(len == 1) {
+                delete filterData[keys[0]];
+            } else if(len == 2) {
+                delete filterData[keys[0]][keys[1]];
+            } else if(len == 3) {
+                delete filterData[keys[0]][keys[1]][keys[2]];
+            } else if(len == 4) {
+                delete filterData[keys[0]][keys[1]][keys[2]][keys[3]];
+            } else if(len == 5) {
+                delete filterData[keys[0]][keys[1]][keys[2]][keys[3]][keys[4]];
+            }
         } else {
-            filterData[col.key] = value;
+            _.set(filterData, key, value);
         }
         if (props.onFilter) {
             props.onFilter(filterData);
@@ -172,7 +185,7 @@ export default class TableHeader extends Component {
                 direction: direction
             };
         }
-        if(props.onSort) {
+        if (props.onSort) {
             props.onSort(sortData);
         }
         this.context.setTableState({sortData: sortData});
@@ -228,9 +241,11 @@ export default class TableHeader extends Component {
                                                 <div className="flex middle center">
                                                     <div>{col.label}</div>
                                                     {col.filter ?
-                                                        <Filter field={col.filter} onFilter={this.handleFilter(col)}
-                                                                value={filterData[col.key]}/> : null}
-                                                    {col.sortable ? <Sort field={col} onSort={this.handleSort(col)}/> : null}
+                                                        <Filter field={col.filter === true ? col : col.filter}
+                                                                onFilter={this.handleFilter(col)}
+                                                                value={_.get(filterData, col.formKey || col.key)}/> : null}
+                                                    {col.sortable ?
+                                                        <Sort field={col} onSort={this.handleSort(col)}/> : null}
                                                 </div>
                                                 {
                                                     props.resize ?
@@ -249,7 +264,6 @@ export default class TableHeader extends Component {
                                         data-key="_extra"
                                         style={{width: state.extraColumnWidth}}></th> : null
                                 }
-
                             </tr>
                         )
                     })}

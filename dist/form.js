@@ -344,23 +344,28 @@ var Form = function (_Component) {
             return _react2.default.createElement(
                 'div',
                 { className: "relative " + this.props.className,
-                    style: {
+                    style: (0, _extends3.default)({
                         width: this.props.width,
                         height: _lodash2.default.isNumber(this.props.height) ? this.props.height : 'calc(' + this.props.height + ')'
-                    } },
+                    }, this.props.style) },
                 this.props.tabs ? _react2.default.createElement(
                     'div',
-                    { style: { width: this.props.width, height: contentHeight } },
+                    { style: { height: contentHeight } },
                     _react2.default.createElement(_tabs2.default, { dataSource: this.getTabDataSource(),
                         labelStyle: { justifyContent: 'center', margin: 12 } })
                 ) : _react2.default.createElement(
                     _reactCustomScrollbars.Scrollbars,
-                    { style: { width: this.props.width, height: contentHeight },
+                    { style: { height: contentHeight },
                         autoHeight: this.props.height == 'auto',
                         autoHeightMax: contentHeight },
                     _react2.default.createElement(
                         'div',
-                        { className: 'space', style: (0, _extends3.default)({ width: '100%', overflowX: 'hidden' }, this.props.style) },
+                        { className: 'space', style: (0, _extends3.default)({
+                                width: '100%',
+                                overflowX: 'hidden',
+                                paddingLeft: 20,
+                                paddingRight: 20
+                            }, this.props.style) },
                         _react2.default.createElement(
                             'div',
                             { className: 'form row-space', cols: this.props.cols },
@@ -595,8 +600,8 @@ var _initialiseProps = function _initialiseProps() {
                                     'div',
                                     {
                                         style: {
-                                            width: _this6.props.labelWidth,
-                                            minWidth: _this6.props.labelWidth
+                                            width: field.labelWidth || _this6.props.labelWidth,
+                                            minWidth: field.labelWidth || _this6.props.labelWidth
                                         } },
                                     field.label,
                                     '\uFF1A'

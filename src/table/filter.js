@@ -38,6 +38,15 @@ export default class Filter extends Component {
 
     constructor(props) {
         super(props);
+        this.initData(props);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.initData(nextProps);
+    }
+
+    initData(props) {
+        this.state.value = props.value;
     }
 
     handleOpen = (event) => {
@@ -69,23 +78,34 @@ export default class Filter extends Component {
     }
 
     render() {
-        return <div ref="container" style={{display: 'inline-block', position: 'relative'}}>
+        return <div ref="container" style={{display: 'inline-block', position: 'relative', lineHeight: 1}}>
             <Icon type="button"
                   name="filter-fill"
                   color={this.state.value ? this.props.filterColor : this.props.color}
                   hoverColor={this.props.hoverColor}
+                  padding={2}
+                  size={14}
                   onClick={this.handleOpen}/>
             <Popover style={{left: -10000}}
                      open={this.state.open}
                      anchorEl={this.state.anchorEl}
                      onRequestClose={this.handleRequestClose}>
                 <div className="space-small">
-                    <Control ref="control" {...this.props.field} value={this.state.value} onChange={(value) => {
-                        this.state.value = value;
-                        if (this.props.field.onChange) {
-                            this.props.field.onChange(value);
-                        }
-                    }}/>
+                    <Control
+                        ref="control"
+                        hintText="输入关键字查询"
+                        {...this.props.field}
+                        label={false}
+                        value={this.state.value}
+                        filter={undefined}
+                        hasClear={false}
+                        defaultValue={undefined}
+                        onChange={(value) => {
+                            this.state.value = value;
+                            if (this.props.field.onChange) {
+                                this.props.field.onChange(value);
+                            }
+                        }}/>
                     <div className="row text-center text-primary" cols="2" style={{padding: '6px 0'}}>
                         {this.props.reset ? <div className="col text-left">
                             <span className="cursor-pointer" style={{padding: 6}}
