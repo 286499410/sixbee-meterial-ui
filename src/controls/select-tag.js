@@ -32,7 +32,7 @@ export default class SelectTag extends Component {
      * @param props
      */
     initData(props) {
-        if (props.value !== undefined) {
+        if (props.hasOwnProperty('value')) {
             this.state.value = props.value;
         }
     }

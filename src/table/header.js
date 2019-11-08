@@ -1,11 +1,19 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types'
 import Checkbox from 'material-ui/Checkbox';
+import _ from 'lodash';
 import Filter from './filter';
 import Sort from './sort';
 import utils from '../utils';
 
 export default class TableHeader extends Component {
+
+    static defaultProps = {
+        width: undefined,
+        showColumns: undefined,
+        showCheckboxes: true,
+        showSeries: true,
+    };
 
     static contextTypes = {
         state: PropTypes.object,
@@ -202,29 +210,49 @@ export default class TableHeader extends Component {
                     className="table-header"
                     style={{
                         overflow: 'hidden',
-                        width: props.containerWidth,
+                        width: this.props.width || props.containerWidth,
                         ...props.headerStyle
                     }}>
-            <table className={className} style={{width: state.tableWidth, tableLayout: 'fixed'}}>
+            <table className={className} style={{width: this.props.width || state.tableWidth, tableLayout: 'fixed'}}>
                 <thead>
                 {
                     state.headerColumns.map((rows, i) => {
+                        let columns = [];
+                        if(_.isArray(this.props.showColumns)) {
+                            rows.map(col => {
+                                if(this.props.showColumns.indexOf(col.key) >= 0) {
+                                    columns.push(col);
+                                }
+                            })
+                        } else {
+                            columns = rows;
+                        }
                         return (
                             <tr key={i}>
                                 {
-                                    props.showCheckboxes && i == 0 ?
+                                    props.showCheckboxes && this.props.showCheckboxes && i == 0 ?
                                         <th className="th-checkbox" rowSpan={state.headerColumns.length}
                                             data-key="checkbox"
                                             style={{
                                                 width: props.checkboxColumnWidth,
-                                                height: props.headerRowHeight
+                                                height: props.headerRowHeight + 1
                                             }}>
                                             <Checkbox checked={this.isChecked()}
                                                       onCheck={this.handleCheck} {...props.checkboxStyle}/>
                                         </th> : null
                                 }
                                 {
-                                    rows.map((col, j) => {
+                                    props.showSeries && this.props.showSeries && i == 0 ?
+                                        <th rowSpan={state.headerColumns.length}
+                                            style={{
+                                                width: props.seriesColumnWidth,
+                                                height: props.headerRowHeight,
+                                                textAlign: props.headerTextAlign
+                                            }}>序号
+                                        </th> : null
+                                }
+                                {
+                                    columns.map((col, j) => {
                                         let style = {};
                                         col.key = col.key || `${i}-${j}`;
                                         if (state.columnWidths[col.key] || col.width) {
@@ -241,7 +269,7 @@ export default class TableHeader extends Component {
                                                 <div className="flex middle center">
                                                     <div>{col.label}</div>
                                                     {col.filter ?
-                                                        <Filter field={col.filter === true ? col : col.filter}
+                                                        <Filter field={col.filter === true ? col : {...col, ...col.filter}}
                                                                 onFilter={this.handleFilter(col)}
                                                                 value={_.get(filterData, col.formKey || col.key)}/> : null}
                                                     {col.sortable ?

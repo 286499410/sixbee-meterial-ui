@@ -12,6 +12,16 @@ import Icon from '../icon';
  */
 export default class TableBody extends Component {
 
+    static defaultProps = {
+        hasScrollbar: true,
+        hasEmptyTip: true,
+        hasLoading: true,
+        width: undefined,
+        showColumns: undefined,
+        showCheckboxes: true,
+        showSeries: true
+    };
+
     static contextTypes = {
         state: PropTypes.object,
         props: PropTypes.object,
@@ -70,23 +80,34 @@ export default class TableBody extends Component {
         let table = <table
             ref="table"
             className={className}
-            style={{tableLayout: 'fixed', width: state.tableWidth}}>
-            <TableBodyColGroup ref="thead"/>
-            <TableBodyContent ref="tbody"/>
+            style={{
+                tableLayout: 'fixed',
+                width: this.props.width || state.tableWidth
+            }}>
+            <TableBodyColGroup ref="thead"
+                               showColumns={this.props.showColumns}
+                               showCheckboxes={this.props.showCheckboxes}
+                               showSeries={this.props.showSeries}
+            />
+            <TableBodyContent ref="tbody"
+                              showColumns={this.props.showColumns}
+                              showCheckboxes={this.props.showCheckboxes}
+                              showSeries={this.props.showSeries}
+            />
         </table>;
         return <div ref="container"
                     className="table-body"
                     style={{
                         overflow: 'hidden',
-                        //position: 'relative',
-                        width: state.containerWidth,
+                        position: 'relative',
+                        width: "calc(100% + 2px)",
                         height: state.bodyHeight,
                         marginTop: -1,
                         ...props.bodyStyle
                     }}
                     onScroll={this.handleScroll}>
             {
-                props.loading ? <div ref="masker" className="masker" style={{zIndex: 1}}>
+                props.loading && this.props.hasLoading ? <div ref="masker" className="masker" style={{zIndex: 1}}>
                     <div className="position-center">
                         <RefreshIndicator size={50}
                                           left={-25}
@@ -100,15 +121,16 @@ export default class TableBody extends Component {
                 </div> : null
             }
             {
-                state.dataSource.length == 0 && !props.loading ? <div className="position-center text-center" style={{zIndex: 1}}>
-                    <div>
-                        <div><img src={props.emptyDataImage} style={{width: 200}}/></div>
-                        <div style={{marginLeft: -8}}>{props.emptyDataTip}</div>
-                    </div>
-                </div> : null
+                state.dataSource.length == 0 && !props.loading && this.props.hasEmptyTip !== false ?
+                    <div className="position-center text-center" style={{zIndex: 1}}>
+                        <div>
+                            <div><img src={props.emptyDataImage} style={{width: 180}}/></div>
+                            <div style={{marginLeft: -8}}>{props.emptyDataTip}</div>
+                        </div>
+                    </div> : null
             }
             {
-                props.containerHeight || state.bodyHeight ?
+                this.props.hasScrollbar && (props.containerHeight || state.bodyHeight) ?
                     <Scrollbars ref="scrollBar"
                                 renderTrackHorizontal={({style, ...props}) =>
                                     <div {...props} style={{
@@ -118,7 +140,7 @@ export default class TableBody extends Component {
                                         left: 2,
                                         right: 2,
                                         borderRadius: 3,
-                                        zIndex: 1,
+                                        zIndex: 3,
                                     }}/>
                                 }
                                 renderThumbHorizontal={({style, ...props}) =>
@@ -181,10 +203,16 @@ export default class TableBody extends Component {
 
 class TableBodyContent extends Component {
 
+    static defaultProps = {
+        showColumns: undefined,
+        showCheckboxes: true,
+        showSeries: true
+    };
+
     static contextTypes = {
-        Table: PropTypes.object,
         state: PropTypes.object,
         props: PropTypes.object,
+        Table: PropTypes.object,
         setTableState: PropTypes.func,
         getDataRows: PropTypes.func,
         cellRender: PropTypes.func,
@@ -385,7 +413,7 @@ class TableBodyContent extends Component {
      */
     handleRowSelect = (data) => (event) => {
         let props = this.context.props;
-        if (props.rowSelect) {
+        if (props.rowSelected) {
             if (data) {
                 this.context.setTableState({
                     selectedRow: data
@@ -441,12 +469,22 @@ class TableBodyContent extends Component {
                 break;
             }
         }
+        let dataColumns = [];
+        if (_.isArray(this.props.showColumns)) {
+            state.dataColumns.map(column => {
+                if (this.props.showColumns.indexOf(column.key) >= 0) {
+                    dataColumns.push(column);
+                }
+            })
+        } else {
+            dataColumns = state.dataColumns;
+        }
         return <tbody ref="tbody">
         {
             topHeight > 0 ? <tr>
                 {this.props.showCheckboxes ?
                     <td style={{height: topHeight, padding: 0}}></td> : null}
-                {state.dataColumns.map((column, colIndex) => {
+                {dataColumns.map((column, colIndex) => {
                     return <td key={colIndex}
                                style={{height: topHeight, padding: 0}}>
                     </td>
@@ -462,14 +500,15 @@ class TableBodyContent extends Component {
                     return null;
                 }
                 let checked = this.isChecked(data);
+                let selected = data.id && _.get(state.selectedRow, 'id') == data.id;
                 return <tr key={data[props.primaryKey] + '' + rowIndex}
                            data-key={data[props.primaryKey]}
-                           className={`${props.iconEventsBehavior}`}
+                           className={`${props.iconEventsBehavior}` + (selected ? ' selected' : '')}
                            onClick={this.handleRowSelect(data)}
                 >
                     {
-                        props.showCheckboxes ?
-                            <td className="td-checkbox">
+                        props.showCheckboxes && this.props.showCheckboxes ?
+                            <td className="td-checkbox" style={{height: props.bodyRowHeight + 1}}>
                                 {
                                     (!props.rowCheckboxEnabled || props.rowCheckboxEnabled(data)) ?
                                         <Checkbox checked={checked}
@@ -487,7 +526,12 @@ class TableBodyContent extends Component {
                             </td> : null
                     }
                     {
-                        state.dataColumns.map((column, colIndex) => {
+                        props.showSeries && this.props.showSeries ? <td style={{textAlign: 'center'}}>
+                            {rowIndex + 1}
+                        </td> : null
+                    }
+                    {
+                        dataColumns.map((column, colIndex) => {
                             let content = () => {
                                 let value = _.get(data, column.dataKey || column.key);
                                 if (column.groupKey) {
@@ -504,7 +548,11 @@ class TableBodyContent extends Component {
                                                 height: props.bodyRowHeight,
                                                 lineHeight: (props.bodyRowHeight - 12) + 'px'
                                             }}>
-                                                {column.render ? column.render(row, column, this.context.Table) : this.context.cellRender(row, column)}
+                                                <span
+                                                    className={`${column.onClick ? 'text-primary cursor-pointer' : ''}`}
+                                                    onClick={column.onClick ? column.onClick.bind(this, row, data) : undefined}>
+                                                    {column.render ? column.render(row, column, this.context.Table) : this.context.cellRender(row, column)}
+                                                </span>
                                             </div>
                                         })}
                                     </div>
@@ -525,7 +573,7 @@ class TableBodyContent extends Component {
                                        }}>
                                 {
                                     (() => {
-                                        if (column.onClick) {
+                                        if (column.onClick && !column.groupKey) {
                                             return <span className='text-primary cursor-pointer'
                                                          onClick={column.onClick ? column.onClick.bind(this, data) : undefined}>
                                                 {content()}
@@ -536,11 +584,12 @@ class TableBodyContent extends Component {
                                                 display: 'table-cell',
                                                 verticalAlign: 'middle',
                                                 lineHeight: 1
-                                            }} onClick={column.onClick ? column.onClick.bind(this, data) : undefined}>
+                                            }}
+                                                             onClick={column.onClick && !column.groupKey ? column.onClick.bind(this, data) : undefined}>
                                                         {content()}
                                             </span>;
                                             return <div
-                                                className={`${column.onClick ? 'text-primary cursor-pointer' : ''}`}
+                                                className={`${column.onClick && !column.groupKey ? 'text-primary cursor-pointer' : ''}`}
                                                 style={{paddingLeft: indent, lineHeight: 1}}>
                                                 {
                                                     props.collapsible ? <div className="flex middle">
@@ -555,8 +604,6 @@ class TableBodyContent extends Component {
                                                         {text}
                                                     </div> : text
                                                 }
-
-
                                             </div>;
                                         } else {
                                             return content();
@@ -607,7 +654,7 @@ class TableBodyContent extends Component {
             bottomHeight > 0 ? <tr>
                 {props.showCheckboxes ?
                     <td style={{height: bottomHeight, padding: 0}}></td> : null}
-                {state.dataColumns.map((column, colIndex) => {
+                {dataColumns.map((column, colIndex) => {
                     return <td key={colIndex}
                                style={{height: bottomHeight, padding: 0}}>
                     </td>
@@ -623,10 +670,15 @@ class TableBodyContent extends Component {
  */
 class TableBodyColGroup extends Component {
 
+    static defaultProps = {
+        showCheckboxes: true,
+        showColumns: undefined
+    };
+
     static contextTypes = {
         state: PropTypes.object,
         props: PropTypes.object,
-        setTableState: PropTypes.func
+        setTableState: PropTypes.func,
     };
 
     constructor(props) {
@@ -637,7 +689,7 @@ class TableBodyColGroup extends Component {
         let state = this.context.state;
         let props = this.context.props;
         let nodes = [];
-        if (props.showCheckboxes) {
+        if (props.showCheckboxes && this.props.showCheckboxes) {
             nodes.push(
                 <th span={1}
                     key={-1}
@@ -645,19 +697,30 @@ class TableBodyColGroup extends Component {
                 </th>
             );
         }
-        nodes = nodes.concat(state.dataColumns.map((column, index) => {
+        if (props.showSeries && this.props.showSeries) {
+            nodes.push(
+                <th span={1}
+                    key={-2}
+                    style={{width: props.seriesColumnWidth, padding: 0, height: 0}}>
+                </th>)
+        }
+        state.dataColumns.map((column, index) => {
             let key = column.key;
             let width = state.columnWidths[key] || 'auto';
-            return <th span={1}
-                       key={index}
-                       style={{
-                           width: width,
-                           maxWidth: width,
-                           padding: 0,
-                           height: 0
-                       }}>
-            </th>;
-        }));
+            if (_.isArray(this.props.showColumns) && this.props.showColumns.indexOf(column.key) < 0) {
+                //限制显示的列
+                return;
+            }
+            nodes.push(<th span={1}
+                           key={index}
+                           style={{
+                               width: width,
+                               maxWidth: width,
+                               padding: 0,
+                               height: 0
+                           }}>
+            </th>);
+        });
         if (state.extraColumnWidth > 0) {
             nodes.push(<th span={1}
                            key={state.dataColumns.length}

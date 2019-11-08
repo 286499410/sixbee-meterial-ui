@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import TableHeader from './header';
 import TableBody from './body';
+import FixedCol from './fixed-col';
 import Pager from './pager';
 import $ from 'jquery';
 import utils from '../utils';
@@ -49,7 +50,7 @@ export default class Table extends Component {
         sortData: {},                           //排序数据
         scrollTop: 0,                           //滚动条初始位置
         scrollLeft: 0,                          //滚动条初始位置
-        headerRowHeight: undefined,             //表头行高
+        headerRowHeight: 32,                    //表头行高
         bodyRowHeight: 32,                      //表内容行高
         dataSource: [],                         //数据源
         onFilter: undefined,                    //过滤自定义事件
@@ -64,6 +65,11 @@ export default class Table extends Component {
         cellRender: undefined,                  //单元格渲染处理函数
         loading: false,                         //是否显示loading
         footerFixed: false,                     //footer是否固定底部
+        fixedCheckbox: false,                   //是否固定选择框列
+        fixedLeftColumns: [],                   //左边列固定字段
+        fixedRightColumns: [],                  //右边列固定字段
+        showSeries: false,                      //是否显示序号
+        seriesColumnWidth: 50,                  //序号列宽度
         checkboxStyle: {
             style: {
                 marginLeft: 15,
@@ -134,7 +140,7 @@ export default class Table extends Component {
 
     initData(props) {
         let nextProps = {
-            containerWidth: props.tableWidth,
+            containerWidth: this.state.containerWidth || props.containerWidth,
             tableWidth: props.tableWidth,
             columnWidths: {...props.columnWidths},
             dataSource: props.dataSource,
@@ -179,6 +185,7 @@ export default class Table extends Component {
                 scrollLeft: this.state.scrollLeft,
                 scrollTop: this.state.scrollTop,
                 collapsed: this.state.collapsed,
+                selectedRow: this.state.selectedRow
             });
         }
     }
@@ -203,6 +210,14 @@ export default class Table extends Component {
     }
 
     /**
+     * 序号列宽度
+     * @returns {number}
+     */
+    getSeriesColumnWidth() {
+        return this.props.showSeries ? this.props.seriesColumnWidth : 0;
+    }
+
+    /**
      * 处理列宽
      */
     handleColumnWidths() {
@@ -219,9 +234,9 @@ export default class Table extends Component {
         });
         if (undefinedWidthColumns.length == 0 && widthSum != this.state.tableWidth) {
             //定义的列宽和不等于表宽，需重新分配宽度
-            let remainWidth = this.state.tableWidth - this.getCheckboxColumnWidth();
+            let remainWidth = this.state.tableWidth - this.getCheckboxColumnWidth() - this.getSeriesColumnWidth();
             for (let [key, width] of Object.entries(this.state.columnWidths)) {
-                this.state.columnWidths[key] = Math.round((width / widthSum) * (this.state.tableWidth - this.getCheckboxColumnWidth()));
+                this.state.columnWidths[key] = Math.round((width / widthSum) * (this.state.tableWidth - this.getCheckboxColumnWidth() - this.getSeriesColumnWidth()));
                 remainWidth -= this.state.columnWidths[key];
             }
             this.state.columnWidths[this.state.dataColumns[this.state.dataColumns.length - 1].key] += remainWidth;
@@ -238,10 +253,10 @@ export default class Table extends Component {
             this.state.pagerHeight = $(this.refs.container).find('.table-pager').height() || 0;
             this.state.bodyHeight = containerHeight - this.state.headerHeight - this.state.pagerHeight - this.state.footerHeight;
         }
-        if(this.state.bodyHeight) {
+        if (this.state.bodyHeight) {
             $(this.refs.container).find('.table-body').css({height: this.state.bodyHeight});
         }
-        $(this.refs.container).find('.table-body .table').css({width: this.state.tableWidth});
+        //$(this.refs.container).find('.table-body .table').css({width: this.state.tableWidth});
         if (!_.isEqual(oldColumnWidths, this.state.columnWidths)) {
             this.forceUpdate();
         }
@@ -254,6 +269,14 @@ export default class Table extends Component {
         }
         this.state.scrollLeft = $(event.target).scrollLeft();
         this.state.scrollTop = $(event.target).scrollTop();
+        if (_.get(this.refs, 'fixedLeft.refs.body')) {
+            $(this.refs.fixedLeft.refs.body.refs.container).scrollTop(this.state.scrollTop);
+            this.refs.fixedLeft.forceUpdate();
+        }
+        if (_.get(this.refs, 'fixedRight.refs.body')) {
+            $(this.refs.fixedRight.refs.body.refs.container).scrollTop(this.state.scrollTop);
+            this.refs.fixedRight.forceUpdate();
+        }
         this.handleStateChange();
         if (this.props.onScroll) {
             this.props.onScroll(event);
@@ -486,8 +509,7 @@ export default class Table extends Component {
         if (this.props.onCheck) {
             this.props.onCheck(this.state.checked);
         }
-        this.handleStateChange();
-        this.forceUpdate();
+        this.setTableState(this.state);
     }
 
     scrollTop(top) {
@@ -511,8 +533,21 @@ export default class Table extends Component {
                      height: this.props.containerHeight,
                      ...this.props.style
                  }}>
+                {
+                    this.props.fixedCheckbox || this.props.fixedLeftColumns.length > 0 ?
+                        <FixedCol ref="fixedLeft" position="left" columns={this.props.fixedLeftColumns}/> : null
+                }
+                {
+                    this.props.fixedRightColumns.length > 0 ?
+                        <FixedCol ref="fixedRight" position="right" columns={this.props.fixedRightColumns}/> : null
+                }
                 <TableHeader ref="header"/>
-                <TableBody ref="body"/>
+                <TableBody
+                    ref="body"
+                    onScroll={this.handleScroll}
+                    rowSelected={this.props.rowSelected}
+                    onRowSelect={this.props.onRowSelect}
+                />
                 {
                     this.props.pager ? <Pager/> : null
                 }

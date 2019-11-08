@@ -5,13 +5,9 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import Icon from '../icon';
-import _ from 'lodash';
-import $ from 'jquery';
 import { Scrollbars } from 'react-custom-scrollbars';
 import Header from './header';
 import Body from './body';
-import filter from './filter';
 
 export default class List extends Component {
 

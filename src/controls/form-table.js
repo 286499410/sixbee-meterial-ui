@@ -10,6 +10,7 @@ import Control from '../control';
 import utils from '../utils';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
+import _ from 'lodash';
 
 export default class FormTable extends Component {
 
@@ -31,6 +32,7 @@ export default class FormTable extends Component {
         tableWidth: undefined,                  //表实际宽度,不传时默认等于容器宽度
         hasSeriesNumber: true,                  //是否有自动序号
         hasAction: true,                        //是否有操作事件
+        hasFooterAddAction: false,              //底部是否有新增按钮
         showCheckboxes: false,                  //是否显示复选框
         autoSortField: false,                   //自动新增排序字段
         autoSortType: 'desc',                   //自动排序字段
@@ -48,7 +50,7 @@ export default class FormTable extends Component {
         scrollTop: 0,                           //滚动条初始位置
         scrollLeft: 0,                          //滚动条初始位置
         value: undefined,                       //值
-        defaultValue: undefined,                //默认值
+        defaultValue: undefined,                //默认值, 支持函数
         defaultRowData: {},                     //默认行数据
         tableClassName: "text-small control",   //表样式类
         style: {},                              //样式
@@ -59,8 +61,8 @@ export default class FormTable extends Component {
         headerRowHeight: undefined,             //表头行高
         bodyRowHeight: undefined,               //表体行高
         controlSize: 'default',                 //控件大小
-
         onStateChange: undefined,               //状态改变后触发：table，pager，currentRow
+        editableStyle: {background: '#fffdf5'}, //可编辑控件的样式
     };
 
     state = {
@@ -71,7 +73,7 @@ export default class FormTable extends Component {
             limit: 50
         },
         tableState: {},
-        controls: {}
+        controls: []
     };
 
     constructor(props) {
@@ -79,7 +81,7 @@ export default class FormTable extends Component {
         this.initData(props);
         if (this.state.value.length == 0 && this.props.defaultRows > 0) {
             for (let i = 0; i < this.props.defaultRows; i++) {
-                this.addDataRow(undefined, props.defaultData, false);
+                this.addDataRow(undefined, this.getDefaultRowData(props), false);
             }
         }
         this.checkMinRow(props);
@@ -91,9 +93,15 @@ export default class FormTable extends Component {
     }
 
     initData(props) {
-        if (props.value !== undefined) {
+        if (_.isArray(props.value)) {
             this.state.value = props.value;
+        } else if(props.value === undefined) {
+            this.state.value = [];
         }
+    }
+
+    getDefaultRowData(props = this.props) {
+        return _.isFunction(props.defaultRowData) ? props.defaultRowData(this) : props.defaultRowData;
     }
 
     /**
@@ -103,7 +111,7 @@ export default class FormTable extends Component {
     checkMinRow(props = this.props) {
         if (this.state.value.length < props.minRows) {
             for (let i = this.state.value.length; i < props.minRows; i++) {
-                this.addDataRow(i, this.props.defaultData, false);
+                this.addDataRow(i,  this.getDefaultRowData(props), false);
             }
         }
     }
@@ -133,11 +141,31 @@ export default class FormTable extends Component {
     }
 
     /**
+     * 获取控件实例
+     * @param row
+     * @param key
+     * @returns {*}
+     */
+    getControl(row, key) {
+        return this.state.controls[row][key];
+    }
+
+    /**
+     * 设置控件值
+     * @param row
+     * @param key
+     * @param value
+     */
+    setControlValue = (row, key, value) => {
+        this.getControl(row, key).setValue(value);
+    };
+
+    /**
      * 新增行(前面插入）
      * @param row
      * @param defaultData
      */
-    addRow(row, defaultData = this.props.defaultRowData) {
+    addRow(row, defaultData =  this.getDefaultRowData()) {
         if (row === undefined) row = this.getCurrentRow();
         this.addDataRow(row, defaultData);
     }
@@ -288,7 +316,7 @@ export default class FormTable extends Component {
      * @param row
      * @param defaultData
      */
-    addDataRow(row, defaultData = this.props.defaultRowData, update = true) {
+    addDataRow(row, defaultData =  this.getDefaultRowData(), update = true) {
         let data = {}, value = this.state.value;
         this.props.columns.map((column) => {
             data[column.key] = "";
@@ -350,7 +378,17 @@ export default class FormTable extends Component {
         }
         let columnWidths = this.getColumnsWidth();
         columns.map((column) => {
-            tableColumns.push({...column, render: false, width: columnWidths[column.key]});
+            let style;
+            if(!column.static && column.type != 'static' && ['text', 'auto', 'money', 'number', 'date', 'datetime', 'select', 'time', 'calendar'].indexOf(column.type) >= 0) {
+                style = this.props.editableStyle;
+            }
+            tableColumns.push({
+                style: style,
+                ...column,
+                dataKey: undefined,
+                render: false,
+                width: columnWidths[column.key],
+            });
         });
         if (this.props.hasAction) {
             tableColumns.push({
@@ -469,7 +507,7 @@ export default class FormTable extends Component {
             dataRow['series_number'] = row + 1;
         }
         this.props.columns.map((column, index) => {
-            let value = _.get(data, column.key);
+            let value = _.get(data, column.formKey || column.key);
             if (column.convert) {
                 value = column.convert(data);
             }
@@ -485,6 +523,14 @@ export default class FormTable extends Component {
                 onBlur={this.handleBlur(row, column)}
                 onKeyUp={this.handleKeyUp(row, column)}
                 onChange={this.handleChange(row, column)}
+                context={this}
+                onComponentDidMount={(context) => {
+                    this.state.controls[row][column.key] = context;
+                }}
+                position={{
+                    row: row,
+                    col: index
+                }}
             />
         });
         if (this.props.hasAction) {
@@ -574,7 +620,6 @@ export default class FormTable extends Component {
     }
 
     render() {
-        this.state.controls = [];
         let dataSource = this.getDataSource();
         let pager = false;
         let tableState = this.state.tableState;
@@ -589,7 +634,8 @@ export default class FormTable extends Component {
                 ...this.state.pager
             }
         }
-        return <div style={{marginTop: 16, ...this.props.style}}>
+        let footerData = this.props.footerData ? this.props.footerData(this) : null;
+        return <div style={{marginBottom: 16, ...this.props.style}}>
             {
                 this.props.label === false ? null : <div style={this.props.labelStyle}>
                     <span style={{
@@ -613,7 +659,7 @@ export default class FormTable extends Component {
                    tableWidth={this.props.tableWidth}
                    headerRowHeight={this.props.headerRowHeight}
                    bodyRowHeight={this.props.bodyRowHeight}
-                   footerData={this.props.footerData ? this.props.footerData(this) : undefined}
+                   footerData={footerData}
                    headerTextAlign="center"
                    showCheckboxes={this.props.showCheckboxes}
                    rowCheckboxEnabled={this.props.rowCheckboxEnabled}
@@ -623,6 +669,14 @@ export default class FormTable extends Component {
                    {...tableState}
                    onStateChange={this.handleStateChange}
             />
+            {
+                this.props.hasFooterAddAction ? <div
+                    className="border-primary text-center cursor-pointer"
+                    style={{marginTop: -1}}
+                    onClick={this.addRow.bind(this, this.state.value.length,  this.getDefaultRowData(), true)}>
+                    <FontIcon className="iconfont icon-plus"/>
+                </div> : null
+            }
         </div>
     }
 

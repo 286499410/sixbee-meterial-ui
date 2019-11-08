@@ -112,6 +112,10 @@ var Filter = function (_Component) {
         value: function render() {
             var _this2 = this;
 
+            var hintText = void 0;
+            if (this.props.field.type == 'text' || this.props.field.type == 'auto') {
+                hintText = '输入关键字查询';
+            }
             return _react2.default.createElement(
                 'div',
                 { ref: 'container', style: { display: 'inline-block', position: 'relative', lineHeight: 1 } },
@@ -133,7 +137,7 @@ var Filter = function (_Component) {
                         { className: 'space-small' },
                         _react2.default.createElement(_control2.default, (0, _extends3.default)({
                             ref: 'control',
-                            hintText: '\u8F93\u5165\u5173\u952E\u5B57\u67E5\u8BE2'
+                            hintText: hintText
                         }, this.props.field, {
                             label: false,
                             value: this.state.value,
@@ -148,7 +152,7 @@ var Filter = function (_Component) {
                             } })),
                         _react2.default.createElement(
                             'div',
-                            { className: 'row text-center text-primary', cols: '2', style: { padding: '6px 0' } },
+                            { className: 'row text-center text-primary', cols: '2', style: { padding: '6px 0', marginTop: 6 } },
                             this.props.reset ? _react2.default.createElement(
                                 'div',
                                 { className: 'col text-left' },

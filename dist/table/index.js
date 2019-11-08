@@ -72,6 +72,10 @@ var _body = require('./body');
 
 var _body2 = _interopRequireDefault(_body);
 
+var _fixedCol = require('./fixed-col');
+
+var _fixedCol2 = _interopRequireDefault(_fixedCol);
+
 var _pager = require('./pager');
 
 var _pager2 = _interopRequireDefault(_pager);
@@ -143,6 +147,14 @@ var Table = function (_Component) {
             }
             _this.state.scrollLeft = (0, _jquery2.default)(event.target).scrollLeft();
             _this.state.scrollTop = (0, _jquery2.default)(event.target).scrollTop();
+            if (_lodash2.default.get(_this.refs, 'fixedLeft.refs.body')) {
+                (0, _jquery2.default)(_this.refs.fixedLeft.refs.body.refs.container).scrollTop(_this.state.scrollTop);
+                _this.refs.fixedLeft.forceUpdate();
+            }
+            if (_lodash2.default.get(_this.refs, 'fixedRight.refs.body')) {
+                (0, _jquery2.default)(_this.refs.fixedRight.refs.body.refs.container).scrollTop(_this.state.scrollTop);
+                _this.refs.fixedRight.forceUpdate();
+            }
             _this.handleStateChange();
             if (_this.props.onScroll) {
                 _this.props.onScroll(event);
@@ -210,7 +222,7 @@ var Table = function (_Component) {
         key: 'initData',
         value: function initData(props) {
             var nextProps = {
-                containerWidth: props.tableWidth,
+                containerWidth: this.state.containerWidth || props.containerWidth,
                 tableWidth: props.tableWidth,
                 columnWidths: (0, _extends3.default)({}, props.columnWidths),
                 dataSource: props.dataSource,
@@ -280,7 +292,8 @@ var Table = function (_Component) {
                     sortData: this.state.sortData,
                     scrollLeft: this.state.scrollLeft,
                     scrollTop: this.state.scrollTop,
-                    collapsed: this.state.collapsed
+                    collapsed: this.state.collapsed,
+                    selectedRow: this.state.selectedRow
                 });
             }
         }
@@ -303,6 +316,11 @@ var Table = function (_Component) {
             return this.props.showCheckboxes ? this.props.checkboxColumnWidth : 0;
         }
     }, {
+        key: 'getSeriesColumnWidth',
+        value: function getSeriesColumnWidth() {
+            return this.props.showSeries ? this.props.seriesColumnWidth : 0;
+        }
+    }, {
         key: 'handleColumnWidths',
         value: function handleColumnWidths() {
             var _this2 = this;
@@ -320,7 +338,7 @@ var Table = function (_Component) {
                 _this2.state.columnWidths[key] = (0, _jquery2.default)(_this2.refs.container).find('.table-header th[data-key=' + key + ']').outerWidth();
             });
             if (undefinedWidthColumns.length == 0 && widthSum != this.state.tableWidth) {
-                var remainWidth = this.state.tableWidth - this.getCheckboxColumnWidth();
+                var remainWidth = this.state.tableWidth - this.getCheckboxColumnWidth() - this.getSeriesColumnWidth();
                 var _iteratorNormalCompletion2 = true;
                 var _didIteratorError2 = false;
                 var _iteratorError2 = undefined;
@@ -331,7 +349,7 @@ var Table = function (_Component) {
                             key = _step2$value[0],
                             width = _step2$value[1];
 
-                        this.state.columnWidths[key] = Math.round(width / widthSum * (this.state.tableWidth - this.getCheckboxColumnWidth()));
+                        this.state.columnWidths[key] = Math.round(width / widthSum * (this.state.tableWidth - this.getCheckboxColumnWidth() - this.getSeriesColumnWidth()));
                         remainWidth -= this.state.columnWidths[key];
                     }
                 } catch (err) {
@@ -367,7 +385,7 @@ var Table = function (_Component) {
             if (this.state.bodyHeight) {
                 (0, _jquery2.default)(this.refs.container).find('.table-body').css({ height: this.state.bodyHeight });
             }
-            (0, _jquery2.default)(this.refs.container).find('.table-body .table').css({ width: this.state.tableWidth });
+
             if (!_lodash2.default.isEqual(oldColumnWidths, this.state.columnWidths)) {
                 this.forceUpdate();
             }
@@ -521,8 +539,7 @@ var Table = function (_Component) {
             if (this.props.onCheck) {
                 this.props.onCheck(this.state.checked);
             }
-            this.handleStateChange();
-            this.forceUpdate();
+            this.setTableState(this.state);
         }
     }, {
         key: 'scrollTop',
@@ -548,8 +565,15 @@ var Table = function (_Component) {
                         width: this.props.containerWidth,
                         height: this.props.containerHeight
                     }, this.props.style) },
+                this.props.fixedCheckbox || this.props.fixedLeftColumns.length > 0 ? _react2.default.createElement(_fixedCol2.default, { ref: 'fixedLeft', position: 'left', columns: this.props.fixedLeftColumns }) : null,
+                this.props.fixedRightColumns.length > 0 ? _react2.default.createElement(_fixedCol2.default, { ref: 'fixedRight', position: 'right', columns: this.props.fixedRightColumns }) : null,
                 _react2.default.createElement(_header2.default, { ref: 'header' }),
-                _react2.default.createElement(_body2.default, { ref: 'body' }),
+                _react2.default.createElement(_body2.default, {
+                    ref: 'body',
+                    onScroll: this.handleScroll,
+                    rowSelected: this.props.rowSelected,
+                    onRowSelect: this.props.onRowSelect
+                }),
                 this.props.pager ? _react2.default.createElement(_pager2.default, null) : null
             );
         }
@@ -590,7 +614,7 @@ Table.defaultProps = {
     sortData: {},
     scrollTop: 0,
     scrollLeft: 0,
-    headerRowHeight: undefined,
+    headerRowHeight: 32,
     bodyRowHeight: 32,
     dataSource: [],
     onFilter: undefined,
@@ -605,6 +629,11 @@ Table.defaultProps = {
     cellRender: undefined,
     loading: false,
     footerFixed: false,
+    fixedCheckbox: false,
+    fixedLeftColumns: [],
+    fixedRightColumns: [],
+    showSeries: false,
+    seriesColumnWidth: 50,
     checkboxStyle: {
         style: {
             marginLeft: 15,

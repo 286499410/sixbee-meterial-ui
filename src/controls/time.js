@@ -47,7 +47,9 @@ export default class Time extends Component {
     }
 
     initData(props) {
-        this.state.value = props.value;
+        if(props.hasOwnProperty('value')) {
+            this.state.value = props.value;
+        }
     }
 
     getHours() {

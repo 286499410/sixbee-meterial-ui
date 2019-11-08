@@ -40,6 +40,7 @@ export default class Form extends Component {
         onDidUpdate: undefined,         //组件重新渲染完成触发事件
         beforeSubmit: undefined,        //提交之前触发事件，return false时可阻止提交
 
+        inlineFlex: false,              //true时，所有控件同行显示
         inline: false,                  //true时，label与控件同行显示
         width: '100%',                  //表单宽度
         height: 400,                    //表单高度
@@ -72,6 +73,10 @@ export default class Form extends Component {
         super(props);
         this.initData(props);
     }
+
+    static contextTypes = {
+        muiTheme: PropTypes.object,
+    };
 
     componentWillReceiveProps(nextProps) {
         this.initData(nextProps);
@@ -228,7 +233,6 @@ export default class Form extends Component {
     submit() {
         let allData = this.getData('all');
         let submitData = this.getData();
-        console.log('submitData', submitData);
         //验证
         if (!this.check(allData)) {
             return false;
@@ -352,14 +356,12 @@ export default class Form extends Component {
                     //分组类型，有组标签field.label
                     return <div key={index} className={`col col-${fieldCols} ${!isShow ? 'hidden' : ''}`}>
                         <div style={{
-                            width: field.width || this.props.controlWidth,
-                            marginBottom: this.props.controlBetweenSpace
+                            width: field.width || this.props.controlWidth
                         }}>
                             <div className="row-space" cols={field.groupCols || cols}>
                                 {
-                                    field.label ? <div className="col col-full"
+                                    field.label ? <div className="col col-full form-group-title"
                                                        style={{
-                                                           color: 'cadetblue',
                                                            marginTop: 16,
                                                            marginBottom: this.props.inline ? 16 : 0
                                                        }}>{field.label}</div> : null
@@ -390,7 +392,10 @@ export default class Form extends Component {
                                             style={{
                                                 width: this.props.labelWidth,
                                                 minWidth: this.props.labelWidth
-                                            }}>{field.label}</div> :
+                                            }}>
+                                                {field.label}
+                                            {field.required ? <span className="text-danger">*</span> : null}
+                                            </div> :
                                         <div className="col col-full"
                                              style={{marginTop: 16}}>{field.label}</div>) : null
                             }
@@ -433,7 +438,10 @@ export default class Form extends Component {
                     />;
                     if (this.props.inline) {
                         return <div className={`col col-${fieldCols}`}
-                                    style={{width: '100%', marginBottom: this.props.controlBetweenSpace}}
+                                    style={{
+                                        marginBottom: this.props.inlineFlex ? 0 : this.props.controlBetweenSpace,
+                                        marginRight: this.props.inlineFlex ? this.props.controlBetweenSpace : 0
+                                    }}
                                     key={index}>
                             <div className={`flex middle ${!isShow ? 'hidden' : ''}`}
                                  style={{width: field.width || this.props.controlWidth}}>
@@ -442,7 +450,7 @@ export default class Form extends Component {
                                         style={{
                                             width: field.labelWidth || this.props.labelWidth,
                                             minWidth: field.labelWidth || this.props.labelWidth
-                                        }}>{field.label}：</div> : null
+                                        }}>{field.required ? <span className="text-danger">*</span> : null}{field.label}：</div> : null
                                 }
                                 <div style={{flexGrow: 1, width: 0}}>
                                     <div>
@@ -486,6 +494,7 @@ export default class Form extends Component {
         if (this.props.actions !== false) {
             contentHeight = `calc(100% - ${footerHeight}px)`;
         }
+        let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
         return (
             <div className={"relative " + this.props.className}
                  style={{
@@ -505,23 +514,29 @@ export default class Form extends Component {
                             <div className="space" style={{
                                 width: '100%',
                                 overflowX: 'hidden',
-                                paddingLeft: 20,
-                                paddingRight: 20,
-                                ...this.props.style
+                                padding: this.props.padding !== undefined ? this.props.padding : borderStyle === 'border' ? 24 : 20,
                             }}>
-                                <div className="form row-space" cols={this.props.cols}>
+                                <div className={"form " + (this.props.inlineFlex ? "flex middle" : "row-space")}
+                                     cols={this.props.cols}>
                                     {this.renderControls(this.props.fields)}
+                                    {
+                                        this.props.inlineFlex ? <FormActions ref="actions"
+                                                                             actions={this.props.actions}
+                                                                             style={this.props.actionStyle}
+                                                                             inlineFlex={this.props.inlineFlex}/> : null
+                                    }
                                 </div>
                             </div>
                         </Scrollbars>
                 }
                 {
-                    this.props.actions === false || this.props.actions.length == 0 ? null : <div>
-                        <div style={{height: footerHeight}}></div>
-                        <div style={{position: 'absolute', bottom: 0, left: 0, right: 0}}>
-                            <FormActions ref="actions" actions={this.props.actions} style={this.props.actionStyle}/>
+                    this.props.actions === false || this.props.actions.length == 0 || this.props.inlineFlex ? null :
+                        <div>
+                            <div style={{height: footerHeight}}></div>
+                            <div style={{position: 'absolute', bottom: 0, left: 0, right: 0}}>
+                                <FormActions ref="actions" actions={this.props.actions} style={this.props.actionStyle}/>
+                            </div>
                         </div>
-                    </div>
                 }
             </div>
         )
@@ -578,22 +593,32 @@ class FormActions extends Component {
 
     render() {
         let actions = this.getActions();
-        return <div className="bg-white space"
-                    style={{
-                        position: 'absolute',
-                        bottom: 0,
-                        width: '100%',
-                        textAlign: 'right',
-                        boxShadow: '0 -1px 5px #ddd',
-                        zIndex: 2,
-                        ...this.props.style
-                    }}>
-            {
-                actions.map((action, index) => {
-                    return <Button key={index} {...action} style={{marginLeft: 12}}/>
-                })
-            }
-        </div>
+        if (this.props.inlineFlex) {
+            return <div className="flex middle">
+                {
+                    actions.reverse().map((action, index) => {
+                        return <Button key={index} {...action} style={{marginRight: 12}}/>
+                    })
+                }
+            </div>
+        } else {
+            return <div className="bg-white space"
+                        style={{
+                            position: 'absolute',
+                            bottom: 0,
+                            width: '100%',
+                            textAlign: 'right',
+                            boxShadow: '0 -1px 5px #ddd',
+                            zIndex: 2,
+                            ...this.props.style
+                        }}>
+                {
+                    actions.map((action, index) => {
+                        return <Button key={index} {...action} style={{marginLeft: 12}}/>
+                    })
+                }
+            </div>
+        }
     }
 }
 

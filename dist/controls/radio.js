@@ -75,17 +75,18 @@ var Radio = function (_Component) {
     }, {
         key: 'initData',
         value: function initData(props) {
-            if (props.value !== undefined) {
+            if (props.hasOwnProperty('value')) {
                 this.state.value = props.value;
             }
         }
     }, {
         key: 'setValue',
         value: function setValue(value) {
-            this.setState({ value: value });
+            this.state.value = value;
             if (this.props.onChange) {
                 this.props.onChange(value, this);
             }
+            this.forceUpdate();
         }
     }, {
         key: 'getValue',
@@ -136,7 +137,8 @@ var Radio = function (_Component) {
                         onChange: this.handleChange },
                     this.state.dataSource.map(function (row, index) {
                         return _react2.default.createElement(_RadioButton.RadioButton, { className: 'col',
-                            key: index, label: row.text,
+                            key: index,
+                            label: row.text,
                             value: row.value });
                     })
                 )
@@ -153,6 +155,7 @@ Radio.defaultProps = {
     cols: undefined,
     dataSource: [],
     dataSourceConfig: { text: 'text', value: 'value' },
-    size: 'default'
+    size: 'default',
+    multiLine: false
 };
 exports.default = Radio;

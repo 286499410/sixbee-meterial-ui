@@ -32,6 +32,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -83,7 +87,7 @@ var DateRange = function (_Component) {
     }, {
         key: 'initData',
         value: function initData(props) {
-            if (props.value !== undefined && _lodash2.default.isArray(props.value) && props.value.length == 2) {
+            if (_lodash2.default.isArray(props.value) && props.value.length == 2) {
                 var value = props.value;
 
                 var _convertValue = this.convertValue(value);
@@ -92,6 +96,9 @@ var DateRange = function (_Component) {
 
                 this.state.startDate = _convertValue2[0];
                 this.state.endDate = _convertValue2[1];
+            } else if (props.hasOwnProperty('value') && props.value === undefined) {
+                this.state.startDate = undefined;
+                this.state.endDate = undefined;
             }
         }
     }, {
@@ -157,6 +164,44 @@ var DateRange = function (_Component) {
                 startDate = _getValue2[0],
                 endDate = _getValue2[1];
 
+            var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+            var content = _react2.default.createElement(
+                'div',
+                { className: 'flex middle' },
+                _react2.default.createElement(
+                    'div',
+                    { style: { width: 'calc(50% - 10px)', minWidth: 'calc(50% - 10px)' } },
+                    _react2.default.createElement(_date2.default, {
+                        borderShow: this.props.borderShow && borderStyle === 'underline',
+                        hasClear: this.props.hasClear,
+                        disabled: this.props.disabled,
+                        immutable: this.props.immutable,
+                        fullWidth: this.props.fullWidth,
+                        value: startDate,
+                        maxDate: endDate,
+                        onChange: this.handleChange(0)
+                    })
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'text-center', style: { color: '#ccc', width: 20, minWidth: 20 } },
+                    '-'
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { style: { width: 'calc(50% - 10px)', minWidth: 'calc(50% - 10px)' } },
+                    _react2.default.createElement(_date2.default, {
+                        borderShow: this.props.borderShow && borderStyle === 'underline',
+                        hasClear: this.props.hasClear,
+                        disabled: this.props.disabled,
+                        immutable: this.props.immutable,
+                        fullWidth: this.props.fullWidth,
+                        value: endDate,
+                        minDate: startDate,
+                        onChange: this.handleChange(1)
+                    })
+                )
+            );
             return _react2.default.createElement(
                 'div',
                 null,
@@ -175,43 +220,11 @@ var DateRange = function (_Component) {
                         label
                     )
                 ),
-                _react2.default.createElement(
+                borderStyle === 'border' && this.props.borderShow ? _react2.default.createElement(
                     'div',
-                    { className: 'flex middle' },
-                    _react2.default.createElement(
-                        'div',
-                        { style: { width: 'calc(50% - 10px)', minWidth: 'calc(50% - 10px)' } },
-                        _react2.default.createElement(_date2.default, {
-                            borderShow: this.props.borderShow,
-                            hasClear: this.props.hasClear,
-                            disabled: this.props.disabled,
-                            immutable: this.props.immutable,
-                            fullWidth: this.props.fullWidth,
-                            value: startDate,
-                            maxDate: endDate,
-                            onChange: this.handleChange(0)
-                        })
-                    ),
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'text-center', style: { color: '#ccc', width: 20, minWidth: 20 } },
-                        '-'
-                    ),
-                    _react2.default.createElement(
-                        'div',
-                        { style: { width: 'calc(50% - 10px)', minWidth: 'calc(50% - 10px)' } },
-                        _react2.default.createElement(_date2.default, {
-                            borderShow: this.props.borderShow,
-                            hasClear: this.props.hasClear,
-                            disabled: this.props.disabled,
-                            immutable: this.props.immutable,
-                            fullWidth: this.props.fullWidth,
-                            value: endDate,
-                            minDate: startDate,
-                            onChange: this.handleChange(1)
-                        })
-                    )
-                )
+                    { className: 'control-border' },
+                    content
+                ) : content
             );
         }
     }]);
@@ -232,4 +245,7 @@ DateRange.defaultProps = {
     minDate: undefined,
     maxDate: undefined,
     timestamp: false };
+DateRange.contextTypes = {
+    muiTheme: _propTypes2.default.object
+};
 exports.default = DateRange;

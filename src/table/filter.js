@@ -78,6 +78,10 @@ export default class Filter extends Component {
     }
 
     render() {
+        let hintText;
+        if(this.props.field.type == 'text' || this.props.field.type == 'auto') {
+            hintText = '输入关键字查询';
+        }
         return <div ref="container" style={{display: 'inline-block', position: 'relative', lineHeight: 1}}>
             <Icon type="button"
                   name="filter-fill"
@@ -93,7 +97,7 @@ export default class Filter extends Component {
                 <div className="space-small">
                     <Control
                         ref="control"
-                        hintText="输入关键字查询"
+                        hintText={hintText}
                         {...this.props.field}
                         label={false}
                         value={this.state.value}
@@ -106,7 +110,7 @@ export default class Filter extends Component {
                                 this.props.field.onChange(value);
                             }
                         }}/>
-                    <div className="row text-center text-primary" cols="2" style={{padding: '6px 0'}}>
+                    <div className="row text-center text-primary" cols="2" style={{padding: '6px 0', marginTop: 6}}>
                         {this.props.reset ? <div className="col text-left">
                             <span className="cursor-pointer" style={{padding: 6}}
                                   onClick={this.handleReset}>{this.props.resetLabel}</span>

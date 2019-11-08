@@ -8,6 +8,7 @@ import TextField from 'material-ui/TextField';
 import _ from 'lodash';
 import style from '../style';
 import utils from "../utils";
+import Icon from '../icon';
 
 export default class Text extends Component {
 
@@ -50,7 +51,7 @@ export default class Text extends Component {
     }
 
     initData(props) {
-        if (props.value !== undefined) {
+        if (props.hasOwnProperty('value')) {
             this.state.value = props.value;
         }
     }
@@ -140,6 +141,9 @@ export default class Text extends Component {
         if (this.props.onKeyUp) {
             this.props.onKeyUp(event, this)
         }
+        if (event.keyCode == 13 && this.props.onEnter) {
+            this.props.onEnter(event, this);
+        }
     };
 
     focus = () => {
@@ -170,16 +174,31 @@ export default class Text extends Component {
             multiLine={this.props.multiLine}
             rows={this.props.rows}
             hintText={this.props.hintText}
-            errorText={this.props.errorText}
+            errorText={borderStyle === 'underline' ? this.props.errorText : undefined}
             floatingLabelFixed={this.props.labelFixed}
             underlineShow={borderStyle === 'underline' && this.props.borderShow}
             autoComplete={this.props.autoComplete}
             {...styleProps}
         />;
+        let content = textField;
+        if (this.props.leftIcon) {
+            content = <div className="flex middle">
+                <div style={{paddingRight: 8}}>
+                    <Icon name={this.props.leftIcon}/>
+                </div>
+                {textField}
+            </div>
+        }
         if (borderStyle === 'border' && this.props.borderShow) {
-            return <div className={"control-border" + (this.state.focus ? ' focus' : '')}>{textField}</div>
+            return <div className="full-width">
+                <div
+                    className={"control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>
+                    {content}
+                </div>
+                <div className="text-small text-danger" style={{marginTop: 2}}>{this.props.errorText}</div>
+            </div>
         } else {
-            return textField;
+            return content;
         }
     }
 

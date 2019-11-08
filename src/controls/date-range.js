@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import _ from 'lodash';
 import Date from './date';
 import utils from "../utils";
@@ -26,6 +27,10 @@ export default class DateRange extends Component {
         endDate: undefined
     };
 
+    static contextTypes = {
+        muiTheme: PropTypes.object,
+    };
+
     constructor(props) {
         super(props);
         this.initData(props);
@@ -36,9 +41,12 @@ export default class DateRange extends Component {
     }
 
     initData(props) {
-        if (props.value !== undefined && _.isArray(props.value) && props.value.length == 2) {
+        if (_.isArray(props.value) && props.value.length == 2) {
             let value = props.value;
             [this.state.startDate, this.state.endDate] = this.convertValue(value);
+        } else if(props.hasOwnProperty('value') && props.value === undefined) {
+            this.state.startDate = undefined;
+            this.state.endDate = undefined;
         }
     }
 
@@ -116,6 +124,34 @@ export default class DateRange extends Component {
     render() {
         let label = this.props.label;
         let [startDate, endDate] = this.getValue();
+        let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+        let content = <div className="flex middle">
+            <div style={{width: 'calc(50% - 10px)', minWidth: 'calc(50% - 10px)'}}>
+                <Date
+                    borderShow={this.props.borderShow && borderStyle === 'underline'}
+                    hasClear={this.props.hasClear}
+                    disabled={this.props.disabled}
+                    immutable={this.props.immutable}
+                    fullWidth={this.props.fullWidth}
+                    value={startDate}
+                    maxDate={endDate}
+                    onChange={this.handleChange(0)}
+                />
+            </div>
+            <div className="text-center" style={{color: '#ccc', width: 20, minWidth: 20}}>-</div>
+            <div style={{width: 'calc(50% - 10px)', minWidth: 'calc(50% - 10px)'}}>
+                <Date
+                    borderShow={this.props.borderShow && borderStyle === 'underline'}
+                    hasClear={this.props.hasClear}
+                    disabled={this.props.disabled}
+                    immutable={this.props.immutable}
+                    fullWidth={this.props.fullWidth}
+                    value={endDate}
+                    minDate={startDate}
+                    onChange={this.handleChange(1)}
+                />
+            </div>
+        </div>;
         return <div>
             {
                 label === false ? null : <div>
@@ -128,33 +164,9 @@ export default class DateRange extends Component {
                     }}>{label}</span>
                 </div>
             }
-            <div className="flex middle">
-                <div style={{width: 'calc(50% - 10px)', minWidth: 'calc(50% - 10px)'}}>
-                    <Date
-                        borderShow={this.props.borderShow}
-                        hasClear={this.props.hasClear}
-                        disabled={this.props.disabled}
-                        immutable={this.props.immutable}
-                        fullWidth={this.props.fullWidth}
-                        value={startDate}
-                        maxDate={endDate}
-                        onChange={this.handleChange(0)}
-                    />
-                </div>
-                <div className="text-center" style={{color: '#ccc', width: 20, minWidth: 20}}>-</div>
-                <div style={{width: 'calc(50% - 10px)', minWidth: 'calc(50% - 10px)'}}>
-                    <Date
-                        borderShow={this.props.borderShow}
-                        hasClear={this.props.hasClear}
-                        disabled={this.props.disabled}
-                        immutable={this.props.immutable}
-                        fullWidth={this.props.fullWidth}
-                        value={endDate}
-                        minDate={startDate}
-                        onChange={this.handleChange(1)}
-                    />
-                </div>
-            </div>
+            {
+                borderStyle === 'border' && this.props.borderShow ? <div className="control-border">{content}</div> : content
+            }
         </div>
     }
 

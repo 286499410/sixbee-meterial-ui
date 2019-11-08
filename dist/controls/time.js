@@ -133,7 +133,9 @@ var Time = function (_Component) {
     }, {
         key: 'initData',
         value: function initData(props) {
-            this.state.value = props.value;
+            if (props.hasOwnProperty('value')) {
+                this.state.value = props.value;
+            }
         }
     }, {
         key: 'getHours',

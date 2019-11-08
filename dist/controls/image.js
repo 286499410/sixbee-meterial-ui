@@ -87,7 +87,7 @@ var Image = function (_Component) {
         value: function initData(props) {
             var _this2 = this;
 
-            if (props.value !== undefined) {
+            if (props.hasOwnProperty('value')) {
                 if (_lodash2.default.isString(props.value)) {
                     this.state.value = props.value;
                 } else if (_lodash2.default.isObject(props.value)) {

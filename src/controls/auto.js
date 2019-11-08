@@ -43,7 +43,8 @@ export default class Auto extends Component {
         dataSource: [],             //数据源
         textFields: [],             //数据配置text解析的参数
         anchorOrigin: {vertical: 'bottom', horizontal: 'left'},
-        targetOrigin: {vertical: 'top', horizontal: 'left'}
+        targetOrigin: {vertical: 'top', horizontal: 'left'},
+        focus: false
     };
 
     static contextTypes = {
@@ -65,13 +66,19 @@ export default class Auto extends Component {
      * @param props
      */
     initData = (props) => {
-        if (props.value !== undefined) {
+        if (props.hasOwnProperty('value')) {
             this.state.value = props.value;
+            if(props.value && this.state.dataSource.length > 0) {
+                let data = this.getData(props.value);
+                if (data) {
+                    this.state.searchText = _.get(data, this.props.dataSourceConfig.text, '');
+                }
+            }
         }
-        if (props.searchText !== undefined) {
+        if (props.hasOwnProperty('searchText') && props.searchText !== undefined) {
             this.state.searchText = props.searchText;
         }
-        if (props.value !== undefined && props.searchText === undefined && props.supportSearchText === true) {
+        if (props.hasOwnProperty('value') && props.searchText === undefined && props.supportSearchText === true) {
             this.state.searchText = props.value;
         }
     };
@@ -131,7 +138,7 @@ export default class Auto extends Component {
             if (value !== undefined && this.state.searchText === undefined) {
                 let data = this.getData(value);
                 if (data) {
-                    this.state.searchText = _.get(data, this.props.dataSourceConfig.text);
+                    this.state.searchText = _.get(data, this.props.dataSourceConfig.text, '');
                 }
             }
             this.forceUpdate();
@@ -202,16 +209,7 @@ export default class Auto extends Component {
      * @param event
      */
     handleFocus = (event) => {
-        // let offsetBottom = $(window).height() - $(event.target).offset().top;
-        // let anchorOrigin = {vertical: 'bottom', horizontal: 'left'};
-        // let targetOrigin = {vertical: 'top', horizontal: 'left'};
-        // if (offsetBottom < 280) {
-        //     anchorOrigin = {vertical: 'top', horizontal: 'left'};
-        //     targetOrigin = {vertical: 'bottom', horizontal: 'left'};
-        // }
-        // if (!_.isEqual(this.state.anchorOrigin, anchorOrigin)) {
-        //     this.setState({anchorOrigin: anchorOrigin, targetOrigin: targetOrigin});
-        // }
+        this.setState({focus: true});
         if (this.props.onFocus) {
             this.props.onFocus(event, this);
         }
@@ -222,6 +220,7 @@ export default class Auto extends Component {
      * @param event
      */
     handleBlur = (event) => {
+        this.setState({focus: false});
         if (this.props.onBlur) {
             this.props.onBlur(event, this);
         }
@@ -248,10 +247,14 @@ export default class Auto extends Component {
 
     render = () => {
         let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
-        let value = this.getValue();
-        let searchText = this.getSearchText();
+        let value = this.getValue() || '';
+        let searchText = this.getSearchText() || '';
         let styleProps = _.merge(style.getStyle('auto', this.props), this.props.styleProps);
         let label = this.props.label;
+        if(borderStyle == 'border') {
+            styleProps.iconStyle.style.right = 0;
+            styleProps.iconStyle.style.top = 3;
+        }
         let autoComplete = <AutoComplete
             ref={"auto"}
             filter={this.props.filter || this.filter}
@@ -299,13 +302,20 @@ export default class Auto extends Component {
             <div className="flex between" ref={"container"}>
                 <div style={{flexGrow: 1, position: 'relative'}}>
                     {
-                        borderStyle === 'border' && this.props.borderShow ? <div className="control-border">{autoComplete}</div> : autoComplete
+                        borderStyle === 'border' && this.props.borderShow ?
+                            <div className="full-width">
+                                <div className={"control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>{autoComplete}</div>
+                                <div className="text-small text-danger" style={{marginTop: 2}}>{this.props.errorText}</div>
+                            </div> : autoComplete
                     }
 
                     {
                         (value !== undefined && value !== null && value !== '') && this.props.hasClear && !this.props.disabled && !this.props.immutable ?
                             <IconButton iconClassName="iconfont icon-close-circle-fill" onClick={this.handleClear}
-                                        style={{position: 'absolute', right: 0, ...styleProps.iconStyle.style}}
+                                        style={{
+                                            position: 'absolute',
+                                            ...styleProps.iconStyle.style
+                                        }}
                                         iconStyle={{color: '#e0e0e0', ...styleProps.iconStyle.iconStyle}}
 
                             /> : null

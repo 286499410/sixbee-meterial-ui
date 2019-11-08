@@ -4,6 +4,7 @@
 
 import React, {Component} from 'react';
 import TextField from 'material-ui/TextField';
+import PropTypes from 'prop-types';
 import Popover from 'material-ui/Popover';
 import IconButton from 'material-ui/IconButton';
 import ReactCalendar from 'react-calendar';
@@ -34,7 +35,12 @@ export default class Date extends Component {
     state = {
         anchorEl: {},
         value: undefined,
-        open: false
+        open: false,
+        focus: false
+    };
+
+    static contextTypes = {
+        muiTheme: PropTypes.object,
     };
 
     constructor(props) {
@@ -47,9 +53,9 @@ export default class Date extends Component {
     }
 
     initData(props) {
-        if (props.value !== undefined) {
+        if (props.hasOwnProperty('value')) {
             let value = props.value;
-            if (this.props.timestamp) {
+            if (this.props.timestamp && value !== undefined && value !== null && value !== '') {
                 value = utils.date('Y-m-d', value);
             }
             this.state.value = value;
@@ -105,6 +111,7 @@ export default class Date extends Component {
      * @param event
      */
     handleBlur = (event) => {
+        this.setState({focus: false});
         if (this.props.onBlur) {
             this.props.onBlur(event, this);
         }
@@ -117,6 +124,7 @@ export default class Date extends Component {
     handleFocus = (event) => {
         this.setState({
             open: true,
+            focus: true,
             anchorEl: this.refs.container
         });
         if (this.props.onFocus) {
@@ -158,36 +166,47 @@ export default class Date extends Component {
         let value = this.getValue();
         let label = this.props.label;
         let styleProps = style.getStyle('calender', this.props);
+        let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+        if (borderStyle == 'border') {
+            styleProps.iconStyle.style.right = 0;
+            styleProps.iconStyle.style.top = 3;
+        }
+        let textField = <TextField
+            ref="text"
+            name={this.props.name || this.props.dataKey || utils.uuid()}
+            fullWidth={this.props.fullWidth}
+            floatingLabelText={label}
+            type={'text'}
+            value={value === null || value === undefined ? '' : value}
+            disabled={this.props.disabled}
+            onChange={this.handleTextChange}
+            onBlur={this.handleBlur}
+            onFocus={this.handleFocus}
+            onKeyUp={this.handleKeyUp}
+            multiLine={this.props.multiLine}
+            rows={this.props.rows}
+            hintText={this.props.hintText}
+            errorText={borderStyle === "underline" ? this.props.errorText : undefined}
+            floatingLabelFixed={this.props.labelFixed}
+            underlineShow={borderStyle === 'underline' && this.props.borderShow}
+            autoComplete="off"
+            textareaStyle={styleProps.textareaStyle}
+            floatingLabelStyle={styleProps.floatingLabelStyle}
+            floatingLabelFocusStyle={styleProps.floatingLabelFocusStyle}
+            floatingLabelShrinkStyle={styleProps.floatingLabelShrinkStyle}
+            errorStyle={{...styleProps.errorStyle, ...this.props.errorStyle}}
+            hintStyle={styleProps.hintStyle}
+            underlineStyle={styleProps.underlineStyle}
+            inputStyle={styleProps.inputStyle}
+            style={styleProps.style}
+        />;
         return <div ref="container" style={{position: 'relative'}}>
-            <TextField
-                ref="text"
-                name={this.props.name || this.props.dataKey || utils.uuid()}
-                fullWidth={this.props.fullWidth}
-                floatingLabelText={label}
-                type={'text'}
-                value={value}
-                disabled={this.props.disabled}
-                onChange={this.handleTextChange}
-                onBlur={this.handleBlur}
-                onFocus={this.handleFocus}
-                onKeyUp={this.handleKeyUp}
-                multiLine={this.props.multiLine}
-                rows={this.props.rows}
-                hintText={this.props.hintText}
-                errorText={this.props.errorText}
-                floatingLabelFixed={this.props.labelFixed}
-                underlineShow={this.props.borderShow}
-                autoComplete="off"
-                textareaStyle={styleProps.textareaStyle}
-                floatingLabelStyle={styleProps.floatingLabelStyle}
-                floatingLabelFocusStyle={styleProps.floatingLabelFocusStyle}
-                floatingLabelShrinkStyle={styleProps.floatingLabelShrinkStyle}
-                errorStyle={{...styleProps.errorStyle, ...this.props.errorStyle}}
-                hintStyle={styleProps.hintStyle}
-                underlineStyle={styleProps.underlineStyle}
-                inputStyle={styleProps.inputStyle}
-                style={styleProps.style}
-            />
+            {
+                borderStyle === 'border' && this.props.borderShow ? <div className="full-width">
+                        <div className={"control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>{textField}</div>
+                        <div className="text-small text-danger" style={{marginTop: 2}}>{this.props.errorText}</div>
+                    </div> : textField
+            }
             {
                 (value !== undefined && value !== null && value !== '') && this.props.hasClear && !this.props.disabled && !this.props.immutable ?
                     <IconButton iconClassName="iconfont icon-close-circle-fill" onClick={this.handleClear}
@@ -201,8 +220,7 @@ export default class Date extends Component {
                 style={styleProps.popoverStyle}
                 open={this.state.open}
                 anchorEl={this.state.anchorEl}
-                onRequestClose={this.handleRequestClose}
-            >
+                onRequestClose={this.handleRequestClose}>
                 <div>
                     <ReactCalendar
                         onChange={this.handleChange}

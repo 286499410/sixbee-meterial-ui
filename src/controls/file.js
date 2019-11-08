@@ -37,7 +37,7 @@ export default class File extends Component {
     }
 
     initData(props) {
-        if (props.value !== undefined) {
+        if (props.hasOwnProperty('value')) {
             this.state.value = props.value;
         }
     }

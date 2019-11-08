@@ -124,7 +124,7 @@ var Auto = function (_Component) {
                 if (value !== undefined && _this3.state.searchText === undefined) {
                     var data = _this3.getData(value);
                     if (data) {
-                        _this3.state.searchText = _lodash2.default.get(data, _this3.props.dataSourceConfig.text);
+                        _this3.state.searchText = _lodash2.default.get(data, _this3.props.dataSourceConfig.text, '');
                     }
                 }
                 _this3.forceUpdate();
@@ -168,17 +168,24 @@ var _initialiseProps = function _initialiseProps() {
         dataSource: [],
         textFields: [],
         anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
-        targetOrigin: { vertical: 'top', horizontal: 'left' }
+        targetOrigin: { vertical: 'top', horizontal: 'left' },
+        focus: false
     };
 
     this.initData = function (props) {
-        if (props.value !== undefined) {
+        if (props.hasOwnProperty('value')) {
             _this4.state.value = props.value;
+            if (props.value && _this4.state.dataSource.length > 0) {
+                var data = _this4.getData(props.value);
+                if (data) {
+                    _this4.state.searchText = _lodash2.default.get(data, _this4.props.dataSourceConfig.text, '');
+                }
+            }
         }
-        if (props.searchText !== undefined) {
+        if (props.hasOwnProperty('searchText') && props.searchText !== undefined) {
             _this4.state.searchText = props.searchText;
         }
-        if (props.value !== undefined && props.searchText === undefined && props.supportSearchText === true) {
+        if (props.hasOwnProperty('value') && props.searchText === undefined && props.supportSearchText === true) {
             _this4.state.searchText = props.value;
         }
     };
@@ -223,12 +230,14 @@ var _initialiseProps = function _initialiseProps() {
     };
 
     this.handleFocus = function (event) {
+        _this4.setState({ focus: true });
         if (_this4.props.onFocus) {
             _this4.props.onFocus(event, _this4);
         }
     };
 
     this.handleBlur = function (event) {
+        _this4.setState({ focus: false });
         if (_this4.props.onBlur) {
             _this4.props.onBlur(event, _this4);
         }
@@ -246,10 +255,14 @@ var _initialiseProps = function _initialiseProps() {
 
     this.render = function () {
         var borderStyle = _this4.props.borderStyle || _this4.context.muiTheme.controlBorderStyle || 'underline';
-        var value = _this4.getValue();
-        var searchText = _this4.getSearchText();
+        var value = _this4.getValue() || '';
+        var searchText = _this4.getSearchText() || '';
         var styleProps = _lodash2.default.merge(_style2.default.getStyle('auto', _this4.props), _this4.props.styleProps);
         var label = _this4.props.label;
+        if (borderStyle == 'border') {
+            styleProps.iconStyle.style.right = 0;
+            styleProps.iconStyle.style.top = 3;
+        }
         var autoComplete = _react2.default.createElement(_AutoComplete2.default, {
             ref: "auto",
             filter: _this4.props.filter || _this4.filter,
@@ -301,11 +314,22 @@ var _initialiseProps = function _initialiseProps() {
                 { style: { flexGrow: 1, position: 'relative' } },
                 borderStyle === 'border' && _this4.props.borderShow ? _react2.default.createElement(
                     'div',
-                    { className: 'control-border' },
-                    autoComplete
+                    { className: 'full-width' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: "control-border" + (_this4.state.focus ? ' focus' : '') + (_this4.props.errorText ? ' error' : '') },
+                        autoComplete
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'text-small text-danger', style: { marginTop: 2 } },
+                        _this4.props.errorText
+                    )
                 ) : autoComplete,
                 value !== undefined && value !== null && value !== '' && _this4.props.hasClear && !_this4.props.disabled && !_this4.props.immutable ? _react2.default.createElement(_IconButton2.default, { iconClassName: 'iconfont icon-close-circle-fill', onClick: _this4.handleClear,
-                    style: (0, _extends3.default)({ position: 'absolute', right: 0 }, styleProps.iconStyle.style),
+                    style: (0, _extends3.default)({
+                        position: 'absolute'
+                    }, styleProps.iconStyle.style),
                     iconStyle: (0, _extends3.default)({ color: '#e0e0e0' }, styleProps.iconStyle.iconStyle)
 
                 }) : null

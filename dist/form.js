@@ -229,7 +229,6 @@ var Form = function (_Component) {
 
             var allData = this.getData('all');
             var submitData = this.getData();
-            console.log('submitData', submitData);
 
             if (!this.check(allData)) {
                 return false;
@@ -341,6 +340,7 @@ var Form = function (_Component) {
             if (this.props.actions !== false) {
                 contentHeight = 'calc(100% - ' + footerHeight + 'px)';
             }
+            var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
             return _react2.default.createElement(
                 'div',
                 { className: "relative " + this.props.className,
@@ -360,20 +360,24 @@ var Form = function (_Component) {
                         autoHeightMax: contentHeight },
                     _react2.default.createElement(
                         'div',
-                        { className: 'space', style: (0, _extends3.default)({
+                        { className: 'space', style: {
                                 width: '100%',
                                 overflowX: 'hidden',
-                                paddingLeft: 20,
-                                paddingRight: 20
-                            }, this.props.style) },
+                                padding: this.props.padding !== undefined ? this.props.padding : borderStyle === 'border' ? 24 : 20
+                            } },
                         _react2.default.createElement(
                             'div',
-                            { className: 'form row-space', cols: this.props.cols },
-                            this.renderControls(this.props.fields)
+                            { className: "form " + (this.props.inlineFlex ? "flex middle" : "row-space"),
+                                cols: this.props.cols },
+                            this.renderControls(this.props.fields),
+                            this.props.inlineFlex ? _react2.default.createElement(FormActions, { ref: 'actions',
+                                actions: this.props.actions,
+                                style: this.props.actionStyle,
+                                inlineFlex: this.props.inlineFlex }) : null
                         )
                     )
                 ),
-                this.props.actions === false || this.props.actions.length == 0 ? null : _react2.default.createElement(
+                this.props.actions === false || this.props.actions.length == 0 || this.props.inlineFlex ? null : _react2.default.createElement(
                     'div',
                     null,
                     _react2.default.createElement('div', { style: { height: footerHeight } }),
@@ -401,6 +405,7 @@ Form.defaultProps = {
     onDidUpdate: undefined,
     beforeSubmit: undefined,
 
+    inlineFlex: false,
     inline: false,
     width: '100%',
     height: 400,
@@ -418,6 +423,9 @@ Form.defaultProps = {
     resetLabel: '重置',
     submitLabel: '提交',
     cancelLabel: '取消'
+};
+Form.contextTypes = {
+    muiTheme: _propTypes2.default.object
 };
 
 var _initialiseProps = function _initialiseProps() {
@@ -484,17 +492,15 @@ var _initialiseProps = function _initialiseProps() {
                         _react2.default.createElement(
                             'div',
                             { style: {
-                                    width: field.width || _this6.props.controlWidth,
-                                    marginBottom: _this6.props.controlBetweenSpace
+                                    width: field.width || _this6.props.controlWidth
                                 } },
                             _react2.default.createElement(
                                 'div',
                                 { className: 'row-space', cols: field.groupCols || cols },
                                 field.label ? _react2.default.createElement(
                                     'div',
-                                    { className: 'col col-full',
+                                    { className: 'col col-full form-group-title',
                                         style: {
-                                            color: 'cadetblue',
                                             marginTop: 16,
                                             marginBottom: _this6.props.inline ? 16 : 0
                                         } },
@@ -531,7 +537,12 @@ var _initialiseProps = function _initialiseProps() {
                                         width: _this6.props.labelWidth,
                                         minWidth: _this6.props.labelWidth
                                     } },
-                                field.label
+                                field.label,
+                                field.required ? _react2.default.createElement(
+                                    'span',
+                                    { className: 'text-danger' },
+                                    '*'
+                                ) : null
                             ) : _react2.default.createElement(
                                 'div',
                                 { className: 'col col-full',
@@ -590,7 +601,10 @@ var _initialiseProps = function _initialiseProps() {
                         return _react2.default.createElement(
                             'div',
                             { className: 'col col-' + fieldCols,
-                                style: { width: '100%', marginBottom: _this6.props.controlBetweenSpace },
+                                style: {
+                                    marginBottom: _this6.props.inlineFlex ? 0 : _this6.props.controlBetweenSpace,
+                                    marginRight: _this6.props.inlineFlex ? _this6.props.controlBetweenSpace : 0
+                                },
                                 key: index },
                             _react2.default.createElement(
                                 'div',
@@ -603,6 +617,11 @@ var _initialiseProps = function _initialiseProps() {
                                             width: field.labelWidth || _this6.props.labelWidth,
                                             minWidth: field.labelWidth || _this6.props.labelWidth
                                         } },
+                                    field.required ? _react2.default.createElement(
+                                        'span',
+                                        { className: 'text-danger' },
+                                        '*'
+                                    ) : null,
                                     field.label,
                                     '\uFF1A'
                                 ) : null,
@@ -706,21 +725,31 @@ var FormActions = function (_Component2) {
         key: 'render',
         value: function render() {
             var actions = this.getActions();
-            return _react2.default.createElement(
-                'div',
-                { className: 'bg-white space',
-                    style: (0, _extends3.default)({
-                        position: 'absolute',
-                        bottom: 0,
-                        width: '100%',
-                        textAlign: 'right',
-                        boxShadow: '0 -1px 5px #ddd',
-                        zIndex: 2
-                    }, this.props.style) },
-                actions.map(function (action, index) {
-                    return _react2.default.createElement(_button2.default, (0, _extends3.default)({ key: index }, action, { style: { marginLeft: 12 } }));
-                })
-            );
+            if (this.props.inlineFlex) {
+                return _react2.default.createElement(
+                    'div',
+                    { className: 'flex middle' },
+                    actions.reverse().map(function (action, index) {
+                        return _react2.default.createElement(_button2.default, (0, _extends3.default)({ key: index }, action, { style: { marginRight: 12 } }));
+                    })
+                );
+            } else {
+                return _react2.default.createElement(
+                    'div',
+                    { className: 'bg-white space',
+                        style: (0, _extends3.default)({
+                            position: 'absolute',
+                            bottom: 0,
+                            width: '100%',
+                            textAlign: 'right',
+                            boxShadow: '0 -1px 5px #ddd',
+                            zIndex: 2
+                        }, this.props.style) },
+                    actions.map(function (action, index) {
+                        return _react2.default.createElement(_button2.default, (0, _extends3.default)({ key: index }, action, { style: { marginLeft: 12 } }));
+                    })
+                );
+            }
         }
     }]);
     return FormActions;

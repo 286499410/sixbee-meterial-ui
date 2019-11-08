@@ -60,6 +60,10 @@ var _FontIcon = require('material-ui/FontIcon');
 
 var _FontIcon2 = _interopRequireDefault(_FontIcon);
 
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var FormTable = function (_Component) {
@@ -86,7 +90,11 @@ var FormTable = function (_Component) {
                 limit: 50
             },
             tableState: {},
-            controls: {}
+            controls: []
+        };
+
+        _this.setControlValue = function (row, key, value) {
+            _this.getControl(row, key).setValue(value);
         };
 
         _this.handleFocus = function (row, column) {
@@ -118,7 +126,7 @@ var FormTable = function (_Component) {
 
         _this.handleChange = function (row, column) {
             return function (value, control) {
-                _.set(_this.state.value[row], column.key, value);
+                _lodash2.default.set(_this.state.value[row], column.key, value);
                 if (column.onChange) {
                     column.onChange(value, control, _this, row);
                 }
@@ -129,7 +137,7 @@ var FormTable = function (_Component) {
         };
 
         _this.getColumnsWidth = function () {
-            if (_.isFunction(_this.props.columnWidths)) {
+            if (_lodash2.default.isFunction(_this.props.columnWidths)) {
                 return _this.props.columnWidths(_this);
             } else {
                 return _this.props.columnWidths;
@@ -160,7 +168,7 @@ var FormTable = function (_Component) {
 
         _this.handleRowSelect = function (data) {
             if (data.series_number) {
-                var row = (_.isNumber(data.series_number) ? data.series_number : data.series_number.props.children) - 1;
+                var row = (_lodash2.default.isNumber(data.series_number) ? data.series_number : data.series_number.props.children) - 1;
                 _this.setCurrentRow(row);
             }
         };
@@ -180,7 +188,7 @@ var FormTable = function (_Component) {
         _this.initData(props);
         if (_this.state.value.length == 0 && _this.props.defaultRows > 0) {
             for (var i = 0; i < _this.props.defaultRows; i++) {
-                _this.addDataRow(undefined, props.defaultData, false);
+                _this.addDataRow(undefined, _this.getDefaultRowData(props), false);
             }
         }
         _this.checkMinRow(props);
@@ -196,9 +204,18 @@ var FormTable = function (_Component) {
     }, {
         key: 'initData',
         value: function initData(props) {
-            if (props.value !== undefined) {
+            if (_lodash2.default.isArray(props.value)) {
                 this.state.value = props.value;
+            } else if (props.value === undefined) {
+                this.state.value = [];
             }
+        }
+    }, {
+        key: 'getDefaultRowData',
+        value: function getDefaultRowData() {
+            var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props;
+
+            return _lodash2.default.isFunction(props.defaultRowData) ? props.defaultRowData(this) : props.defaultRowData;
         }
     }, {
         key: 'checkMinRow',
@@ -207,7 +224,7 @@ var FormTable = function (_Component) {
 
             if (this.state.value.length < props.minRows) {
                 for (var i = this.state.value.length; i < props.minRows; i++) {
-                    this.addDataRow(i, this.props.defaultData, false);
+                    this.addDataRow(i, this.getDefaultRowData(props), false);
                 }
             }
         }
@@ -216,7 +233,7 @@ var FormTable = function (_Component) {
         value: function setValue(value) {
             var _this2 = this;
 
-            if (_.isArray(value) && this.props.autoSortField) {
+            if (_lodash2.default.isArray(value) && this.props.autoSortField) {
                 value.map(function (row, index) {
                     row.sort = _this2.props.autoSortType == 'desc' ? value.length - index : index + 1;
                 });
@@ -232,9 +249,14 @@ var FormTable = function (_Component) {
             return (this.state.value === undefined ? this.props.defaultValue : this.state.value) || [];
         }
     }, {
+        key: 'getControl',
+        value: function getControl(row, key) {
+            return this.state.controls[row][key];
+        }
+    }, {
         key: 'addRow',
         value: function addRow(row) {
-            var defaultData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.props.defaultRowData;
+            var defaultData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.getDefaultRowData();
 
             if (row === undefined) row = this.getCurrentRow();
             this.addDataRow(row, defaultData);
@@ -309,7 +331,7 @@ var FormTable = function (_Component) {
     }, {
         key: 'addDataRow',
         value: function addDataRow(row) {
-            var defaultData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.props.defaultRowData;
+            var defaultData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.getDefaultRowData();
             var update = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
             var data = {},
@@ -361,7 +383,17 @@ var FormTable = function (_Component) {
             }
             var columnWidths = this.getColumnsWidth();
             columns.map(function (column) {
-                tableColumns.push((0, _extends3.default)({}, column, { render: false, width: columnWidths[column.key] }));
+                var style = void 0;
+                if (!column.static && column.type != 'static' && ['text', 'auto', 'money', 'number', 'date', 'datetime', 'select', 'time', 'calendar'].indexOf(column.type) >= 0) {
+                    style = _this3.props.editableStyle;
+                }
+                tableColumns.push((0, _extends3.default)({
+                    style: style
+                }, column, {
+                    dataKey: undefined,
+                    render: false,
+                    width: columnWidths[column.key]
+                }));
             });
             if (this.props.hasAction) {
                 tableColumns.push({
@@ -456,7 +488,7 @@ var FormTable = function (_Component) {
                 dataRow['series_number'] = row + 1;
             }
             this.props.columns.map(function (column, index) {
-                var value = _.get(data, column.key);
+                var value = _lodash2.default.get(data, column.formKey || column.key);
                 if (column.convert) {
                     value = column.convert(data);
                 }
@@ -471,7 +503,15 @@ var FormTable = function (_Component) {
                     onFocus: _this4.handleFocus(row, column),
                     onBlur: _this4.handleBlur(row, column),
                     onKeyUp: _this4.handleKeyUp(row, column),
-                    onChange: _this4.handleChange(row, column)
+                    onChange: _this4.handleChange(row, column),
+                    context: _this4,
+                    onComponentDidMount: function onComponentDidMount(context) {
+                        _this4.state.controls[row][column.key] = context;
+                    },
+                    position: {
+                        row: row,
+                        col: index
+                    }
                 }));
             });
             if (this.props.hasAction) {
@@ -497,7 +537,7 @@ var FormTable = function (_Component) {
 
             var dataSource = [];
             if (this.props.bodyHeaderData) {
-                if (_.isFunction(this.props.bodyHeaderData)) {
+                if (_lodash2.default.isFunction(this.props.bodyHeaderData)) {
                     dataSource.push(this.props.bodyHeaderData(this));
                 } else {
                     dataSource.push(this.props.bodyHeaderData);
@@ -508,7 +548,7 @@ var FormTable = function (_Component) {
                 dataSource.push(dataRow);
             });
             if (this.props.bodyFooterData) {
-                if (_.isFunction(this.props.bodyFooterData)) {
+                if (_lodash2.default.isFunction(this.props.bodyFooterData)) {
                     dataSource.push(this.props.bodyFooterData(this));
                 } else {
                     dataSource.push(this.props.bodyFooterData);
@@ -531,7 +571,6 @@ var FormTable = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            this.state.controls = [];
             var dataSource = this.getDataSource();
             var pager = false;
             var tableState = this.state.tableState;
@@ -545,9 +584,10 @@ var FormTable = function (_Component) {
                     autoUpdateState: false
                 }, this.state.pager);
             }
+            var footerData = this.props.footerData ? this.props.footerData(this) : null;
             return _react2.default.createElement(
                 'div',
-                { style: (0, _extends3.default)({ marginTop: 16 }, this.props.style) },
+                { style: (0, _extends3.default)({ marginBottom: 16 }, this.props.style) },
                 this.props.label === false ? null : _react2.default.createElement(
                     'div',
                     { style: this.props.labelStyle },
@@ -575,7 +615,7 @@ var FormTable = function (_Component) {
                     tableWidth: this.props.tableWidth,
                     headerRowHeight: this.props.headerRowHeight,
                     bodyRowHeight: this.props.bodyRowHeight,
-                    footerData: this.props.footerData ? this.props.footerData(this) : undefined,
+                    footerData: footerData,
                     headerTextAlign: 'center',
                     showCheckboxes: this.props.showCheckboxes,
                     rowCheckboxEnabled: this.props.rowCheckboxEnabled,
@@ -584,7 +624,15 @@ var FormTable = function (_Component) {
                     mode: pager ? 'local' : undefined
                 }, tableState, {
                     onStateChange: this.handleStateChange
-                }))
+                })),
+                this.props.hasFooterAddAction ? _react2.default.createElement(
+                    'div',
+                    {
+                        className: 'border-primary text-center cursor-pointer',
+                        style: { marginTop: -1 },
+                        onClick: this.addRow.bind(this, this.state.value.length, this.getDefaultRowData(), true) },
+                    _react2.default.createElement(_FontIcon2.default, { className: 'iconfont icon-plus' })
+                ) : null
             );
         }
     }]);
@@ -602,6 +650,7 @@ FormTable.defaultProps = {
     tableWidth: undefined,
     hasSeriesNumber: true,
     hasAction: true,
+    hasFooterAddAction: false,
     showCheckboxes: false,
     autoSortField: false,
     autoSortType: 'desc',
@@ -630,6 +679,6 @@ FormTable.defaultProps = {
     headerRowHeight: undefined,
     bodyRowHeight: undefined,
     controlSize: 'default',
-
-    onStateChange: undefined };
+    onStateChange: undefined,
+    editableStyle: { background: '#fffdf5' } };
 exports.default = FormTable;

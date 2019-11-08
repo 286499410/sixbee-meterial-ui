@@ -56,6 +56,10 @@ var _utils = require('../utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
+var _icon = require('../icon');
+
+var _icon2 = _interopRequireDefault(_icon);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Text = function (_Component) {
@@ -117,6 +121,9 @@ var Text = function (_Component) {
             if (_this.props.onKeyUp) {
                 _this.props.onKeyUp(event, _this);
             }
+            if (event.keyCode == 13 && _this.props.onEnter) {
+                _this.props.onEnter(event, _this);
+            }
         };
 
         _this.focus = function () {
@@ -135,7 +142,7 @@ var Text = function (_Component) {
     }, {
         key: 'initData',
         value: function initData(props) {
-            if (props.value !== undefined) {
+            if (props.hasOwnProperty('value')) {
                 this.state.value = props.value;
             }
         }
@@ -179,19 +186,42 @@ var Text = function (_Component) {
                 multiLine: this.props.multiLine,
                 rows: this.props.rows,
                 hintText: this.props.hintText,
-                errorText: this.props.errorText,
+                errorText: borderStyle === 'underline' ? this.props.errorText : undefined,
                 floatingLabelFixed: this.props.labelFixed,
                 underlineShow: borderStyle === 'underline' && this.props.borderShow,
                 autoComplete: this.props.autoComplete
             }, styleProps));
+            var content = textField;
+            if (this.props.leftIcon) {
+                content = _react2.default.createElement(
+                    'div',
+                    { className: 'flex middle' },
+                    _react2.default.createElement(
+                        'div',
+                        { style: { paddingRight: 8 } },
+                        _react2.default.createElement(_icon2.default, { name: this.props.leftIcon })
+                    ),
+                    textField
+                );
+            }
             if (borderStyle === 'border' && this.props.borderShow) {
                 return _react2.default.createElement(
                     'div',
-                    { className: "control-border" + (this.state.focus ? ' focus' : '') },
-                    textField
+                    { className: 'full-width' },
+                    _react2.default.createElement(
+                        'div',
+                        {
+                            className: "control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '') },
+                        content
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'text-small text-danger', style: { marginTop: 2 } },
+                        this.props.errorText
+                    )
                 );
             } else {
-                return textField;
+                return content;
             }
         }
     }]);

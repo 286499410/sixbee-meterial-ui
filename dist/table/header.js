@@ -44,6 +44,10 @@ var _Checkbox = require('material-ui/Checkbox');
 
 var _Checkbox2 = _interopRequireDefault(_Checkbox);
 
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
 var _filter = require('./filter');
 
 var _filter2 = _interopRequireDefault(_filter);
@@ -132,30 +136,50 @@ var TableHeader = function (_Component) {
                     className: 'table-header',
                     style: (0, _extends3.default)({
                         overflow: 'hidden',
-                        width: props.containerWidth
+                        width: this.props.width || props.containerWidth
                     }, props.headerStyle) },
                 _react2.default.createElement(
                     'table',
-                    { className: className, style: { width: state.tableWidth, tableLayout: 'fixed' } },
+                    { className: className, style: { width: this.props.width || state.tableWidth, tableLayout: 'fixed' } },
                     _react2.default.createElement(
                         'thead',
                         null,
                         state.headerColumns.map(function (rows, i) {
+                            var columns = [];
+                            if (_lodash2.default.isArray(_this3.props.showColumns)) {
+                                rows.map(function (col) {
+                                    if (_this3.props.showColumns.indexOf(col.key) >= 0) {
+                                        columns.push(col);
+                                    }
+                                });
+                            } else {
+                                columns = rows;
+                            }
                             return _react2.default.createElement(
                                 'tr',
                                 { key: i },
-                                props.showCheckboxes && i == 0 ? _react2.default.createElement(
+                                props.showCheckboxes && _this3.props.showCheckboxes && i == 0 ? _react2.default.createElement(
                                     'th',
                                     { className: 'th-checkbox', rowSpan: state.headerColumns.length,
                                         'data-key': 'checkbox',
                                         style: {
                                             width: props.checkboxColumnWidth,
-                                            height: props.headerRowHeight
+                                            height: props.headerRowHeight + 1
                                         } },
                                     _react2.default.createElement(_Checkbox2.default, (0, _extends3.default)({ checked: _this3.isChecked(),
                                         onCheck: _this3.handleCheck }, props.checkboxStyle))
                                 ) : null,
-                                rows.map(function (col, j) {
+                                props.showSeries && _this3.props.showSeries && i == 0 ? _react2.default.createElement(
+                                    'th',
+                                    { rowSpan: state.headerColumns.length,
+                                        style: {
+                                            width: props.seriesColumnWidth,
+                                            height: props.headerRowHeight,
+                                            textAlign: props.headerTextAlign
+                                        } },
+                                    '\u5E8F\u53F7'
+                                ) : null,
+                                columns.map(function (col, j) {
                                     var style = {};
                                     col.key = col.key || i + '-' + j;
                                     if (state.columnWidths[col.key] || col.width) {
@@ -178,9 +202,9 @@ var TableHeader = function (_Component) {
                                                 null,
                                                 col.label
                                             ),
-                                            col.filter ? _react2.default.createElement(_filter2.default, { field: col.filter === true ? col : col.filter,
+                                            col.filter ? _react2.default.createElement(_filter2.default, { field: col.filter === true ? col : (0, _extends3.default)({}, col, col.filter),
                                                 onFilter: _this3.handleFilter(col),
-                                                value: _.get(filterData, col.formKey || col.key) }) : null,
+                                                value: _lodash2.default.get(filterData, col.formKey || col.key) }) : null,
                                             col.sortable ? _react2.default.createElement(_sort2.default, { field: col, onSort: _this3.handleSort(col) }) : null
                                         ),
                                         props.resize ? _react2.default.createElement('div', { className: 'resize',
@@ -203,6 +227,12 @@ var TableHeader = function (_Component) {
     return TableHeader;
 }(_react.Component);
 
+TableHeader.defaultProps = {
+    width: undefined,
+    showColumns: undefined,
+    showCheckboxes: true,
+    showSeries: true
+};
 TableHeader.contextTypes = {
     state: _propTypes2.default.object,
     props: _propTypes2.default.object,
@@ -289,7 +319,7 @@ var _initialiseProps = function _initialiseProps() {
                     delete filterData[keys[0]][keys[1]][keys[2]][keys[3]][keys[4]];
                 }
             } else {
-                _.set(filterData, key, value);
+                _lodash2.default.set(filterData, key, value);
             }
             if (props.onFilter) {
                 props.onFilter(filterData);

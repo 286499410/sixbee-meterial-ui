@@ -69,10 +69,10 @@ var Money = function (_Component) {
 
         _this.setValue = function (value) {
             value = _lodash2.default.trim(value);
-            if (/^-?\d{0,3}((,\d{3})*)((,\d{0,3})?)((\.\d{0,2})?)$/.test(value) || /^-?\d*((\.\d{0,2})?)$/.test(value)) {
-                var number = value === '' ? '' : _utils2.default.parseNumber(value);
+            if (/^-?\d{0,3}((,\d{3})*)((,\d{0,3})?)((\.\d{0,9})?)$/.test(value) || /^-?\d*((\.\d{0,9})?)$/.test(value)) {
+                var number = value === '' ? '' : _utils2.default.round(_utils2.default.parseNumber(value), _this.props.float);
                 _this.setState({
-                    value: value
+                    value: number
                 });
                 if (_this.props.onChange) {
                     _this.props.onChange(number, _this);
@@ -120,8 +120,8 @@ var Money = function (_Component) {
     }, {
         key: 'initData',
         value: function initData(props) {
-            if (props.value !== undefined) {
-                this.state.value = props.value === '' ? '' : _utils2.default.parseNumber(props.value, props.float);
+            if (props.hasOwnProperty('value')) {
+                this.state.value = props.value === '' ? '' : _utils2.default.round(_utils2.default.parseNumber(props.value), props.float);
             }
         }
     }, {

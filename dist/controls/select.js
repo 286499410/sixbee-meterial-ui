@@ -8,6 +8,10 @@ var _extends2 = require('babel-runtime/helpers/extends');
 
 var _extends3 = _interopRequireDefault(_extends2);
 
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -62,6 +66,10 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var _dialog = require('../dialog');
+
+var _dialog2 = _interopRequireDefault(_dialog);
+
 var _style = require('../style');
 
 var _style2 = _interopRequireDefault(_style);
@@ -69,6 +77,14 @@ var _style2 = _interopRequireDefault(_style);
 var _utils = require('../utils');
 
 var _utils2 = _interopRequireDefault(_utils);
+
+var _table = require('../table');
+
+var _table2 = _interopRequireDefault(_table);
+
+var _button = require('../button');
+
+var _button2 = _interopRequireDefault(_button);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -88,15 +104,25 @@ var Select = function (_Component) {
         _this.state = {
             value: undefined,
             dataSource: [],
+            tableState: {},
             filterText: '',
             open: false,
             anchorEl: undefined
         };
 
         _this.setValue = function (value) {
-            _this.setState({ value: value });
+            _this.state.value = value;
             if (_this.props.onChange) {
                 _this.props.onChange(value, _this);
+            }
+            _this.forceUpdate();
+        };
+
+        _this.clearValue = function () {
+            if (_this.props.multiple) {
+                _this.setValue([]);
+            } else {
+                _this.setValue(null);
             }
         };
 
@@ -132,6 +158,23 @@ var Select = function (_Component) {
                 }
             });
             return options;
+        };
+
+        _this.getFilterDataSource = function (data) {
+            var dataSourceConfig = _this.props.dataSourceConfig;
+            var dataSource = [];
+            data.map(function (row) {
+                var selectText = _lodash2.default.get(row, dataSourceConfig.searchText || dataSourceConfig.text);
+                if (_this.props.hasFilter && _this.state.filterText !== '' && selectText.indexOf(_this.state.filterText) == -1) {
+                    return;
+                }
+                dataSource.push(row);
+                if (row.children && row.children.length > 0) {
+                    var children = _this.getFilterDataSource(row.children);
+                    dataSource = dataSource.concat(children);
+                }
+            });
+            return dataSource;
         };
 
         _this.getAllOptions = function (data) {
@@ -173,6 +216,44 @@ var Select = function (_Component) {
             _this.setState({ open: false });
         };
 
+        _this.handleDelete = function (value) {
+            return function (event) {
+                var originValue = _this.state.value;
+                if (_this.props.multiple) {
+                    originValue.splice(_this.indexOf(value), 1);
+                } else {
+                    originValue = value;
+                }
+                _this.setValue(originValue);
+            };
+        };
+
+        _this.handleStateChange = function (state) {
+            var dataSource = _this.getFilterDataSource(_this.state.dataSource);
+            var originValue = _lodash2.default.cloneDeep(_this.getValue());
+            (0, _keys2.default)(state.checked || {}).map(function (id) {
+                var data = _lodash2.default.find(dataSource, { id: parseInt(id) });
+                var value = _lodash2.default.get(data, _this.props.dataSourceConfig.value);
+                if (data && !_this.isChecked(value)) {
+                    if (_this.props.carryKey) {
+                        value = {};
+                        _lodash2.default.set(value, _this.props.dataSourceConfig.value, data.value);
+                    }
+                    originValue.push(value);
+                }
+            });
+            dataSource.map(function (data) {
+                var value = _lodash2.default.get(data, _this.props.dataSourceConfig.value);
+                if (!state.checked[data.id]) {
+                    if (_this.isChecked(value)) {
+                        originValue.splice(_this.indexOf(value, originValue), 1);
+                    }
+                }
+            });
+            _this.state.tableState = state;
+            _this.setValue(originValue);
+        };
+
         _this.initData(props);
         return _this;
     }
@@ -186,7 +267,7 @@ var Select = function (_Component) {
         key: 'initData',
         value: function initData(props) {
             this.setDataSource(props.dataSource);
-            if (props.value !== undefined) {
+            if (props.hasOwnProperty('value')) {
                 this.state.value = props.value;
             }
         }
@@ -207,17 +288,218 @@ var Select = function (_Component) {
             return index >= 0 ? this.state.dataSource[index] : undefined;
         }
     }, {
+        key: 'indexOf',
+        value: function indexOf(value) {
+            var _this3 = this;
+
+            return _lodash2.default.findIndex(this.state.value, function (n) {
+                return _this3.props.carryKey ? _lodash2.default.get(n, _this3.props.dataSourceConfig.value) == value : n == value;
+            });
+        }
+    }, {
+        key: 'indexOf',
+        value: function indexOf(value) {
+            var _this4 = this;
+
+            var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.state.value;
+
+            return _lodash2.default.findIndex(data, function (n) {
+                return _this4.props.carryKey ? _lodash2.default.get(n, _this4.props.dataSourceConfig.value) == value : n == value;
+            });
+        }
+    }, {
+        key: 'isChecked',
+        value: function isChecked(value) {
+            if (this.props.multiple) {
+                return this.indexOf(value) >= 0;
+            } else {
+                return this.state.value == value;
+            }
+        }
+    }, {
+        key: 'getContent',
+        value: function getContent() {
+            var _this5 = this;
+
+            var value = this.getValue();
+            var styleProps = _lodash2.default.merge(_style2.default.getStyle('select', this.props), this.props.styleProps);
+            var options = this.getOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]);
+            var menuWidth = this.state.anchorEl && this.props.fullWidth ? this.state.anchorEl.clientWidth : this.props.menuWidth;
+            if (this.props.tableProps === undefined) {
+                return _react2.default.createElement(
+                    'div',
+                    null,
+                    this.props.hasFilter ? _react2.default.createElement(
+                        'div',
+                        { style: { marginTop: 12, paddingLeft: 16, paddingRight: 16 } },
+                        _react2.default.createElement(_TextField2.default, { hintText: '\u8F93\u5165\u5173\u952E\u5B57\u7B5B\u9009',
+                            name: 'filterText',
+                            fullWidth: true,
+                            value: this.state.filterText,
+                            autoComplete: "off",
+                            onChange: this.handleFilter })
+                    ) : null,
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'flex' },
+                        _react2.default.createElement(
+                            'div',
+                            { style: { width: menuWidth } },
+                            _react2.default.createElement(Options, {
+                                dataSource: options,
+                                styleProps: styleProps,
+                                onChange: this.handleChange,
+                                value: value,
+                                defaultValue: this.props.defaultValue,
+                                multiple: this.props.multiple,
+                                carryKey: this.props.carryKey,
+                                dataSourceConfig: this.props.dataSourceConfig,
+                                cancel: this.props.cancel
+                            })
+                        ),
+                        this.props.hasFilter && this.props.multiple && _lodash2.default.isArray(value) && value.length > 0 ? _react2.default.createElement(
+                            'div',
+                            { style: { padding: '0 4px', width: menuWidth, minWidth: 160 } },
+                            _react2.default.createElement(
+                                'div',
+                                { style: { marginBottom: 3 } },
+                                '\u5DF2\u9009'
+                            ),
+                            _react2.default.createElement(
+                                _reactCustomScrollbars.Scrollbars,
+                                { style: { maxHeight: 400 }, autoHeight: true },
+                                (value || []).map(function (value, index) {
+                                    var data = _this5.getData(_this5.props.carryKey ? _lodash2.default.get(value, _this5.props.dataSourceConfig.value) : value);
+                                    return _react2.default.createElement(
+                                        'div',
+                                        { key: index, className: 'tag tag-default flex middle between',
+                                            style: { marginRight: 4, marginBottom: 4 } },
+                                        _react2.default.createElement(
+                                            'div',
+                                            { style: { marginRight: 12 },
+                                                className: 'text-ellipsis' },
+                                            _lodash2.default.get(data, _this5.props.dataSourceConfig.text)
+                                        ),
+                                        _react2.default.createElement(
+                                            'div',
+                                            { className: 'cursor-pointer', onClick: _this5.handleDelete(value) },
+                                            _react2.default.createElement('i', {
+                                                className: 'iconfont icon-close text-small' })
+                                        )
+                                    );
+                                })
+                            )
+                        ) : null
+                    )
+                );
+            } else {
+                var checked = {};
+                var dataSource = this.getFilterDataSource(this.state.dataSource);
+                dataSource.map(function (data) {
+                    var value = _lodash2.default.get(data, _this5.props.dataSourceConfig.value);
+                    if (_this5.isChecked(value)) {
+                        checked[data.id] = true;
+                    }
+                });
+                return _react2.default.createElement(
+                    'div',
+                    { className: 'relative space' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'flex' },
+                        _react2.default.createElement(
+                            'div',
+                            null,
+                            this.props.hasFilter ? _react2.default.createElement(
+                                'div',
+                                null,
+                                _react2.default.createElement(_TextField2.default, { hintText: '\u8F93\u5165\u5173\u952E\u5B57\u7B5B\u9009',
+                                    name: 'filterText',
+                                    fullWidth: true,
+                                    value: this.state.filterText,
+                                    autoComplete: "off",
+                                    onChange: this.handleFilter })
+                            ) : null,
+                            _react2.default.createElement(_table2.default, (0, _extends3.default)({
+                                containerHeight: 300
+                            }, this.props.tableProps, {
+                                dataSource: dataSource
+                            }, this.state.tableState, {
+                                checked: checked,
+                                onStateChange: this.handleStateChange
+                            }))
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { style: { paddingLeft: 12, width: menuWidth, minWidth: 160 } },
+                            _react2.default.createElement(
+                                'div',
+                                { className: 'flex between', style: { marginBottom: 10, marginTop: 20 } },
+                                _react2.default.createElement(
+                                    'div',
+                                    null,
+                                    '\u5DF2\u9009'
+                                ),
+                                _react2.default.createElement(
+                                    'div',
+                                    { className: 'text-primary cursor-pointer', onClick: this.clearValue },
+                                    '\u5168\u4E0D\u9009'
+                                )
+                            ),
+                            _react2.default.createElement(
+                                _reactCustomScrollbars.Scrollbars,
+                                { style: { maxHeight: 400 }, autoHeight: true },
+                                (value || []).map(function (value, index) {
+                                    var data = _this5.getData(_this5.props.carryKey ? _lodash2.default.get(value, _this5.props.dataSourceConfig.value) : value);
+                                    return _react2.default.createElement(
+                                        'div',
+                                        { key: index, className: 'tag tag-default flex middle between',
+                                            style: { marginRight: 4, marginBottom: 4 } },
+                                        _react2.default.createElement(
+                                            'div',
+                                            { style: { marginRight: 12 },
+                                                className: 'text-ellipsis' },
+                                            _lodash2.default.get(data, _this5.props.dataSourceConfig.text)
+                                        ),
+                                        _react2.default.createElement(
+                                            'div',
+                                            { className: 'cursor-pointer', onClick: _this5.handleDelete(value) },
+                                            _react2.default.createElement('i', { className: 'iconfont icon-close text-small' })
+                                        )
+                                    );
+                                })
+                            )
+                        )
+                    ),
+                    _react2.default.createElement('div', { style: { height: 52 } }),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'bg-white space',
+                            style: {
+                                position: 'absolute',
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                textAlign: 'right',
+                                boxShadow: '0 -1px 5px #ddd',
+                                zIndex: 2
+                            } },
+                        _react2.default.createElement(_button2.default, { type: 'primary', label: '\u786E\u5B9A', onClick: this.handleRequestClose })
+                    )
+                );
+            }
+        }
+    }, {
         key: 'render',
         value: function render() {
-            var _this3 = this;
+            var _this6 = this;
 
             var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
             var value = this.getValue();
             var styleProps = _lodash2.default.merge(_style2.default.getStyle('select', this.props), this.props.styleProps);
             var label = this.props.label;
-            var options = this.getOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]);
             var selectValue = this.props.multiple && this.props.carryKey ? (value || []).map(function (n) {
-                return _lodash2.default.get(n, _this3.props.dataSourceConfig.value);
+                return _lodash2.default.get(n, _this6.props.dataSourceConfig.value);
             }) : value;
             var selectField = _react2.default.createElement(
                 _SelectField2.default,
@@ -228,7 +510,7 @@ var Select = function (_Component) {
                     fullWidth: this.props.fullWidth,
                     disabled: this.props.disabled,
                     hintText: this.props.hintText,
-                    errorText: this.props.errorText,
+                    errorText: borderStyle === "underline" ? this.props.errorText : undefined,
                     floatingLabelFixed: this.props.labelFixed,
                     underlineShow: borderStyle === 'underline' && this.props.borderShow
                 }, styleProps),
@@ -243,14 +525,15 @@ var Select = function (_Component) {
                     });
                 })
             );
+            var content = this.getContent();
             return _react2.default.createElement(
                 'div',
                 { className: 'relative', style: (0, _extends3.default)({ overflow: 'hidden' }, this.props.style) },
                 _react2.default.createElement(
                     'div',
                     { className: 'relative cursor-pointer', onClick: function onClick(event) {
-                            if (!_this3.props.disabled) {
-                                _this3.setState({
+                            if (!_this6.props.disabled) {
+                                _this6.setState({
                                     open: true,
                                     anchorEl: event.currentTarget
                                 });
@@ -258,37 +541,39 @@ var Select = function (_Component) {
                         } },
                     borderStyle === 'border' && this.props.borderShow ? _react2.default.createElement(
                         'div',
-                        { className: 'control-border' },
-                        selectField
+                        { className: 'full-width' },
+                        _react2.default.createElement(
+                            'div',
+                            { className: "control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '') },
+                            selectField
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'text-small text-danger', style: { marginTop: 2 } },
+                            this.props.errorText
+                        )
                     ) : selectField,
                     _react2.default.createElement('div', { className: 'full-screen' })
                 ),
-                _react2.default.createElement(
+                this.props.mode == 'inline' ? _react2.default.createElement(
                     _Popover2.default,
                     {
                         open: this.state.open,
                         anchorEl: this.state.anchorEl,
                         anchorOrigin: { horizontal: "left", vertical: "bottom" },
                         targetOrigin: { horizontal: "left", vertical: "top" },
-                        style: { width: this.state.anchorEl ? this.state.anchorEl.clientWidth : 'auto' },
+
                         onRequestClose: this.handleRequestClose },
-                    this.props.hasFilter ? _react2.default.createElement(
-                        'div',
-                        { style: { marginTop: 12, paddingLeft: 16, paddingRight: 16 } },
-                        _react2.default.createElement(_TextField2.default, { hintText: '\u8F93\u5165\u5173\u952E\u5B57\u7B5B\u9009', name: 'filterText', fullWidth: true, value: this.state.filterText,
-                            onChange: this.handleFilter })
-                    ) : null,
-                    _react2.default.createElement(Options, {
-                        dataSource: options,
-                        styleProps: styleProps,
-                        onChange: this.handleChange,
-                        value: value,
-                        multiple: this.props.multiple,
-                        carryKey: this.props.carryKey,
-                        dataSourceConfig: this.props.dataSourceConfig,
-                        cancel: this.props.cancel
-                    })
-                )
+                    content
+                ) : this.state.open ? _react2.default.createElement(
+                    _dialog2.default,
+                    {
+                        title: label,
+                        open: this.state.open,
+                        modal: true,
+                        onClose: this.handleRequestClose },
+                    content
+                ) : null
             );
         }
     }]);
@@ -314,7 +599,10 @@ Select.defaultProps = {
     rows: 1,
     fullWidth: true,
     size: 'default',
-    cancel: false };
+    cancel: false,
+    menuWidth: 'auto',
+    mode: 'inline',
+    tableProps: undefined };
 Select.contextTypes = {
     muiTheme: _propTypes2.default.object
 };
@@ -326,48 +614,48 @@ var Options = function (_Component2) {
     function Options(props) {
         (0, _classCallCheck3.default)(this, Options);
 
-        var _this4 = (0, _possibleConstructorReturn3.default)(this, (Options.__proto__ || (0, _getPrototypeOf2.default)(Options)).call(this, props));
+        var _this7 = (0, _possibleConstructorReturn3.default)(this, (Options.__proto__ || (0, _getPrototypeOf2.default)(Options)).call(this, props));
 
-        _this4.state = {};
+        _this7.state = {};
 
-        _this4.handleItemClick = function (event, menuItem, index) {
-            var data = _this4.props.dataSource[index];
+        _this7.handleItemClick = function (event, menuItem, index) {
+            var data = _this7.props.dataSource[index];
             if (data) {
                 var value = data.value,
-                    originValue = _this4.props.value || [];
-                if (_this4.props.multiple) {
-                    if (_this4.isChecked(value)) {
-                        originValue.splice(_this4.indexOf(value), 1);
+                    originValue = _this7.props.value || [];
+                if (_this7.props.multiple) {
+                    if (_this7.isChecked(value)) {
+                        originValue.splice(_this7.indexOf(value), 1);
                     } else {
-                        if (_this4.props.carryKey) {
+                        if (_this7.props.carryKey) {
                             value = {};
-                            _lodash2.default.set(value, _this4.props.dataSourceConfig.value, data.value);
+                            _lodash2.default.set(value, _this7.props.dataSourceConfig.value, data.value);
                         }
                         originValue.push(value);
                     }
                 } else {
                     originValue = value;
                 }
-                if (_this4.props.onChange) {
-                    _this4.props.onChange(originValue);
+                if (_this7.props.onChange) {
+                    _this7.props.onChange(originValue);
                 }
             } else {
-                if (_this4.props.onChange) {
-                    _this4.props.onChange(_this4.props.multiple ? [] : null);
+                if (_this7.props.onChange) {
+                    _this7.props.onChange(_this7.props.multiple ? [] : null);
                 }
             }
         };
 
-        return _this4;
+        return _this7;
     }
 
     (0, _createClass3.default)(Options, [{
         key: 'indexOf',
         value: function indexOf(value) {
-            var _this5 = this;
+            var _this8 = this;
 
             return _lodash2.default.findIndex(this.props.value, function (n) {
-                return _this5.props.carryKey ? _lodash2.default.get(n, _this5.props.dataSourceConfig.value) == value : n == value;
+                return _this8.props.carryKey ? _lodash2.default.get(n, _this8.props.dataSourceConfig.value) == value : n == value;
             });
         }
     }, {
@@ -382,7 +670,7 @@ var Options = function (_Component2) {
     }, {
         key: 'render',
         value: function render() {
-            var _this6 = this;
+            var _this9 = this;
 
             return _react2.default.createElement(
                 _reactCustomScrollbars.Scrollbars,
@@ -396,7 +684,7 @@ var Options = function (_Component2) {
                         onItemClick: this.handleItemClick },
                     this.props.dataSource.map(function (option, index) {
                         var style = { textIndent: option.indent };
-                        if (_this6.isChecked(option.value)) {
+                        if (_this9.isChecked(option.value)) {
                             style.color = '#FF0099';
                         }
                         return _react2.default.createElement(_MenuItem2.default, { key: index,
@@ -404,7 +692,7 @@ var Options = function (_Component2) {
                             label: option.text,
                             primaryText: option.selectText || option.label,
                             disabled: option.disabled,
-                            innerDivStyle: _this6.props.styleProps.menuItemStyle.innerDivStyle,
+                            innerDivStyle: _this9.props.styleProps.menuItemStyle.innerDivStyle,
                             style: style
                         });
                     }),

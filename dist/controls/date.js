@@ -36,6 +36,10 @@ var _TextField = require('material-ui/TextField');
 
 var _TextField2 = _interopRequireDefault(_TextField);
 
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 var _Popover = require('material-ui/Popover');
 
 var _Popover2 = _interopRequireDefault(_Popover);
@@ -69,7 +73,8 @@ var Date = function (_Component) {
         _this.state = {
             anchorEl: {},
             value: undefined,
-            open: false
+            open: false,
+            focus: false
         };
 
         _this.handleTextChange = function (event) {
@@ -87,6 +92,7 @@ var Date = function (_Component) {
         };
 
         _this.handleBlur = function (event) {
+            _this.setState({ focus: false });
             if (_this.props.onBlur) {
                 _this.props.onBlur(event, _this);
             }
@@ -95,6 +101,7 @@ var Date = function (_Component) {
         _this.handleFocus = function (event) {
             _this.setState({
                 open: true,
+                focus: true,
                 anchorEl: _this.refs.container
             });
             if (_this.props.onFocus) {
@@ -132,9 +139,9 @@ var Date = function (_Component) {
     }, {
         key: 'initData',
         value: function initData(props) {
-            if (props.value !== undefined) {
+            if (props.hasOwnProperty('value')) {
                 var value = props.value;
-                if (this.props.timestamp) {
+                if (this.props.timestamp && value !== undefined && value !== null && value !== '') {
                     value = _utils2.default.date('Y-m-d', value);
                 }
                 this.state.value = value;
@@ -162,38 +169,57 @@ var Date = function (_Component) {
             var value = this.getValue();
             var label = this.props.label;
             var styleProps = _style2.default.getStyle('calender', this.props);
+            var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+            if (borderStyle == 'border') {
+                styleProps.iconStyle.style.right = 0;
+                styleProps.iconStyle.style.top = 3;
+            }
+            var textField = _react2.default.createElement(_TextField2.default, {
+                ref: 'text',
+                name: this.props.name || this.props.dataKey || _utils2.default.uuid(),
+                fullWidth: this.props.fullWidth,
+                floatingLabelText: label,
+                type: 'text',
+                value: value === null || value === undefined ? '' : value,
+                disabled: this.props.disabled,
+                onChange: this.handleTextChange,
+                onBlur: this.handleBlur,
+                onFocus: this.handleFocus,
+                onKeyUp: this.handleKeyUp,
+                multiLine: this.props.multiLine,
+                rows: this.props.rows,
+                hintText: this.props.hintText,
+                errorText: borderStyle === "underline" ? this.props.errorText : undefined,
+                floatingLabelFixed: this.props.labelFixed,
+                underlineShow: borderStyle === 'underline' && this.props.borderShow,
+                autoComplete: 'off',
+                textareaStyle: styleProps.textareaStyle,
+                floatingLabelStyle: styleProps.floatingLabelStyle,
+                floatingLabelFocusStyle: styleProps.floatingLabelFocusStyle,
+                floatingLabelShrinkStyle: styleProps.floatingLabelShrinkStyle,
+                errorStyle: (0, _extends3.default)({}, styleProps.errorStyle, this.props.errorStyle),
+                hintStyle: styleProps.hintStyle,
+                underlineStyle: styleProps.underlineStyle,
+                inputStyle: styleProps.inputStyle,
+                style: styleProps.style
+            });
             return _react2.default.createElement(
                 'div',
                 { ref: 'container', style: { position: 'relative' } },
-                _react2.default.createElement(_TextField2.default, {
-                    ref: 'text',
-                    name: this.props.name || this.props.dataKey || _utils2.default.uuid(),
-                    fullWidth: this.props.fullWidth,
-                    floatingLabelText: label,
-                    type: 'text',
-                    value: value,
-                    disabled: this.props.disabled,
-                    onChange: this.handleTextChange,
-                    onBlur: this.handleBlur,
-                    onFocus: this.handleFocus,
-                    onKeyUp: this.handleKeyUp,
-                    multiLine: this.props.multiLine,
-                    rows: this.props.rows,
-                    hintText: this.props.hintText,
-                    errorText: this.props.errorText,
-                    floatingLabelFixed: this.props.labelFixed,
-                    underlineShow: this.props.borderShow,
-                    autoComplete: 'off',
-                    textareaStyle: styleProps.textareaStyle,
-                    floatingLabelStyle: styleProps.floatingLabelStyle,
-                    floatingLabelFocusStyle: styleProps.floatingLabelFocusStyle,
-                    floatingLabelShrinkStyle: styleProps.floatingLabelShrinkStyle,
-                    errorStyle: (0, _extends3.default)({}, styleProps.errorStyle, this.props.errorStyle),
-                    hintStyle: styleProps.hintStyle,
-                    underlineStyle: styleProps.underlineStyle,
-                    inputStyle: styleProps.inputStyle,
-                    style: styleProps.style
-                }),
+                borderStyle === 'border' && this.props.borderShow ? _react2.default.createElement(
+                    'div',
+                    { className: 'full-width' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: "control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '') },
+                        textField
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'text-small text-danger', style: { marginTop: 2 } },
+                        this.props.errorText
+                    )
+                ) : textField,
                 value !== undefined && value !== null && value !== '' && this.props.hasClear && !this.props.disabled && !this.props.immutable ? _react2.default.createElement(_IconButton2.default, { iconClassName: 'iconfont icon-close-circle-fill', onClick: this.handleClear,
                     style: (0, _extends3.default)({ position: 'absolute', right: 0 }, styleProps.iconStyle.style),
                     iconStyle: (0, _extends3.default)({ color: '#e0e0e0' }, styleProps.iconStyle.iconStyle)
@@ -206,8 +232,7 @@ var Date = function (_Component) {
                         style: styleProps.popoverStyle,
                         open: this.state.open,
                         anchorEl: this.state.anchorEl,
-                        onRequestClose: this.handleRequestClose
-                    },
+                        onRequestClose: this.handleRequestClose },
                     _react2.default.createElement(
                         'div',
                         null,
@@ -243,4 +268,7 @@ Date.defaultProps = {
     activeStartDate: undefined,
     minDate: undefined,
     maxDate: undefined };
+Date.contextTypes = {
+    muiTheme: _propTypes2.default.object
+};
 exports.default = Date;

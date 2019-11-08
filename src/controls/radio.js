@@ -16,7 +16,8 @@ export default class Radio extends Component {
         cols: undefined,            //一行多少列
         dataSource: [],             //数据源，选项,
         dataSourceConfig: {text: 'text', value: 'value'},
-        size: 'default'
+        size: 'default',
+        multiLine: false,
     };
 
     state = {
@@ -39,7 +40,7 @@ export default class Radio extends Component {
     }
 
     initData(props) {
-        if (props.value !== undefined) {
+        if (props.hasOwnProperty('value')) {
             this.state.value = props.value;
         }
     }
@@ -49,10 +50,11 @@ export default class Radio extends Component {
      * @param value
      */
     setValue(value) {
-        this.setState({value: value});
+        this.state.value = value;
         if (this.props.onChange) {
             this.props.onChange(value, this);
         }
+        this.forceUpdate();
     }
 
     /**
@@ -100,7 +102,8 @@ export default class Radio extends Component {
                 onChange={this.handleChange}>
                 {this.state.dataSource.map((row, index) => {
                     return <RadioButton className="col"
-                                        key={index} label={row.text}
+                                        key={index}
+                                        label={row.text}
                                         value={row.value}/>
                 })}
             </RadioButtonGroup>

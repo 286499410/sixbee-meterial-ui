@@ -151,7 +151,7 @@ var File = function (_Component) {
     }, {
         key: 'initData',
         value: function initData(props) {
-            if (props.value !== undefined) {
+            if (props.hasOwnProperty('value')) {
                 this.state.value = props.value;
             }
         }

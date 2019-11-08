@@ -19,6 +19,7 @@ import Time from './controls/time';
 import Image from './controls/image';
 import Editor from './controls/editor';
 import SelectTag from './controls/select-tag';
+import Static from './controls/static';
 
 export default class Control extends Component {
 
@@ -46,11 +47,18 @@ export default class Control extends Component {
         file: File,
         image: Image,
         editor: Editor,
-        selectTag: SelectTag
+        selectTag: SelectTag,
+        static: Static
     };
 
     constructor(props) {
         super(props);
+    }
+
+    componentDidMount() {
+        if(this.props.onComponentDidMount) {
+            this.props.onComponentDidMount(this);
+        }
     }
 
     setValue(value) {

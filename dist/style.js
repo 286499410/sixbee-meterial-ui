@@ -52,7 +52,7 @@ var style = {
                 bottom: props.label ? 6 + l * 2 : l
             },
             hintStyle: {
-                bottom: 4 + l * 2
+                bottom: 5 + l * 2
             },
             underlineStyle: {
                 bottom: 2 + l * 2

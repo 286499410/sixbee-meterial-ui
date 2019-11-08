@@ -49,8 +49,8 @@ export default class Money extends Component {
     }
 
     initData(props) {
-        if (props.value !== undefined) {
-            this.state.value = props.value === '' ? '' : utils.parseNumber(props.value, props.float);
+        if (props.hasOwnProperty('value')) {
+            this.state.value = props.value === '' ? '' : utils.round(utils.parseNumber(props.value), props.float);
         }
     }
 
@@ -60,10 +60,10 @@ export default class Money extends Component {
      */
     setValue = (value) => {
         value = _.trim(value);
-        if (/^-?\d{0,3}((,\d{3})*)((,\d{0,3})?)((\.\d{0,2})?)$/.test(value) || /^-?\d*((\.\d{0,2})?)$/.test(value)) {
-            let number = value === '' ? '' : utils.parseNumber(value);
+        if (/^-?\d{0,3}((,\d{3})*)((,\d{0,3})?)((\.\d{0,9})?)$/.test(value) || /^-?\d*((\.\d{0,9})?)$/.test(value)) {
+            let number = value === '' ? '' : utils.round(utils.parseNumber(value), this.props.float);
             this.setState({
-                value: value
+                value: number
             });
             if (this.props.onChange) {
                 this.props.onChange(number, this);

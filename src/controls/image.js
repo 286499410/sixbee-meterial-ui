@@ -26,7 +26,7 @@ export default class Image extends Component {
     }
 
     initData(props) {
-        if (props.value !== undefined) {
+        if (props.hasOwnProperty('value')) {
             if (_.isString(props.value)) {
                 this.state.value = props.value;
             } else if (_.isObject(props.value)) {

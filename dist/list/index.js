@@ -48,18 +48,6 @@ var _propTypes = require('prop-types');
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _icon = require('../icon');
-
-var _icon2 = _interopRequireDefault(_icon);
-
-var _lodash = require('lodash');
-
-var _lodash2 = _interopRequireDefault(_lodash);
-
-var _jquery = require('jquery');
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
 var _reactCustomScrollbars = require('react-custom-scrollbars');
 
 var _header = require('./header');
@@ -69,10 +57,6 @@ var _header2 = _interopRequireDefault(_header);
 var _body = require('./body');
 
 var _body2 = _interopRequireDefault(_body);
-
-var _filter = require('./filter');
-
-var _filter2 = _interopRequireDefault(_filter);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 

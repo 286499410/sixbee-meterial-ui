@@ -79,7 +79,7 @@ var DateRange = function (_Component) {
     }, {
         key: 'initData',
         value: function initData(props) {
-            if (props.value !== undefined && _lodash2.default.isArray(props.value) && props.value.length == 2) {
+            if (_lodash2.default.isArray(props.value) && props.value.length == 2) {
                 var value = props.value;
 
                 var _value = (0, _slicedToArray3.default)(value, 2);

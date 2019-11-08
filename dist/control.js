@@ -92,6 +92,10 @@ var _selectTag = require('./controls/select-tag');
 
 var _selectTag2 = _interopRequireDefault(_selectTag);
 
+var _static = require('./controls/static');
+
+var _static2 = _interopRequireDefault(_static);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Control = function (_Component) {
@@ -121,12 +125,20 @@ var Control = function (_Component) {
             file: _file2.default,
             image: _image2.default,
             editor: _editor2.default,
-            selectTag: _selectTag2.default
+            selectTag: _selectTag2.default,
+            static: _static2.default
         };
         return _this;
     }
 
     (0, _createClass3.default)(Control, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            if (this.props.onComponentDidMount) {
+                this.props.onComponentDidMount(this);
+            }
+        }
+    }, {
         key: 'setValue',
         value: function setValue(value) {
             return this.refs.control.setValue(value);

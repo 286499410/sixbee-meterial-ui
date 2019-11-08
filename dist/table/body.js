@@ -126,9 +126,20 @@ var TableBody = function (_Component) {
                 {
                     ref: 'table',
                     className: className,
-                    style: { tableLayout: 'fixed', width: state.tableWidth } },
-                _react2.default.createElement(TableBodyColGroup, { ref: 'thead' }),
-                _react2.default.createElement(TableBodyContent, { ref: 'tbody' })
+                    style: {
+                        tableLayout: 'fixed',
+                        width: this.props.width || state.tableWidth
+                    } },
+                _react2.default.createElement(TableBodyColGroup, { ref: 'thead',
+                    showColumns: this.props.showColumns,
+                    showCheckboxes: this.props.showCheckboxes,
+                    showSeries: this.props.showSeries
+                }),
+                _react2.default.createElement(TableBodyContent, { ref: 'tbody',
+                    showColumns: this.props.showColumns,
+                    showCheckboxes: this.props.showCheckboxes,
+                    showSeries: this.props.showSeries
+                })
             );
             return _react2.default.createElement(
                 'div',
@@ -136,13 +147,13 @@ var TableBody = function (_Component) {
                     className: 'table-body',
                     style: (0, _extends3.default)({
                         overflow: 'hidden',
-
-                        width: state.containerWidth,
+                        position: 'relative',
+                        width: "calc(100% + 2px)",
                         height: state.bodyHeight,
                         marginTop: -1
                     }, props.bodyStyle),
                     onScroll: this.handleScroll },
-                props.loading ? _react2.default.createElement(
+                props.loading && this.props.hasLoading ? _react2.default.createElement(
                     'div',
                     { ref: 'masker', className: 'masker', style: { zIndex: 1 } },
                     _react2.default.createElement(
@@ -158,7 +169,7 @@ var TableBody = function (_Component) {
                         })
                     )
                 ) : null,
-                state.dataSource.length == 0 && !props.loading ? _react2.default.createElement(
+                state.dataSource.length == 0 && !props.loading && this.props.hasEmptyTip !== false ? _react2.default.createElement(
                     'div',
                     { className: 'position-center text-center', style: { zIndex: 1 } },
                     _react2.default.createElement(
@@ -167,7 +178,7 @@ var TableBody = function (_Component) {
                         _react2.default.createElement(
                             'div',
                             null,
-                            _react2.default.createElement('img', { src: props.emptyDataImage, style: { width: 200 } })
+                            _react2.default.createElement('img', { src: props.emptyDataImage, style: { width: 180 } })
                         ),
                         _react2.default.createElement(
                             'div',
@@ -176,7 +187,7 @@ var TableBody = function (_Component) {
                         )
                     )
                 ) : null,
-                props.containerHeight || state.bodyHeight ? _react2.default.createElement(
+                this.props.hasScrollbar && (props.containerHeight || state.bodyHeight) ? _react2.default.createElement(
                     _reactCustomScrollbars.Scrollbars,
                     { ref: 'scrollBar',
                         renderTrackHorizontal: function renderTrackHorizontal(_ref) {
@@ -188,7 +199,7 @@ var TableBody = function (_Component) {
                                     left: 2,
                                     right: 2,
                                     borderRadius: 3,
-                                    zIndex: 1
+                                    zIndex: 3
                                 }) }));
                         },
                         renderThumbHorizontal: function renderThumbHorizontal(_ref2) {
@@ -256,6 +267,15 @@ var TableBody = function (_Component) {
     return TableBody;
 }(_react.Component);
 
+TableBody.defaultProps = {
+    hasScrollbar: true,
+    hasEmptyTip: true,
+    hasLoading: true,
+    width: undefined,
+    showColumns: undefined,
+    showCheckboxes: true,
+    showSeries: true
+};
 TableBody.contextTypes = {
     state: _propTypes2.default.object,
     props: _propTypes2.default.object,
@@ -429,6 +449,16 @@ var TableBodyContent = function (_Component2) {
                     break;
                 }
             }
+            var dataColumns = [];
+            if (_lodash2.default.isArray(this.props.showColumns)) {
+                state.dataColumns.map(function (column) {
+                    if (_this6.props.showColumns.indexOf(column.key) >= 0) {
+                        dataColumns.push(column);
+                    }
+                });
+            } else {
+                dataColumns = state.dataColumns;
+            }
             return _react2.default.createElement(
                 'tbody',
                 { ref: 'tbody' },
@@ -436,7 +466,7 @@ var TableBodyContent = function (_Component2) {
                     'tr',
                     null,
                     this.props.showCheckboxes ? _react2.default.createElement('td', { style: { height: topHeight, padding: 0 } }) : null,
-                    state.dataColumns.map(function (column, colIndex) {
+                    dataColumns.map(function (column, colIndex) {
                         return _react2.default.createElement('td', { key: colIndex,
                             style: { height: topHeight, padding: 0 } });
                     })
@@ -447,16 +477,17 @@ var TableBodyContent = function (_Component2) {
                         return null;
                     }
                     var checked = _this6.isChecked(data);
+                    var selected = data.id && _lodash2.default.get(state.selectedRow, 'id') == data.id;
                     return _react2.default.createElement(
                         'tr',
                         { key: data[props.primaryKey] + '' + rowIndex,
                             'data-key': data[props.primaryKey],
-                            className: '' + props.iconEventsBehavior,
+                            className: '' + props.iconEventsBehavior + (selected ? ' selected' : ''),
                             onClick: _this6.handleRowSelect(data)
                         },
-                        props.showCheckboxes ? _react2.default.createElement(
+                        props.showCheckboxes && _this6.props.showCheckboxes ? _react2.default.createElement(
                             'td',
-                            { className: 'td-checkbox' },
+                            { className: 'td-checkbox', style: { height: props.bodyRowHeight + 1 } },
                             !props.rowCheckboxEnabled || props.rowCheckboxEnabled(data) ? _react2.default.createElement(_Checkbox2.default, (0, _extends3.default)({ checked: checked,
                                 onCheck: _this6.handleCheck(data) }, props.checkboxStyle)) : _react2.default.createElement('div', { style: {
                                     display: 'inline-block',
@@ -468,7 +499,12 @@ var TableBodyContent = function (_Component2) {
                                     cursor: 'not-allowed'
                                 } })
                         ) : null,
-                        state.dataColumns.map(function (column, colIndex) {
+                        props.showSeries && _this6.props.showSeries ? _react2.default.createElement(
+                            'td',
+                            { style: { textAlign: 'center' } },
+                            rowIndex + 1
+                        ) : null,
+                        dataColumns.map(function (column, colIndex) {
                             var content = function content() {
                                 var value = _lodash2.default.get(data, column.dataKey || column.key);
                                 if (column.groupKey) {
@@ -489,7 +525,13 @@ var TableBodyContent = function (_Component2) {
                                                         height: props.bodyRowHeight,
                                                         lineHeight: props.bodyRowHeight - 12 + 'px'
                                                     } },
-                                                column.render ? column.render(row, column, _this6.context.Table) : _this6.context.cellRender(row, column)
+                                                _react2.default.createElement(
+                                                    'span',
+                                                    {
+                                                        className: '' + (column.onClick ? 'text-primary cursor-pointer' : ''),
+                                                        onClick: column.onClick ? column.onClick.bind(_this6, row, data) : undefined },
+                                                    column.render ? column.render(row, column, _this6.context.Table) : _this6.context.cellRender(row, column)
+                                                )
                                             );
                                         })
                                     );
@@ -509,7 +551,7 @@ var TableBodyContent = function (_Component2) {
                                         height: props.bodyRowHeight
                                     }, column.groupKey ? { padding: 0 } : {}, _lodash2.default.isFunction(column.style) ? column.style(data) : column.style || {}) },
                                 function () {
-                                    if (column.onClick) {
+                                    if (column.onClick && !column.groupKey) {
                                         return _react2.default.createElement(
                                             'span',
                                             { className: 'text-primary cursor-pointer',
@@ -524,13 +566,14 @@ var TableBodyContent = function (_Component2) {
                                                     display: 'table-cell',
                                                     verticalAlign: 'middle',
                                                     lineHeight: 1
-                                                }, onClick: column.onClick ? column.onClick.bind(_this6, data) : undefined },
+                                                },
+                                                onClick: column.onClick && !column.groupKey ? column.onClick.bind(_this6, data) : undefined },
                                             content()
                                         );
                                         return _react2.default.createElement(
                                             'div',
                                             {
-                                                className: '' + (column.onClick ? 'text-primary cursor-pointer' : ''),
+                                                className: '' + (column.onClick && !column.groupKey ? 'text-primary cursor-pointer' : ''),
                                                 style: { paddingLeft: indent, lineHeight: 1 } },
                                             props.collapsible ? _react2.default.createElement(
                                                 'div',
@@ -590,7 +633,7 @@ var TableBodyContent = function (_Component2) {
                     'tr',
                     null,
                     props.showCheckboxes ? _react2.default.createElement('td', { style: { height: bottomHeight, padding: 0 } }) : null,
-                    state.dataColumns.map(function (column, colIndex) {
+                    dataColumns.map(function (column, colIndex) {
                         return _react2.default.createElement('td', { key: colIndex,
                             style: { height: bottomHeight, padding: 0 } });
                     })
@@ -601,17 +644,22 @@ var TableBodyContent = function (_Component2) {
     return TableBodyContent;
 }(_react.Component);
 
+TableBodyContent.defaultProps = {
+    showColumns: undefined,
+    showCheckboxes: true,
+    showSeries: true
+};
 TableBodyContent.contextTypes = {
-    Table: _propTypes2.default.object,
     state: _propTypes2.default.object,
     props: _propTypes2.default.object,
+    Table: _propTypes2.default.object,
     setTableState: _propTypes2.default.func,
     getDataRows: _propTypes2.default.func,
     cellRender: _propTypes2.default.func
 };
 
 var _initialiseProps = function _initialiseProps() {
-    var _this8 = this;
+    var _this9 = this;
 
     this.state = {
         showMinRows: 0,
@@ -623,8 +671,8 @@ var _initialiseProps = function _initialiseProps() {
 
     this.handleCollapse = function (data) {
         return function (event) {
-            var state = _this8.context.state;
-            var primaryKey = _this8.context.props.primaryKey;
+            var state = _this9.context.state;
+            var primaryKey = _this9.context.props.primaryKey;
             var collapsed = state.collapsed[data[primaryKey]];
             if (collapsed) {
                 delete state.collapsed[data[primaryKey]];
@@ -647,16 +695,16 @@ var _initialiseProps = function _initialiseProps() {
             if (data.children && data.children.length > 0) {
                 displayChildren(data.children, !collapsed);
             }
-            _this8.context.setTableState({ collapsed: state.collapsed, collapsedHidden: state.collapsedHidden });
+            _this9.context.setTableState({ collapsed: state.collapsed, collapsedHidden: state.collapsedHidden });
         };
     };
 
     this.handleRowSelect = function (data) {
         return function (event) {
-            var props = _this8.context.props;
-            if (props.rowSelect) {
+            var props = _this9.context.props;
+            if (props.rowSelected) {
                 if (data) {
-                    _this8.context.setTableState({
+                    _this9.context.setTableState({
                         selectedRow: data
                     });
                     if (props.onRowSelect) {
@@ -669,8 +717,8 @@ var _initialiseProps = function _initialiseProps() {
 
     this.handleCheck = function (data) {
         return function (event, isInputChecked) {
-            var state = _this8.context.state;
-            var props = _this8.context.props;
+            var state = _this9.context.state;
+            var props = _this9.context.props;
             if (isInputChecked) {
                 state.checked[data[props.primaryKey]] = true;
             } else {
@@ -679,7 +727,7 @@ var _initialiseProps = function _initialiseProps() {
             if (props.onCheck) {
                 props.onCheck(state.checked);
             }
-            _this8.context.setTableState({
+            _this9.context.setTableState({
                 checked: state.checked
             });
         };
@@ -697,26 +745,36 @@ var TableBodyColGroup = function (_Component3) {
     (0, _createClass3.default)(TableBodyColGroup, [{
         key: 'render',
         value: function render() {
+            var _this8 = this;
+
             var state = this.context.state;
             var props = this.context.props;
             var nodes = [];
-            if (props.showCheckboxes) {
+            if (props.showCheckboxes && this.props.showCheckboxes) {
                 nodes.push(_react2.default.createElement('th', { span: 1,
                     key: -1,
                     style: { width: props.checkboxColumnWidth, padding: 0, height: 0 } }));
             }
-            nodes = nodes.concat(state.dataColumns.map(function (column, index) {
+            if (props.showSeries && this.props.showSeries) {
+                nodes.push(_react2.default.createElement('th', { span: 1,
+                    key: -2,
+                    style: { width: props.seriesColumnWidth, padding: 0, height: 0 } }));
+            }
+            state.dataColumns.map(function (column, index) {
                 var key = column.key;
                 var width = state.columnWidths[key] || 'auto';
-                return _react2.default.createElement('th', { span: 1,
+                if (_lodash2.default.isArray(_this8.props.showColumns) && _this8.props.showColumns.indexOf(column.key) < 0) {
+                    return;
+                }
+                nodes.push(_react2.default.createElement('th', { span: 1,
                     key: index,
                     style: {
                         width: width,
                         maxWidth: width,
                         padding: 0,
                         height: 0
-                    } });
-            }));
+                    } }));
+            });
             if (state.extraColumnWidth > 0) {
                 nodes.push(_react2.default.createElement('th', { span: 1,
                     key: state.dataColumns.length,
@@ -736,6 +794,10 @@ var TableBodyColGroup = function (_Component3) {
     return TableBodyColGroup;
 }(_react.Component);
 
+TableBodyColGroup.defaultProps = {
+    showCheckboxes: true,
+    showColumns: undefined
+};
 TableBodyColGroup.contextTypes = {
     state: _propTypes2.default.object,
     props: _propTypes2.default.object,

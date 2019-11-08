@@ -31,7 +31,7 @@ export default class DateRange extends Component {
     }
 
     initData(props) {
-        if (props.value !== undefined && _.isArray(props.value) && props.value.length == 2) {
+        if (_.isArray(props.value) && props.value.length == 2) {
             let value = props.value;
             [this.state.startMoney, this.state.endMoney] = value;
         }
