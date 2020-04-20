@@ -133,7 +133,7 @@ var DateRange = function (_Component) {
 
             return _react2.default.createElement(
                 'div',
-                null,
+                { style: this.props.rootStyle },
                 label === false ? null : _react2.default.createElement(
                     'div',
                     null,

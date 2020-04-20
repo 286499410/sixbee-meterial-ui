@@ -28,6 +28,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _utils = require('../utils');
+
+var _utils2 = _interopRequireDefault(_utils);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Static = function (_Component) {
@@ -61,7 +65,11 @@ var Static = function (_Component) {
     }, {
         key: 'setValue',
         value: function setValue(value) {
-            this.setValue(value);
+            this.state.value = value;
+            this.forceUpdate();
+            if (this.props.onChange) {
+                this.props.onChange(value);
+            }
         }
     }, {
         key: 'getValue',
@@ -71,7 +79,15 @@ var Static = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            return this.state.value == undefined ? null : this.state.value;
+            var data = {};
+            var key = this.props.formKey || this.props.dataKey;
+            _.set(data, key, this.props.value);
+            return _utils2.default.render(data, {
+                key: key,
+                type: this.props.staticType || 'text',
+                dataSource: this.props.dataSource,
+                dataSourceConfig: this.props.dataSourceConfig
+            }) || null;
         }
     }]);
     return Static;

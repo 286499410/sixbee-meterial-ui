@@ -79,6 +79,14 @@ var Auto = function (_Component) {
             this.initData(nextProps);
         }
     }, {
+        key: 'shouldComponentUpdate',
+        value: function shouldComponentUpdate(nextProps, nextState) {
+            if (_lodash2.default.isEqual(this.state, nextState) && _lodash2.default.isEqual(this.props, nextProps)) {
+                return false;
+            }
+            return true;
+        }
+    }, {
         key: 'getData',
         value: function getData(value) {
             var _this2 = this;
@@ -121,7 +129,7 @@ var Auto = function (_Component) {
                 _this3.state.dataSource = dataSource;
                 var value = _this3.getValue();
 
-                if (value !== undefined && _this3.state.searchText === undefined) {
+                if (value !== undefined) {
                     var data = _this3.getData(value);
                     if (data) {
                         _this3.state.searchText = _lodash2.default.get(data, _this3.props.dataSourceConfig.text, '');
@@ -140,6 +148,7 @@ Auto.defaultProps = {
     borderShow: true,
     openOnFocus: true,
     hasClear: true,
+    hasDropDown: false,
     labelFixed: false,
     disabled: false,
     immutable: false,
@@ -273,7 +282,7 @@ var _initialiseProps = function _initialiseProps() {
             searchText: searchText,
             disabled: _this4.props.disabled,
             hintText: _this4.props.hintText,
-            errorText: _this4.props.errorText,
+            errorText: borderStyle === 'underline' ? _this4.props.errorText : undefined,
             floatingLabelFixed: _this4.props.labelFixed,
             underlineShow: borderStyle === 'underline' && _this4.props.borderShow,
             dataSource: _this4.state.dataSource,
@@ -308,7 +317,7 @@ var _initialiseProps = function _initialiseProps() {
         });
         return _react2.default.createElement(
             'div',
-            { className: 'flex between', ref: "container" },
+            { className: 'flex middle between', ref: "container", style: _this4.props.rootStyle },
             _react2.default.createElement(
                 'div',
                 { style: { flexGrow: 1, position: 'relative' } },
@@ -317,12 +326,14 @@ var _initialiseProps = function _initialiseProps() {
                     { className: 'full-width' },
                     _react2.default.createElement(
                         'div',
-                        { className: "control-border" + (_this4.state.focus ? ' focus' : '') + (_this4.props.errorText ? ' error' : '') },
+                        {
+                            className: "control-border" + (_this4.state.focus ? ' focus' : '') + (_this4.props.errorText ? ' error' : '') },
                         autoComplete
                     ),
                     _react2.default.createElement(
                         'div',
-                        { className: 'text-small text-danger', style: { marginTop: 2 } },
+                        { className: 'text-small text-danger',
+                            style: { marginTop: 2 } },
                         _this4.props.errorText
                     )
                 ) : autoComplete,
@@ -330,14 +341,21 @@ var _initialiseProps = function _initialiseProps() {
                     style: (0, _extends3.default)({
                         position: 'absolute'
                     }, styleProps.iconStyle.style),
-                    iconStyle: (0, _extends3.default)({ color: '#e0e0e0' }, styleProps.iconStyle.iconStyle)
+                    iconStyle: (0, _extends3.default)({ color: "rgba(0,0,0,0.3)" }, styleProps.iconStyle.iconStyle)
 
                 }) : null
             ),
             _this4.props.events ? _react2.default.createElement(
                 'div',
-                { style: { position: 'relative', top: 18, width: _this4.props.events.length * 20 },
-                    className: 'flex center' },
+                { style: {
+                        position: 'relative',
+                        top: borderStyle === "underline" ? 18 : 0,
+                        paddingLeft: 6,
+                        width: _this4.props.events.length * 20 + 6,
+                        paddingBottom: 1,
+                        height: 30
+                    },
+                    className: 'flex middle center' },
                 _this4.props.events.map(function (event) {
                     return _react2.default.createElement(_IconButton2.default, { iconStyle: (0, _extends3.default)({ color: '#aaa', fontSize: 20 }, event.iconStyle),
                         title: event.title,

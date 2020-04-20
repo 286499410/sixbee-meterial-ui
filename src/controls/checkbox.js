@@ -47,7 +47,8 @@ export default class Checkbox extends Component {
      * @param value
      */
     setValue(value) {
-        this.setState({value: value});
+        this.state.value = value;
+        this.forceUpdate();
         if (this.props.onChange) {
             this.props.onChange(value, this);
         }
@@ -150,7 +151,7 @@ export default class Checkbox extends Component {
         let styleProps = _.merge({}, style.getStyle('checkbox', this.props), this.props.styleProps);
         let options = this.getOptions(this.state.dataSource);
         if (options && options.length > 0) {
-            return <div style={{width: '100%'}}>
+            return <div style={{...this.props.style, ...this.props.rootStyle}}>
                 <div style={{...styleProps.labelStyle}}>
                     <span style={{
                         transform: "scale(0.75)",
@@ -175,7 +176,7 @@ export default class Checkbox extends Component {
                 </div>
             </div>
         } else {
-            return <div style={{width: '100%', ...this.props.style}}>
+            return <div style={{...this.props.style, ...this.props.rootStyle}}>
                 <MaterialCheckbox
                     label={label}
                     disabled={this.props.disabled}

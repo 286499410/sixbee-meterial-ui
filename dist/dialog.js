@@ -111,6 +111,9 @@ var Dialog = function (_Component) {
             this.initData(nextProps);
         }
     }, {
+        key: 'componentDidMount',
+        value: function componentDidMount() {}
+    }, {
         key: 'initData',
         value: function initData(props) {
             this.state.open = props.open || false;
@@ -156,9 +159,11 @@ var Dialog = function (_Component) {
             return _react2.default.createElement(
                 _Dialog2.default,
                 {
+                    bodyClassName: 'dialogBody',
+                    ref: "dialog",
                     style: (0, _extends3.default)({}, this.state.style, this.props.style),
                     contentStyle: { width: 'auto', maxWidth: 'auto', textAlign: 'left', display: 'inline-block' },
-                    bodyStyle: { padding: '1px 0 0', fontSize: 14 },
+                    bodyStyle: { padding: '1px 0 0', fontSize: 15, maxHeight: 800 },
                     title: this.props.title ? title : undefined,
                     titleStyle: { padding: 0, cursor: 'move' },
                     overlayStyle: { backgroundColor: 'rgba(0,0,0, 0.2)' },

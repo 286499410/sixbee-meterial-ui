@@ -329,10 +329,12 @@ var style = {
             },
             labelStyle: {
                 lineHeight: 16 + l * 2 + 'px',
-                fontSize: 10 + l * 2
+                fontSize: 10 + l * 2,
+                width: "calc(100% - " + (16 + l * 2) + 'px)'
             },
             style: {
-                marginTop: 8 + l * 2
+                marginTop: 8 + l * 2,
+                padding: l * 2
             }
         };
     },

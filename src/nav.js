@@ -188,8 +188,7 @@ export default class Nav extends Component {
                             let index = this.findIndex(child);
                             return <div key={j} auth-key={child.dataKey} className="flex middle hover-bg hover cursor-pointer relative text-small"
                                         style={{padding: 8, userSelect: 'none'}}
-                                        onClick={this.handleClick(child)}
-                            >
+                                        onClick={this.handleClick(child)}>
                                 <div>{child.label}</div>
                                 {
                                     index >= 0 ?

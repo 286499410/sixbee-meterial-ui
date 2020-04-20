@@ -38,7 +38,8 @@ export default class Text extends Component {
     state = {
         value: undefined,
         errorText: '',
-        focus: false
+        focus: false,
+        pyInputing: false
     };
 
     constructor(props) {
@@ -48,6 +49,13 @@ export default class Text extends Component {
 
     componentWillReceiveProps(nextProps) {
         this.initData(nextProps);
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        if (_.isEqual(this.state, nextState) && _.isEqual(this.props, nextProps)) {
+            return false;
+        }
+        return true;
     }
 
     initData(props) {
@@ -62,7 +70,7 @@ export default class Text extends Component {
      */
     setValue = (value) => {
         this.state.value = value;
-        if (this.props.onChange) {
+        if (this.props.onChange && !this.state.pyInputing) {
             this.props.onChange(value, this);
         }
         this.forceUpdate();
@@ -178,6 +186,13 @@ export default class Text extends Component {
             floatingLabelFixed={this.props.labelFixed}
             underlineShow={borderStyle === 'underline' && this.props.borderShow}
             autoComplete={this.props.autoComplete}
+            onCompositionStart={() => {
+                this.state.pyInputing = true;
+            }}
+            onCompositionEnd={(event) => {
+                this.state.pyInputing = false;
+                this.handleChange(event);
+            }}
             {...styleProps}
         />;
         let content = textField;
@@ -190,15 +205,14 @@ export default class Text extends Component {
             </div>
         }
         if (borderStyle === 'border' && this.props.borderShow) {
-            return <div className="full-width">
-                <div
-                    className={"control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>
+            return <div className="full-width" style={{...this.props.rootStyle}}>
+                <div className={"control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>
                     {content}
                 </div>
                 <div className="text-small text-danger" style={{marginTop: 2}}>{this.props.errorText}</div>
             </div>
         } else {
-            return content;
+            return <div className="full-width" style={{...this.props.rootStyle}}>{content}</div>;
         }
     }
 

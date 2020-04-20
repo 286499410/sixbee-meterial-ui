@@ -36,6 +36,9 @@ export default class Dialog extends Component {
     componentWillReceiveProps(nextProps) {
         this.initData(nextProps);
     }
+    componentDidMount() {
+
+    }
 
     initData(props) {
         this.state.open = props.open || false;
@@ -94,9 +97,11 @@ export default class Dialog extends Component {
         </div>;
         return (
             <MaterialDialog
+                bodyClassName="dialogBody"
+                ref={"dialog"}
                 style={{...this.state.style, ...this.props.style}}
                 contentStyle={{width: 'auto', maxWidth: 'auto', textAlign: 'left', display: 'inline-block'}}
-                bodyStyle={{padding:'1px 0 0', fontSize: 14}}
+                bodyStyle={{padding:'1px 0 0', fontSize: 15, maxHeight: 800}}
                 title={this.props.title ? title : undefined}
                 titleStyle={{padding: 0, cursor: 'move'}}
                 overlayStyle={{backgroundColor:'rgba(0,0,0, 0.2)'}}

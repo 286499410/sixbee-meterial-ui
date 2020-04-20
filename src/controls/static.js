@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import utils from '../utils';
 
 export default class Static extends Component {
 
@@ -22,7 +23,11 @@ export default class Static extends Component {
     }
 
     setValue(value) {
-        this.setValue(value);
+        this.state.value = value;
+        this.forceUpdate();
+        if(this.props.onChange) {
+            this.props.onChange(value);
+        }
     }
 
     getValue() {
@@ -30,7 +35,15 @@ export default class Static extends Component {
     }
 
     render() {
-        return this.state.value == undefined ? null : this.state.value;
+        let data = {};
+        let key = this.props.formKey || this.props.dataKey;
+        _.set(data, key, this.props.value);
+        return utils.render(data, {
+            key: key,
+            type: this.props.staticType || 'text',
+            dataSource: this.props.dataSource,
+            dataSourceConfig: this.props.dataSourceConfig
+        }) || null;
     }
 
 }

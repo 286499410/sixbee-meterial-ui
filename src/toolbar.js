@@ -145,7 +145,7 @@ export default class Toolbar extends Component {
                     return event.render(this.props);
                 case 'text':
                 default:
-                    return <div style={{display: 'table', fontSize: 18, ...event.style}}>{event.label}</div>
+                    return <div style={{display: 'table', fontSize: 14, ...event.style}}>{event.label}</div>
             }
         }
         return null;
@@ -167,7 +167,13 @@ export default class Toolbar extends Component {
                             } else if (_.isObject(event) && this.props.events && this.props.events[event.key]) {
                                 event = {...this.props.events[event.key], ...event}
                             }
-                            return <div className="toolbar-item" key={j} onClick={this.handleClick(event)}>
+                            if(event.isShow) {
+                                let isShow = _.isFunction(event.isShow) ? event.isShow() : event.isShow;
+                                if(!isShow) {
+                                    return null;
+                                }
+                            }
+                            return <div className="toolbar-item" key={j} onClick={this.handleClick(event)} auth-key={event.authKey}>
                                 {this.renderEvent(event)}
                             </div>
                         })}

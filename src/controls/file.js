@@ -111,7 +111,7 @@ export default class File extends Component {
     };
 
     render() {
-        return <div style={{padding: '8px 0'}}>
+        return <div style={{padding: '8px 0', ...this.props.rootStyle}}>
             <div className="flex middle">
                 <RaisedButton
                     label={this.props.label}

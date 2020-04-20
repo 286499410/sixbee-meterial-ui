@@ -19,7 +19,7 @@ export default class TableBody extends Component {
         width: undefined,
         showColumns: undefined,
         showCheckboxes: true,
-        showSeries: true
+        showSeries: true,
     };
 
     static contextTypes = {
@@ -45,9 +45,35 @@ export default class TableBody extends Component {
         }
     }
 
+    componentDidUpdate() {
+        this.showEllipsis();
+    }
+
+
+    /**
+     * 省略的文本，加上title属性
+     */
+    showEllipsis = () => {
+        let props = this.context.props;
+        if (props.showEllipsis) {
+            let fn = function () {
+                let clientWidth = this.clientWidth;
+                let scrollWidth = this.scrollWidth;
+                let text = $(this).text();
+                if (clientWidth < scrollWidth && text !== '') {
+                    $(this).attr('title', text);
+                } else {
+                    $(this).removeAttr('title');
+                }
+            };
+            $(this.refs.container).find('td').each(fn);
+            $(this.refs.container).find('td .td').each(fn);
+        }
+    };
+
     handleScroll = (event) => {
-        let scrollTop = this.refs.scrollBar.getScrollTop();
-        let scrollLeft = this.refs.scrollBar.getScrollLeft();
+        let scrollTop = this.refs.scrollBar ? this.refs.scrollBar.getScrollTop() : 0;
+        let scrollLeft = this.refs.scrollBar ? this.refs.scrollBar.getScrollLeft() : 0;
         this.refs.tbody.showData(scrollTop);
         this.context.handleStateChange({
             scrollTop: scrollTop,
@@ -107,27 +133,36 @@ export default class TableBody extends Component {
                     }}
                     onScroll={this.handleScroll}>
             {
-                props.loading && this.props.hasLoading ? <div ref="masker" className="masker" style={{zIndex: 1}}>
-                    <div className="position-center">
-                        <RefreshIndicator size={50}
-                                          left={-25}
-                                          top={-25}
-                                          percentage={100}
-                                          status="loading"
-                                          loadingColor="#28a7e1"
-                                          style={{backgroundColor: 'transparent', boxShadow: 'none'}}
-                        />
-                    </div>
+                props.loading ? <div ref="masker" className="masker" style={{zIndex: 1}}>
+                    {
+                        this.props.hasLoading ? <div className="position-center">
+                            <RefreshIndicator size={50}
+                                              left={-25}
+                                              top={-25}
+                                              percentage={100}
+                                              status="loading"
+                                              loadingColor="#28a7e1"
+                                              style={{backgroundColor: 'transparent', boxShadow: 'none'}}
+                            />
+                        </div> : null
+                    }
                 </div> : null
             }
             {
                 state.dataSource.length == 0 && !props.loading && this.props.hasEmptyTip !== false ?
-                    <div className="position-center text-center" style={{zIndex: 1}}>
-                        <div>
-                            <div><img src={props.emptyDataImage} style={{width: 180}}/></div>
-                            <div style={{marginLeft: -8}}>{props.emptyDataTip}</div>
+                    <Scrollbars ref="scrollBar" style={{
+                        width: '100%',
+                        height: '100%'
+                    }}>
+                        <div className="position-center text-center" style={{zIndex: 1}}>
+                            <div>
+                                <div><img src={props.emptyDataImage} style={{maxWidth: 180, maxHeight: state.bodyHeight * 0.7}}/></div>
+                                <div>{props.emptyDataTip}</div>
+                            </div>
                         </div>
-                    </div> : null
+                        <div style={{width: state.tableWidth, height: 1}}></div>
+                    </Scrollbars>
+                     : null
             }
             {
                 this.props.hasScrollbar && (props.containerHeight || state.bodyHeight) ?
@@ -146,14 +181,14 @@ export default class TableBody extends Component {
                                 renderThumbHorizontal={({style, ...props}) =>
                                     <div {...props} style={{
                                         ...style,
-                                        height: 12,
+                                        height: 10,
                                         cursor: 'pointer',
                                         borderRadius: 'inherit',
                                     }}>
                                         <div style={{
                                             position: 'relative',
-                                            top: 4,
-                                            height: 8,
+                                            top: 8,
+                                            height: 6,
                                             backgroundColor: 'rgba(0, 0, 0, 0.2)',
                                             borderRadius: 'inherit'
                                         }}></div>
@@ -167,20 +202,20 @@ export default class TableBody extends Component {
                                         bottom: 2,
                                         top: 2,
                                         borderRadius: 3,
-                                        zIndex: 1,
+                                        zIndex: 3,
                                     }}/>
                                 }
                                 renderThumbVertical={({style, ...props}) =>
                                     <div {...props} style={{
                                         ...style,
-                                        width: 12,
+                                        width: 10,
                                         cursor: 'pointer',
                                         borderRadius: 'inherit'
                                     }}>
                                         <div style={{
                                             position: 'relative',
-                                            left: 4,
-                                            width: 8,
+                                            left: 8,
+                                            width: 6,
                                             height: '100%',
                                             backgroundColor: 'rgba(0, 0, 0, 0.2)',
                                             borderRadius: 'inherit'
@@ -242,7 +277,7 @@ class TableBodyContent extends Component {
             let height = props.bodyRowHeight;
             state.dataColumns.map((column) => {
                 if (column.groupKey) {
-                    let group = _.get(data, column.groupKey);
+                    let group = _.get(data, column.groupKey) || [];
                     height = Math.max(height, group.length * props.bodyRowHeight)
                 }
             });
@@ -275,6 +310,9 @@ class TableBodyContent extends Component {
         this.handleRowHeight(list);
         let rows = list.length;
         let showMinRows = 0, showMaxRows = Math.max(rows - 1, 0);
+        if(props.containerHeight === undefined) {
+            return true;
+        }
         if (this.state.isSameHeight) {
             //相同行高
             if (props.bodyRowHeight * rows < 2000) {
@@ -319,31 +357,13 @@ class TableBodyContent extends Component {
     handleCollapse = (data) => (event) => {
         let state = this.context.state;
         let primaryKey = this.context.props.primaryKey;
-        let collapsed = state.collapsed[data[primaryKey]];
+        let collapsed = this.isCollapsed(data);
         if (collapsed) {
-            delete state.collapsed[data[primaryKey]];
+            state.collapsed[data[primaryKey]] = false;
         } else {
             state.collapsed[data[primaryKey]] = true;
         }
-        //处理子节点
-        let displayChildren = (children, collapsed) => {
-            children.map((child) => {
-                if (collapsed) {
-                    //隐藏
-                    state.collapsedHidden[child[primaryKey]] = true;
-                } else {
-                    //显示
-                    delete state.collapsedHidden[child[primaryKey]];
-                }
-                if (child.children && child.children.length > 0) {
-                    displayChildren(child.children, collapsed || state.collapsed[child[primaryKey]]);
-                }
-            });
-        };
-        if (data.children && data.children.length > 0) {
-            displayChildren(data.children, !collapsed);
-        }
-        this.context.setTableState({collapsed: state.collapsed, collapsedHidden: state.collapsedHidden})
+        this.context.setTableState({collapsed: state.collapsed})
     };
 
     /**
@@ -353,7 +373,7 @@ class TableBodyContent extends Component {
         let data = [];
         let state = this.context.state;
         state.dataRows.map((row) => {
-            if (!state.collapsedHidden[row[this.context.props.primaryKey]]) {
+            if (row._parent === null || !this.isCollapsed(row._parent)) {
                 data.push(row);
             }
         });
@@ -446,6 +466,20 @@ class TableBodyContent extends Component {
         });
     };
 
+    /**
+     * 是否折叠的
+     * @param data
+     */
+    isCollapsed(data) {
+        let state = this.context.state;
+        let props = this.context.props;
+        if(state.collapsed[data[props.primaryKey]] === undefined) {
+            return props.defaultCollapsible;
+        } else {
+            return state.collapsed[data[props.primaryKey]];
+        }
+    }
+
     render() {
         let state = this.context.state;
         let props = this.context.props;
@@ -462,6 +496,10 @@ class TableBodyContent extends Component {
         let topHeight = this.getTopHeight(list);
         let bottomHeight = this.getBottomHeight(list);
         let topHideNum = 0;
+        let seriesOffset = 0;
+        if(props.pager) {
+            seriesOffset = (props.pager.page - 1) * props.pager.limit;
+        }
         for (let i = 0; i < list.length; i++) {
             if (!this.isRowShow(i)) {
                 topHideNum++;
@@ -508,7 +546,9 @@ class TableBodyContent extends Component {
                 >
                     {
                         props.showCheckboxes && this.props.showCheckboxes ?
-                            <td className="td-checkbox" style={{height: props.bodyRowHeight + 1}}>
+                            <td className="td-checkbox" style={{height: props.bodyRowHeight}} onClick={(event) => {
+                                event.stopPropagation();
+                            }}>
                                 {
                                     (!props.rowCheckboxEnabled || props.rowCheckboxEnabled(data)) ?
                                         <Checkbox checked={checked}
@@ -527,7 +567,7 @@ class TableBodyContent extends Component {
                     }
                     {
                         props.showSeries && this.props.showSeries ? <td style={{textAlign: 'center'}}>
-                            {rowIndex + 1}
+                            {seriesOffset + rowIndex + 1}
                         </td> : null
                     }
                     {
@@ -535,7 +575,7 @@ class TableBodyContent extends Component {
                             let content = () => {
                                 let value = _.get(data, column.dataKey || column.key);
                                 if (column.groupKey) {
-                                    let group = _.get(data, column.groupKey);
+                                    let group = _.get(data, column.groupKey) || [];
                                     return <div style={{width: '100%', overflow: 'hidden'}}>
                                         {group.map((row, index) => {
                                             if (rowIndex < this.state.showMinRows || rowIndex > this.state.showMaxRows) {
@@ -551,7 +591,7 @@ class TableBodyContent extends Component {
                                                 <span
                                                     className={`${column.onClick ? 'text-primary cursor-pointer' : ''}`}
                                                     onClick={column.onClick ? column.onClick.bind(this, row, data) : undefined}>
-                                                    {column.render ? column.render(row, column, this.context.Table) : this.context.cellRender(row, column)}
+                                                    {column.render ? column.render(row, column, this.context.Table, data) : this.context.cellRender(row, column)}
                                                 </span>
                                             </div>
                                         })}
@@ -586,16 +626,16 @@ class TableBodyContent extends Component {
                                                 lineHeight: 1
                                             }}
                                                              onClick={column.onClick && !column.groupKey ? column.onClick.bind(this, data) : undefined}>
-                                                        {content()}
+                                                {content()}
                                             </span>;
                                             return <div
                                                 className={`${column.onClick && !column.groupKey ? 'text-primary cursor-pointer' : ''}`}
                                                 style={{paddingLeft: indent, lineHeight: 1}}>
                                                 {
                                                     props.collapsible ? <div className="flex middle">
-                                                        <div style={{opacity: data.children.length > 0 ? 1 : 0}}>
+                                                        <div style={{opacity: data.children && data.children.length > 0 ? 1 : 0}}>
                                                             <Icon type="button"
-                                                                  name={state.collapsed[data[props.primaryKey]] ? "plus-square" : "minus-square"}
+                                                                  name={this.isCollapsed(data) ? "plus-square" : "minus-square"}
                                                                   size={14}
                                                                   padding={4}
                                                                   onClick={this.handleCollapse(data)}
@@ -630,7 +670,7 @@ class TableBodyContent extends Component {
                                                     events.map((event, key) => {
                                                         return <Icon key={key}
                                                                      type="button"
-                                                                     name={`icon-${event}`}
+                                                                     name={`${event === 'add' ? 'plus' : event}`}
                                                                      title={label[event]}
                                                                      onClick={props.iconEvents[event].bind(this, data, column, this.context.Table)}/>
                                                     })
@@ -668,7 +708,7 @@ class TableBodyContent extends Component {
 /**
  * 表体列宽度定义
  */
-class TableBodyColGroup extends Component {
+export class TableBodyColGroup extends Component {
 
     static defaultProps = {
         showCheckboxes: true,
@@ -693,7 +733,7 @@ class TableBodyColGroup extends Component {
             nodes.push(
                 <th span={1}
                     key={-1}
-                    style={{width: props.checkboxColumnWidth, padding: 0, height: 0}}>
+                    style={{width: props.checkboxColumnWidth, padding: 0, height: 0, border: 'none'}}>
                 </th>
             );
         }
@@ -701,7 +741,7 @@ class TableBodyColGroup extends Component {
             nodes.push(
                 <th span={1}
                     key={-2}
-                    style={{width: props.seriesColumnWidth, padding: 0, height: 0}}>
+                    style={{width: props.seriesColumnWidth, padding: 0, height: 0, border: 'none'}}>
                 </th>)
         }
         state.dataColumns.map((column, index) => {
@@ -717,14 +757,15 @@ class TableBodyColGroup extends Component {
                                width: width,
                                maxWidth: width,
                                padding: 0,
-                               height: 0
+                               height: 0,
+                               border: 'none'
                            }}>
             </th>);
         });
         if (state.extraColumnWidth > 0) {
             nodes.push(<th span={1}
                            key={state.dataColumns.length}
-                           style={{width: 'auto', padding: 0, height: 0}}></th>);
+                           style={{width: 'auto', padding: 0, height: 0, border: 'none'}}></th>);
         }
         return <thead>
         <tr>

@@ -5,6 +5,7 @@ import React, {Component} from 'react';
 import Icon from './icon';
 import $ from 'jquery';
 import _ from 'lodash';
+
 /**
  * 菜单组件
  */
@@ -15,7 +16,8 @@ export default class Nav2 extends Component {
         mode: 'vertical',
         theme: 'light',
         onClick: undefined,
-        selectedKey: undefined
+        selectedKey: undefined,
+        iconPrefix: 'iconfont icon-'
     };
 
     mode = [
@@ -66,11 +68,19 @@ export default class Nav2 extends Component {
         if (nextProps.selectedKey) {
             this.state.selectedKey = nextProps.selectedKey;
         }
+        if (nextProps.dataSource) {
+            this.getDataSource().then((dataSource) => {
+                this.updateDataSource(dataSource);
+            });
+        }
     }
 
     getDataSource = () => {
         return new Promise((resolve, reject) => {
             let dataSource = this.props.dataSource;
+            if(_.isFunction(dataSource)) {
+                dataSource = dataSource();
+            }
             if (_.isArray(dataSource)) {
                 resolve(dataSource);
             } else if (_.isFunction(dataSource)) {
@@ -107,7 +117,7 @@ export default class Nav2 extends Component {
         dataSource.map((item) => {
             let key = item.key || item.dataKey;
             if (item.url == this.state.selectedKey) {
-                if(parent) {
+                if (parent) {
                     this.state.unFoldedKeySet.add(parentKey);
                 }
             }
@@ -156,7 +166,7 @@ export default class Nav2 extends Component {
         }
         if (this.props.mode == 'vertical-pop') {
             let ref = this.getRootRef(key);
-            if(ref) {
+            if (ref) {
                 ref.setState({popHidden: true});
             }
         }
@@ -186,9 +196,13 @@ export default class Nav2 extends Component {
         let key = item.key || item.dataKey;
         if (_.isArray(item.children) && item.children.length > 0) {
             let children = [], selected = false;
-            item.children.map((subitem) => {
+            item.children.map((subitem, index) => {
+                let col = parseInt(index / 7);
                 let ret = this.renderNavItem(subitem, key);
-                children.push(ret.component);
+                if(!children[col]) {
+                    children[col] = [];
+                }
+                children[col].push(ret.component);
                 selected = selected || ret.selected;
             });
             return {
@@ -198,10 +212,15 @@ export default class Nav2 extends Component {
                     itemKey={key}
                     label={item.label || item.title}
                     icon={item.icon}
+                    iconPrefix={this.props.iconPrefix}
                     folded={this.isFolded(item)}
                     selected={selected}
                     onClick={this.handleFold(item, parentKey)}>
-                    {children}
+                    {
+                        children.map((data, index) => {
+                            return <ul key={index} className="sub-nav">{data}</ul>
+                        })
+                    }
                 </Subnav>,
                 selected: selected
             }
@@ -215,6 +234,7 @@ export default class Nav2 extends Component {
                     selected={this.isSelected(item)}
                     onClick={this.handleSelect(item)}
                     icon={item.icon}
+                    iconPrefix={this.props.iconPrefix}
                     label={item.label || item.title}/>,
                 selected: selected
             }
@@ -261,16 +281,17 @@ class Subnav extends Component {
 
     render() {
         return <li auth-key={this.props.itemKey}
-            className={`nav-item${this.props.folded ? ' folded' : ''}${this.props.selected ? ' as-selected' : ''}${this.state.popHidden ? ' pop-hidden' : ''}`}>
-            <label className="folder" onClick={this.handleClick} onDoubleClick={this.handleDoubleClick} onMouseEnter={this.handleMouseEnter}>
-                <Icon name={this.props.icon}/>
+                   className={`nav-item${this.props.folded ? ' folded' : ''}${this.props.selected ? ' as-selected' : ''}${this.state.popHidden ? ' pop-hidden' : ''}`}>
+            <label className="folder" onClick={this.handleClick} onDoubleClick={this.handleDoubleClick}
+                   onMouseEnter={this.handleMouseEnter}>
+                {
+                    this.props.icon ? <Icon name={this.props.icon} classPrefix={this.props.iconPrefix} iconStyle={{paddingRight: 6}}/> : null
+                }
                 <span className="label">{this.props.label}</span>
                 <i className="arrow"></i>
             </label>
             <div className="sub-nav-container">
-                <ul className="sub-nav" ref="subnav">
-                    {this.props.children}
-                </ul>
+                {this.props.children}
             </div>
         </li>
     }
@@ -285,9 +306,12 @@ class NavItem extends Component {
     };
 
     render() {
-        return <li className={`nav-item${this.props.selected ? ' selected' : ''}`} data-key={this.props.itemKey} auth-key={this.props.itemKey}>
+        return <li className={`nav-item${this.props.selected ? ' selected' : ''}`} data-key={this.props.itemKey}
+                   auth-key={this.props.itemKey}>
             <label onClick={this.handleClick}>
-                <Icon name={this.props.icon}/>
+                {
+                    this.props.icon ? <Icon name={this.props.icon} classPrefix={this.props.iconPrefix} style={{paddingRight: 6}}/> : null
+                }
                 <span className="label">{this.props.label}</span>
             </label>
         </li>

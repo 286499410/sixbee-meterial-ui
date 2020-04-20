@@ -21,6 +21,7 @@ export default class Auto extends Component {
         borderShow: true,           //是否显示下划线
         openOnFocus: true,          //获取焦点时是否显示选项
         hasClear: true,             //最右边是否显示清除按钮
+        hasDropDown: false,         //显示所有数据
         labelFixed: false,          //是否固定标签
         disabled: false,            //是否禁止输入
         immutable: false,           //是否不可更改
@@ -61,6 +62,13 @@ export default class Auto extends Component {
         this.initData(nextProps);
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (_.isEqual(this.state, nextState) && _.isEqual(this.props, nextProps)) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * 参数初始化处理
      * @param props
@@ -68,7 +76,7 @@ export default class Auto extends Component {
     initData = (props) => {
         if (props.hasOwnProperty('value')) {
             this.state.value = props.value;
-            if(props.value && this.state.dataSource.length > 0) {
+            if (props.value && this.state.dataSource.length > 0) {
                 let data = this.getData(props.value);
                 if (data) {
                     this.state.searchText = _.get(data, this.props.dataSourceConfig.text, '');
@@ -135,7 +143,7 @@ export default class Auto extends Component {
             this.state.dataSource = dataSource;
             let value = this.getValue();
             //设置了value，未设置searchText, 自动从dataSource获取
-            if (value !== undefined && this.state.searchText === undefined) {
+            if (value !== undefined) {
                 let data = this.getData(value);
                 if (data) {
                     this.state.searchText = _.get(data, this.props.dataSourceConfig.text, '');
@@ -251,7 +259,7 @@ export default class Auto extends Component {
         let searchText = this.getSearchText() || '';
         let styleProps = _.merge(style.getStyle('auto', this.props), this.props.styleProps);
         let label = this.props.label;
-        if(borderStyle == 'border') {
+        if (borderStyle == 'border') {
             styleProps.iconStyle.style.right = 0;
             styleProps.iconStyle.style.top = 3;
         }
@@ -265,7 +273,7 @@ export default class Auto extends Component {
             searchText={searchText}
             disabled={this.props.disabled}
             hintText={this.props.hintText}
-            errorText={this.props.errorText}
+            errorText={borderStyle === 'underline' ? this.props.errorText : undefined}
             floatingLabelFixed={this.props.labelFixed}
             underlineShow={borderStyle === 'underline' && this.props.borderShow}
             dataSource={this.state.dataSource}
@@ -299,13 +307,15 @@ export default class Auto extends Component {
             popoverProps={styleProps.popoverProps}
         />;
         return (
-            <div className="flex between" ref={"container"}>
+            <div className="flex middle between" ref={"container"} style={this.props.rootStyle}>
                 <div style={{flexGrow: 1, position: 'relative'}}>
                     {
                         borderStyle === 'border' && this.props.borderShow ?
                             <div className="full-width">
-                                <div className={"control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>{autoComplete}</div>
-                                <div className="text-small text-danger" style={{marginTop: 2}}>{this.props.errorText}</div>
+                                <div
+                                    className={"control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>{autoComplete}</div>
+                                <div className="text-small text-danger"
+                                     style={{marginTop: 2}}>{this.props.errorText}</div>
                             </div> : autoComplete
                     }
 
@@ -316,15 +326,22 @@ export default class Auto extends Component {
                                             position: 'absolute',
                                             ...styleProps.iconStyle.style
                                         }}
-                                        iconStyle={{color: '#e0e0e0', ...styleProps.iconStyle.iconStyle}}
+                                        iconStyle={{color: "rgba(0,0,0,0.3)", ...styleProps.iconStyle.iconStyle}}
 
                             /> : null
                     }
                 </div>
                 {
                     this.props.events ?
-                        <div style={{position: 'relative', top: 18, width: this.props.events.length * 20}}
-                             className="flex center">
+                        <div style={{
+                            position: 'relative',
+                            top: borderStyle === "underline" ? 18 : 0,
+                            paddingLeft: 6,
+                            width: this.props.events.length * 20 + 6,
+                            paddingBottom: 1,
+                            height: 30
+                        }}
+                             className="flex middle center">
                             {
                                 this.props.events.map((event) => {
                                     return <IconButton iconStyle={{color: '#aaa', fontSize: 20, ...event.iconStyle}}

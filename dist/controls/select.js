@@ -62,6 +62,14 @@ var _TextField = require('material-ui/TextField');
 
 var _TextField2 = _interopRequireDefault(_TextField);
 
+var _IconButton = require('material-ui/IconButton');
+
+var _IconButton2 = _interopRequireDefault(_IconButton);
+
+var _Divider = require('material-ui/Divider');
+
+var _Divider2 = _interopRequireDefault(_Divider);
+
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -86,7 +94,16 @@ var _button = require('../button');
 
 var _button2 = _interopRequireDefault(_button);
 
+var _icon = require('../icon');
+
+var _icon2 = _interopRequireDefault(_icon);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var selectStyle = {
+    wrapper: {},
+    filter: { marginTop: 12, paddingLeft: 16, paddingRight: 16 }
+};
 
 var Select = function (_Component) {
     (0, _inherits3.default)(Select, _Component);
@@ -200,6 +217,15 @@ var Select = function (_Component) {
             return options;
         };
 
+        _this.handleClick = function (event) {
+            if (!_this.props.disabled) {
+                _this.setState({
+                    open: true,
+                    anchorEl: event.currentTarget
+                });
+            }
+        };
+
         _this.handleChange = function (data) {
             if (_this.props.multiple === false) {
                 _this.state.open = false;
@@ -292,19 +318,10 @@ var Select = function (_Component) {
         value: function indexOf(value) {
             var _this3 = this;
 
-            return _lodash2.default.findIndex(this.state.value, function (n) {
-                return _this3.props.carryKey ? _lodash2.default.get(n, _this3.props.dataSourceConfig.value) == value : n == value;
-            });
-        }
-    }, {
-        key: 'indexOf',
-        value: function indexOf(value) {
-            var _this4 = this;
-
             var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.state.value;
 
             return _lodash2.default.findIndex(data, function (n) {
-                return _this4.props.carryKey ? _lodash2.default.get(n, _this4.props.dataSourceConfig.value) == value : n == value;
+                return _this3.props.carryKey ? _lodash2.default.get(n, _this3.props.dataSourceConfig.value) == value : n == value;
             });
         }
     }, {
@@ -315,6 +332,25 @@ var Select = function (_Component) {
             } else {
                 return this.state.value == value;
             }
+        }
+    }, {
+        key: 'getSelectedText',
+        value: function getSelectedText() {
+            var _this4 = this;
+
+            var selectedText = [];
+            var value = this.getValue();
+            var options = this.getAllOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]);
+            options.map(function (data) {
+                if (_this4.props.multiple) {
+                    if (value.indexOf(data.value) >= 0) {
+                        selectedText.push(data.selectText || data.text);
+                    }
+                } else if (value == data.value) {
+                    selectedText.push(data.selectText || data.text);
+                }
+            });
+            return selectedText.join(',');
         }
     }, {
         key: 'getContent',
@@ -331,7 +367,7 @@ var Select = function (_Component) {
                     null,
                     this.props.hasFilter ? _react2.default.createElement(
                         'div',
-                        { style: { marginTop: 12, paddingLeft: 16, paddingRight: 16 } },
+                        { style: selectStyle.filter },
                         _react2.default.createElement(_TextField2.default, { hintText: '\u8F93\u5165\u5173\u952E\u5B57\u7B5B\u9009',
                             name: 'filterText',
                             fullWidth: true,
@@ -354,7 +390,10 @@ var Select = function (_Component) {
                                 multiple: this.props.multiple,
                                 carryKey: this.props.carryKey,
                                 dataSourceConfig: this.props.dataSourceConfig,
-                                cancel: this.props.cancel
+                                cancel: this.props.cancel,
+                                footer: this.props.footer,
+                                context: this,
+                                emptyTip: this.props.emptyTip
                             })
                         ),
                         this.props.hasFilter && this.props.multiple && _lodash2.default.isArray(value) && value.length > 0 ? _react2.default.createElement(
@@ -501,50 +540,64 @@ var Select = function (_Component) {
             var selectValue = this.props.multiple && this.props.carryKey ? (value || []).map(function (n) {
                 return _lodash2.default.get(n, _this6.props.dataSourceConfig.value);
             }) : value;
-            var selectField = _react2.default.createElement(
-                _SelectField2.default,
-                (0, _extends3.default)({ value: selectValue,
-                    name: this.props.name || this.props.dataKey || _utils2.default.uuid(),
-                    floatingLabelText: label,
-                    multiple: this.props.multiple,
-                    fullWidth: this.props.fullWidth,
-                    disabled: this.props.disabled,
-                    hintText: this.props.hintText,
-                    errorText: borderStyle === "underline" ? this.props.errorText : undefined,
-                    floatingLabelFixed: this.props.labelFixed,
-                    underlineShow: borderStyle === 'underline' && this.props.borderShow
-                }, styleProps),
-                this.getAllOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]).map(function (option, index) {
-                    return _react2.default.createElement(_MenuItem2.default, { key: index,
-                        value: option.value,
-                        label: option.text,
-                        primaryText: option.selectText || option.label,
-                        disabled: option.disabled,
-                        innerDivStyle: styleProps.menuItemStyle.innerDivStyle,
-                        style: { textIndent: option.indent }
-                    });
-                })
-            );
+            var selectField = void 0;
+            if (borderStyle !== 'underline') {
+                selectField = _react2.default.createElement(
+                    'div',
+                    { className: "flex middle between full-width" + (this.props.disabled ? ' text-disabled' : '') },
+                    _react2.default.createElement(
+                        'div',
+                        { style: { textAlign: this.props.textAlign || 'left', flexGrow: 1 } },
+                        this.getSelectedText()
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { style: { width: 16, textAlign: 'right' } },
+                        _react2.default.createElement('i', { className: 'iconfont icon-caret-down', style: { fontSize: 12, color: 'rgba(0,0,0,0.3)' } })
+                    )
+                );
+            } else {
+                selectField = _react2.default.createElement(
+                    _SelectField2.default,
+                    (0, _extends3.default)({ value: selectValue,
+                        name: this.props.name || this.props.dataKey || _utils2.default.uuid(),
+                        floatingLabelText: label,
+                        multiple: this.props.multiple,
+                        fullWidth: this.props.fullWidth,
+                        disabled: this.props.disabled,
+                        hintText: this.props.hintText,
+                        errorText: borderStyle === "underline" ? this.props.errorText : undefined,
+                        floatingLabelFixed: this.props.labelFixed,
+                        underlineShow: borderStyle === 'underline' && this.props.borderShow
+                    }, styleProps),
+                    this.getAllOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]).map(function (option, index) {
+                        return _react2.default.createElement(_MenuItem2.default, { key: index,
+                            value: option.value,
+                            label: option.text,
+                            primaryText: option.selectText || option.label,
+                            disabled: option.disabled,
+                            innerDivStyle: styleProps.menuItemStyle.innerDivStyle,
+                            style: { textIndent: option.indent }
+                        });
+                    })
+                );
+            }
             var content = this.getContent();
             return _react2.default.createElement(
                 'div',
-                { className: 'relative', style: (0, _extends3.default)({ overflow: 'hidden' }, this.props.style) },
+                { className: 'flex middle relative', style: (0, _extends3.default)({ overflow: 'hidden' }, this.props.style, this.props.rootStyle) },
                 _react2.default.createElement(
                     'div',
-                    { className: 'relative cursor-pointer', onClick: function onClick(event) {
-                            if (!_this6.props.disabled) {
-                                _this6.setState({
-                                    open: true,
-                                    anchorEl: event.currentTarget
-                                });
-                            }
-                        } },
+                    { style: { flexGrow: 1 },
+                        className: "relative" + (this.props.disabled ? ' text-disabled' : ' cursor-pointer'),
+                        onClick: this.handleClick },
                     borderStyle === 'border' && this.props.borderShow ? _react2.default.createElement(
                         'div',
                         { className: 'full-width' },
                         _react2.default.createElement(
                             'div',
-                            { className: "control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '') },
+                            {
+                                className: "control-border" + (this.state.focus || this.state.open ? ' focus' : '') + (this.props.errorText ? ' error' : '') },
                             selectField
                         ),
                         _react2.default.createElement(
@@ -552,9 +605,34 @@ var Select = function (_Component) {
                             { className: 'text-small text-danger', style: { marginTop: 2 } },
                             this.props.errorText
                         )
-                    ) : selectField,
-                    _react2.default.createElement('div', { className: 'full-screen' })
+                    ) : _react2.default.createElement(
+                        'div',
+                        null,
+                        selectField,
+                        _react2.default.createElement('div', { className: 'full-screen' })
+                    )
                 ),
+                this.props.events ? _react2.default.createElement(
+                    'div',
+                    { style: {
+                            position: 'relative',
+                            top: borderStyle === "underline" ? 18 : 0,
+                            paddingLeft: 6,
+                            width: this.props.events.length * 20 + 6,
+                            paddingBottom: 1,
+                            height: 30
+                        },
+                        className: 'flex middle center' },
+                    this.props.events.map(function (event) {
+                        return _react2.default.createElement(_IconButton2.default, { iconStyle: (0, _extends3.default)({ color: '#aaa', fontSize: 20 }, event.iconStyle),
+                            title: event.title,
+                            key: event.icon,
+                            iconClassName: "iconfont icon-" + event.icon,
+                            onClick: event.onClick.bind(_this6, _this6),
+                            style: event.style
+                        });
+                    })
+                ) : null,
                 this.props.mode == 'inline' ? _react2.default.createElement(
                     _Popover2.default,
                     {
@@ -562,7 +640,6 @@ var Select = function (_Component) {
                         anchorEl: this.state.anchorEl,
                         anchorOrigin: { horizontal: "left", vertical: "bottom" },
                         targetOrigin: { horizontal: "left", vertical: "top" },
-
                         onRequestClose: this.handleRequestClose },
                     content
                 ) : this.state.open ? _react2.default.createElement(
@@ -602,7 +679,10 @@ Select.defaultProps = {
     cancel: false,
     menuWidth: 'auto',
     mode: 'inline',
-    tableProps: undefined };
+    tableProps: undefined,
+    footer: undefined,
+    emptyTip: '没有数据'
+};
 Select.contextTypes = {
     muiTheme: _propTypes2.default.object
 };
@@ -673,35 +753,63 @@ var Options = function (_Component2) {
             var _this9 = this;
 
             return _react2.default.createElement(
-                _reactCustomScrollbars.Scrollbars,
-                { style: { maxHeight: 300 }, autoHeight: true },
-                _react2.default.createElement(
-                    _Menu2.default,
-                    { style: this.props.styleProps.dropDownMenuProps,
-                        listStyle: this.props.styleProps.listStyle,
-                        menuItemStyle: this.props.styleProps.menuItemStyle,
-                        disableAutoFocus: true,
-                        onItemClick: this.handleItemClick },
-                    this.props.dataSource.map(function (option, index) {
-                        var style = { textIndent: option.indent };
-                        if (_this9.isChecked(option.value)) {
-                            style.color = '#FF0099';
-                        }
-                        return _react2.default.createElement(_MenuItem2.default, { key: index,
-                            value: option.value,
-                            label: option.text,
-                            primaryText: option.selectText || option.label,
-                            disabled: option.disabled,
-                            innerDivStyle: _this9.props.styleProps.menuItemStyle.innerDivStyle,
-                            style: style
-                        });
-                    }),
-                    this.props.cancel ? _react2.default.createElement(_MenuItem2.default, { value: null,
-                        primaryText: "取消选择",
-                        innerDivStyle: this.props.styleProps.menuItemStyle.innerDivStyle,
-                        style: { color: '#9b9b9b' }
-                    }) : null
-                )
+                'div',
+                null,
+                this.props.dataSource.length > 0 ? _react2.default.createElement(
+                    _reactCustomScrollbars.Scrollbars,
+                    { style: { maxHeight: 300 }, autoHeight: true },
+                    _react2.default.createElement(
+                        _Menu2.default,
+                        { style: this.props.styleProps.dropDownMenuProps,
+                            listStyle: this.props.styleProps.listStyle,
+                            menuItemStyle: this.props.styleProps.menuItemStyle,
+                            disableAutoFocus: true,
+                            onItemClick: this.handleItemClick },
+                        this.props.dataSource.map(function (option, index) {
+                            var style = { textIndent: option.indent };
+                            if (_this9.isChecked(option.value)) {
+                                style.color = '#FF0099';
+                            }
+                            return _react2.default.createElement(_MenuItem2.default, { key: index,
+                                value: option.value,
+                                label: option.text,
+                                primaryText: option.selectText || option.label,
+                                disabled: option.disabled,
+                                innerDivStyle: _this9.props.styleProps.menuItemStyle.innerDivStyle,
+                                style: style
+                            });
+                        }),
+                        this.props.cancel ? _react2.default.createElement(_MenuItem2.default, { value: null,
+                            primaryText: "取消选择",
+                            innerDivStyle: this.props.styleProps.menuItemStyle.innerDivStyle,
+                            style: { color: '#9b9b9b' }
+                        }) : null
+                    )
+                ) : _react2.default.createElement(
+                    'div',
+                    { className: 'space-small text-muted' },
+                    this.props.emptyTip
+                ),
+                this.props.footer ? _react2.default.createElement(
+                    'div',
+                    null,
+                    _react2.default.createElement(_Divider2.default, null),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'flex center middle text-primary hover-bg border-top cursor-pointer relative',
+                            style: { height: 40 },
+                            onClick: function onClick() {
+                                _this9.props.context.setState({ open: false });
+                                _this9.props.footer.onClick(_this9.props.context);
+                            } },
+                        _react2.default.createElement(_icon2.default, { name: this.props.footer.icon }),
+                        _react2.default.createElement(
+                            'div',
+                            null,
+                            this.props.footer.title
+                        )
+                    )
+                ) : null
             );
         }
     }]);

@@ -249,6 +249,11 @@ var Form = function (_Component) {
                                 if (json.errCode == 10002 && json.validator) {
                                     _this4.setFormStatus(STATUS_CHECKERROR);
                                     _this4.setState({ errorText: json.validator });
+                                } else {
+                                    _this4.setFormStatus(STATUS_ERROR);
+                                }
+                                if (_this4.props.afterSubmit) {
+                                    _this4.props.afterSubmit(json);
                                 }
                             });
                         } else {
@@ -269,6 +274,15 @@ var Form = function (_Component) {
             });
             if (this.props.onReset) {
                 this.props.onReset(this);
+            }
+        }
+    }, {
+        key: 'cancel',
+        value: function cancel() {
+            if (this.props.onCancel) {
+                this.props.onCancel(this);
+            } else {
+                history.go(-1);
             }
         }
     }, {
@@ -337,7 +351,7 @@ var Form = function (_Component) {
         value: function render() {
             var footerHeight = 54;
             var contentHeight = this.props.height;
-            if (this.props.actions !== false) {
+            if (this.props.actions !== false && this.props.actions.length !== 0) {
                 contentHeight = 'calc(100% - ' + footerHeight + 'px)';
             }
             var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
@@ -351,7 +365,10 @@ var Form = function (_Component) {
                 this.props.tabs ? _react2.default.createElement(
                     'div',
                     { style: { height: contentHeight } },
-                    _react2.default.createElement(_tabs2.default, { dataSource: this.getTabDataSource(),
+                    _react2.default.createElement(_tabs2.default, {
+                        activeIndex: this.state.tabIndex,
+                        onChange: this.handleTabChange,
+                        dataSource: this.getTabDataSource(),
                         labelStyle: { justifyContent: 'center', margin: 12 } })
                 ) : _react2.default.createElement(
                     _reactCustomScrollbars.Scrollbars,
@@ -367,7 +384,7 @@ var Form = function (_Component) {
                             } },
                         _react2.default.createElement(
                             'div',
-                            { className: "form " + (this.props.inlineFlex ? "flex middle" : "row-space"),
+                            { className: "form " + (this.props.inlineFlex ? "flex middle warp" : "row-space"),
                                 cols: this.props.cols },
                             this.renderControls(this.props.fields),
                             this.props.inlineFlex ? _react2.default.createElement(FormActions, { ref: 'actions',
@@ -404,6 +421,7 @@ Form.defaultProps = {
     onDidMount: undefined,
     onDidUpdate: undefined,
     beforeSubmit: undefined,
+    afterSubmit: undefined,
 
     inlineFlex: false,
     inline: false,
@@ -412,12 +430,13 @@ Form.defaultProps = {
     cols: 1,
     actions: ['reset', 'submit'],
     defaultData: {},
+    changedData: undefined,
     originData: undefined,
     dataScope: 'changed',
     controlSize: 'default',
     controlWidth: '100%',
     fields: [],
-    controlBetweenSpace: 0,
+    controlBetweenSpace: 8,
     controlProps: {},
 
     resetLabel: '重置',
@@ -437,13 +456,21 @@ var _initialiseProps = function _initialiseProps() {
         fieldDefaultData: {},
         fieldOriginData: {},
         changedData: {},
-        errorText: {} };
+        errorText: {},
+        tabIndex: 0
+    };
 
     this.initData = function (props) {
         if (_lodash2.default.isFunction(props.originData)) {
             _this6.state.originData = props.originData();
         } else if (props.originData !== undefined) {
             _this6.state.originData = props.originData;
+        }
+        if (props.changedData !== undefined) {
+            _this6.state.changedData = props.changedData;
+        }
+        if (props.tabIndex !== undefined) {
+            _this6.state.tabIndex = props.tabIndex;
         }
 
         _this6.state.fieldDefaultData = {};
@@ -479,7 +506,10 @@ var _initialiseProps = function _initialiseProps() {
         var cols = _this6.props.cols || 1;
         return fields.map(function (field, index) {
             var value = _lodash2.default.get(data, field.formKey || field.key);
-            var isShow = _this6.isShow(field, data);
+            var isShow = _this6.isShow(field, allExtraData);
+            if (!isShow) {
+                return null;
+            }
 
             if (field.convert) value = field.convert(allExtraData);
             var fieldCols = field.cols || 1;
@@ -521,6 +551,7 @@ var _initialiseProps = function _initialiseProps() {
                             value: value,
                             controlSize: _this6.props.controlSize,
                             data: allExtraData,
+                            context: _this6,
                             onChange: _this6.handleChange(field) }))
                     );
                 case 'multi':
@@ -580,6 +611,7 @@ var _initialiseProps = function _initialiseProps() {
                             'div',
                             { style: {
                                     width: field.width || _this6.props.controlWidth,
+                                    paddingRight: field.paddingRight || _this6.props.controlPaddingRight,
                                     marginBottom: _this6.props.controlBetweenSpace
                                 } },
                             field.render(data, _this6)
@@ -589,7 +621,7 @@ var _initialiseProps = function _initialiseProps() {
                     var control = _react2.default.createElement(_control2.default, (0, _extends3.default)({ ref: field.key,
                         value: value,
                         size: _this6.props.controlSize
-                    }, (0, _extends3.default)({}, field, { label: _this6.props.inline ? false : field.label }), {
+                    }, (0, _extends3.default)({}, field, { label: _this6.props.inline && field.type !== 'checkbox' ? false : field.label }), {
                         labelFixed: _this6.props.labelFixed,
                         errorText: _lodash2.default.get(_this6.state.errorText, field.key),
                         validate: _this6.props.validate ? _this6.state.validate : false,
@@ -600,22 +632,25 @@ var _initialiseProps = function _initialiseProps() {
                     if (_this6.props.inline) {
                         return _react2.default.createElement(
                             'div',
-                            { className: 'col col-' + fieldCols,
+                            { className: 'col col-' + fieldCols + ' ' + (!isShow ? 'hidden' : ''),
                                 style: {
-                                    marginBottom: _this6.props.inlineFlex ? 0 : _this6.props.controlBetweenSpace,
-                                    marginRight: _this6.props.inlineFlex ? _this6.props.controlBetweenSpace : 0
+                                    marginBottom: _this6.props.inlineFlex ? 8 : _this6.props.controlBetweenSpace,
+                                    marginRight: _this6.props.inlineFlex ? _this6.props.controlBetweenSpace : 0,
+                                    paddingRight: field.paddingRight || _this6.props.controlPaddingRight
                                 },
                                 key: index },
                             _react2.default.createElement(
                                 'div',
                                 { className: 'flex middle ' + (!isShow ? 'hidden' : ''),
                                     style: { width: field.width || _this6.props.controlWidth } },
-                                field.label ? _react2.default.createElement(
+                                field.type !== 'checkbox' && field.label ? _react2.default.createElement(
                                     'div',
                                     {
                                         style: {
                                             width: field.labelWidth || _this6.props.labelWidth,
-                                            minWidth: field.labelWidth || _this6.props.labelWidth
+                                            minWidth: field.labelWidth || _this6.props.labelWidth,
+                                            paddingRight: 8,
+                                            paddingBottom: _lodash2.default.get(_this6.state.errorText, field.key) ? 16 : undefined
                                         } },
                                     field.required ? _react2.default.createElement(
                                         'span',
@@ -637,8 +672,9 @@ var _initialiseProps = function _initialiseProps() {
                             ),
                             field.helperText ? _react2.default.createElement(
                                 'div',
-                                { className: 'helper-text' },
-                                field.helperText
+                                {
+                                    className: 'helper-text' },
+                                _lodash2.default.isFunction(field.helperText) ? field.helperText(value, _this6) : field.helperText
                             ) : null
                         );
                     } else {
@@ -660,6 +696,13 @@ var _initialiseProps = function _initialiseProps() {
                     }
             }
         });
+    };
+
+    this.handleTabChange = function (index) {
+        _this6.setState({ tabIndex: index });
+        if (_this6.props.onTabChange) {
+            _this6.props.onTabChange(index);
+        }
     };
 };
 
@@ -689,7 +732,7 @@ var FormActions = function (_Component2) {
                         _this7.context.Form.submit.bind(_this7.context.Form)();
                         break;
                     case 'cancel':
-                        history.go(-1);
+                        _this7.context.Form.cancel.bind(_this7.context.Form)();
                         break;
                 }
             };
@@ -699,22 +742,37 @@ var FormActions = function (_Component2) {
     (0, _createClass3.default)(FormActions, [{
         key: 'getActions',
         value: function getActions() {
+            var _this8 = this;
+
             var actions = [];
             var label = {
-                reset: { label: this.context.Form.props.resetLabel, onClick: this.handleClick('reset') },
+                reset: {
+                    type: 'button',
+                    label: this.context.Form.props.resetLabel,
+                    buttonType: 'default',
+                    onClick: this.handleClick('reset')
+                },
                 submit: {
+                    type: 'button',
                     label: this.context.Form.props.submitLabel + (this.context.state.formStatus == STATUS_SUBMITTING ? '中...' : ''),
-                    type: this.context.state.formStatus == STATUS_SUBMITTING ? 'disabled' : 'primary',
+                    buttonType: this.context.state.formStatus == STATUS_SUBMITTING ? 'disabled' : 'primary',
                     onClick: this.handleClick('submit')
                 },
                 cancel: {
+                    type: 'button',
                     label: this.context.Form.props.cancelLabel,
+                    buttonType: 'default',
                     onClick: this.handleClick('cancel')
                 }
             };
             this.props.actions.map(function (action) {
                 if (_lodash2.default.isString(action)) {
                     actions.push((0, _extends3.default)({}, label[action]));
+                } else if (label[action.key]) {
+                    var disabled = _lodash2.default.isFunction(action.disabled) ? action.disabled(_this8.context.Form) : action.disabled;
+                    actions.push((0, _extends3.default)({}, label[action.key], action, {
+                        disabled: disabled
+                    }));
                 } else {
                     actions.push(action);
                 }
@@ -730,7 +788,14 @@ var FormActions = function (_Component2) {
                     'div',
                     { className: 'flex middle' },
                     actions.reverse().map(function (action, index) {
-                        return _react2.default.createElement(_button2.default, (0, _extends3.default)({ key: index }, action, { style: { marginRight: 12 } }));
+                        return _react2.default.createElement(_button2.default, {
+                            key: index,
+                            label: action.label,
+                            type: action.buttonType || 'default',
+                            onClick: action.onClick,
+                            disabled: action.disabled,
+                            style: { marginRight: 12, marginBottom: 10 }
+                        });
                     })
                 );
             } else {
@@ -746,7 +811,22 @@ var FormActions = function (_Component2) {
                             zIndex: 2
                         }, this.props.style) },
                     actions.map(function (action, index) {
-                        return _react2.default.createElement(_button2.default, (0, _extends3.default)({ key: index }, action, { style: { marginLeft: 12 } }));
+                        if (action.type == 'text') {
+                            return _react2.default.createElement(
+                                'span',
+                                { key: index, style: (0, _extends3.default)({ marginLeft: 12 }, action.style) },
+                                action.label
+                            );
+                        } else {
+                            return _react2.default.createElement(_button2.default, {
+                                key: index,
+                                label: action.label,
+                                type: action.buttonType || 'default',
+                                onClick: action.onClick,
+                                disabled: action.disabled,
+                                style: { marginLeft: 12 }
+                            });
+                        }
                     })
                 );
             }

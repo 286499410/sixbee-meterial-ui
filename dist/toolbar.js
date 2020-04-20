@@ -201,7 +201,7 @@ var Toolbar = function (_Component) {
                     default:
                         return _react2.default.createElement(
                             'div',
-                            { style: (0, _extends3.default)({ display: 'table', fontSize: 18 }, event.style) },
+                            { style: (0, _extends3.default)({ display: 'table', fontSize: 14 }, event.style) },
                             event.label
                         );
                 }
@@ -236,9 +236,15 @@ var Toolbar = function (_Component) {
                             } else if (_lodash2.default.isObject(event) && _this2.props.events && _this2.props.events[event.key]) {
                                 event = (0, _extends3.default)({}, _this2.props.events[event.key], event);
                             }
+                            if (event.isShow) {
+                                var isShow = _lodash2.default.isFunction(event.isShow) ? event.isShow() : event.isShow;
+                                if (!isShow) {
+                                    return null;
+                                }
+                            }
                             return _react2.default.createElement(
                                 'div',
-                                { className: 'toolbar-item', key: j, onClick: _this2.handleClick(event) },
+                                { className: 'toolbar-item', key: j, onClick: _this2.handleClick(event), 'auth-key': event.authKey },
                                 _this2.renderEvent(event)
                             );
                         })

@@ -109,7 +109,8 @@ var SelectTag = function (_Component) {
     }, {
         key: 'setValue',
         value: function setValue(value) {
-            this.setState({ value: value });
+            this.state.value = value;
+            this.forceUpdate();
             if (this.props.onChange) {
                 this.props.onChange(value, this);
             }
@@ -155,7 +156,7 @@ var SelectTag = function (_Component) {
             var label = this.props.label;
             return _react2.default.createElement(
                 'div',
-                { style: (0, _extends3.default)({ marginTop: 12 }, this.props.style) },
+                { style: (0, _extends3.default)({ marginTop: 12 }, this.props.style, this.props.rootStyle) },
                 label === false ? null : _react2.default.createElement(
                     'div',
                     null,

@@ -84,7 +84,8 @@ export default class Time extends Component {
      */
     setValue(value) {
         if (value !== undefined && value !== '' && /^[0-5]\d:[0-5]\d$/.test(value)) {
-            this.setState({value: value});
+            this.state.value = value;
+            this.forceUpdate();
             if (this.props.onChange) {
                 this.props.onChange(value);
             }
@@ -172,7 +173,7 @@ export default class Time extends Component {
         let currentMinute = this.getMinute();
         let value = this.getValue();
         return (
-            <div ref="container" style={{position: 'relative'}}>
+            <div ref="container" style={{position: 'relative', ...this.props.rootStyle}}>
                 <Text
                     ref="text"
                     name={this.props.name || this.props.dataKey || utils.uuid()}

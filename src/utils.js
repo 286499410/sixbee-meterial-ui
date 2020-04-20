@@ -115,6 +115,10 @@ const utils = {
      */
     parseMoney:
         (number, float = 2) => {
+            if(_.isFunction(float)) {
+                float = float();
+            }
+            float = parseInt(float);
             if (number === undefined || number === null) {
                 return '';
             }
@@ -289,6 +293,7 @@ const utils = {
             case 'money':
                 return value == 0 && column.showZero !== true ? '' : utils.parseMoney(value, column.float);
             case 'select':
+            case 'select-check':
             case 'radio':
                 if (_.isArray(column.dataSource)) {
                     let dataSource = column.dataSource;

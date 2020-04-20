@@ -28,7 +28,18 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _icon = require('./icon');
+
+var _icon2 = _interopRequireDefault(_icon);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var style = {
+    content: {
+        marginTop: 12,
+        fontSize: 14
+    }
+};
 
 var Alert = function (_Component) {
     (0, _inherits3.default)(Alert, _Component);
@@ -57,6 +68,11 @@ var Alert = function (_Component) {
             message: '',
             type: 'info',
             autoHideDuration: 4000
+        };
+        _this.icon = {
+            info: 'info-circle',
+            error: 'close-circle',
+            success: 'check-circle'
         };
 
         _this.handleClick = function (event) {
@@ -92,9 +108,24 @@ var Alert = function (_Component) {
             }
             return _react2.default.createElement(
                 'div',
-                { ref: 'container', className: 'alert bottom',
-                    style: { opacity: this.state.open ? 1 : 0 }, onClick: this.handleClick },
-                this.state.message
+                { ref: 'container',
+                    className: 'alert center',
+                    style: { display: this.state.open ? 'block' : 'none' },
+                    onClick: this.handleClick },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'text-center' },
+                    this.icon[this.state.type] ? _react2.default.createElement(
+                        'div',
+                        null,
+                        _react2.default.createElement(_icon2.default, { name: this.icon[this.state.type], size: 50 })
+                    ) : null,
+                    _react2.default.createElement(
+                        'div',
+                        { style: style.content },
+                        this.state.message
+                    )
+                )
             );
         }
     }]);

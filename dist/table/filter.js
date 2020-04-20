@@ -69,6 +69,13 @@ var Filter = function (_Component) {
                 open: true,
                 anchorEl: event.currentTarget
             });
+            var type = _this.getFilterType();
+            if (type == 'text' || type == 'auto' || type == 'date') {
+                setTimeout(function () {
+                    _this.refs.control.focus();
+                }, 50);
+            }
+            if (type == 'date-range') {}
         };
 
         _this.handleRequestClose = function (event) {
@@ -76,6 +83,7 @@ var Filter = function (_Component) {
         };
 
         _this.handleReset = function (event) {
+            _this.state.value = undefined;
             _this.refs.control.setValue(undefined);
             _this.filter();
         };
@@ -102,10 +110,14 @@ var Filter = function (_Component) {
         key: 'filter',
         value: function filter() {
             this.setState({ open: false });
-            var value = this.refs.control.getValue();
             if (this.props.onFilter) {
-                this.props.onFilter(value, this.props.field);
+                this.props.onFilter(this.state.value, this.props.field);
             }
+        }
+    }, {
+        key: 'getFilterType',
+        value: function getFilterType() {
+            return this.props.field.filterType || this.props.field.type;
         }
     }, {
         key: 'render',
@@ -113,7 +125,8 @@ var Filter = function (_Component) {
             var _this2 = this;
 
             var hintText = void 0;
-            if (this.props.field.type == 'text' || this.props.field.type == 'auto') {
+            var type = this.getFilterType();
+            if (type == 'text' || type == 'auto') {
                 hintText = '输入关键字查询';
             }
             return _react2.default.createElement(
@@ -134,7 +147,7 @@ var Filter = function (_Component) {
                         onRequestClose: this.handleRequestClose },
                     _react2.default.createElement(
                         'div',
-                        { className: 'space-small' },
+                        { className: 'space', style: { width: this.props.field.filterWidth || 'auto' } },
                         _react2.default.createElement(_control2.default, (0, _extends3.default)({
                             ref: 'control',
                             hintText: hintText
@@ -144,6 +157,10 @@ var Filter = function (_Component) {
                             filter: undefined,
                             hasClear: false,
                             defaultValue: undefined,
+                            onEnter: function onEnter(event) {
+                                _this2.handleSubmit(event);
+                            },
+                            type: type,
                             onChange: function onChange(value) {
                                 _this2.state.value = value;
                                 if (_this2.props.field.onChange) {
@@ -152,27 +169,17 @@ var Filter = function (_Component) {
                             } })),
                         _react2.default.createElement(
                             'div',
-                            { className: 'row text-center text-primary', cols: '2', style: { padding: '6px 0', marginTop: 6 } },
-                            this.props.reset ? _react2.default.createElement(
-                                'div',
-                                { className: 'col text-left' },
-                                _react2.default.createElement(
-                                    'span',
-                                    { className: 'cursor-pointer', style: { padding: 6 },
-                                        onClick: this.handleReset },
-                                    this.props.resetLabel
-                                )
-                            ) : _react2.default.createElement('div', null),
+                            { className: 'flex text-center right', style: { marginTop: 12, flexDirection: 'row-reverse' } },
                             this.props.submit ? _react2.default.createElement(
                                 'div',
-                                { className: 'col text-right' },
-                                _react2.default.createElement(
-                                    'span',
-                                    { className: 'cursor-pointer', style: { padding: 6 },
-                                        onClick: this.handleSubmit },
-                                    this.props.submitLabel
-                                )
-                            ) : _react2.default.createElement('div', null)
+                                { className: 'text-primary cursor-pointer', style: { marginLeft: 12 }, onClick: this.handleSubmit },
+                                this.props.submitLabel
+                            ) : null,
+                            this.props.reset ? _react2.default.createElement(
+                                'div',
+                                { className: 'text-muted cursor-pointer', onClick: this.handleReset },
+                                this.props.resetLabel
+                            ) : null
                         )
                     )
                 )

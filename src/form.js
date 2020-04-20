@@ -39,6 +39,7 @@ export default class Form extends Component {
         onDidMount: undefined,          //组件挂载完成触发事件
         onDidUpdate: undefined,         //组件重新渲染完成触发事件
         beforeSubmit: undefined,        //提交之前触发事件，return false时可阻止提交
+        afterSubmit: undefined,         //提交之后触发事件
 
         inlineFlex: false,              //true时，所有控件同行显示
         inline: false,                  //true时，label与控件同行显示
@@ -47,12 +48,13 @@ export default class Form extends Component {
         cols: 1,                        //多少列
         actions: ['reset', 'submit'],   //按钮事件
         defaultData: {},                //默认数据，一定会提交，优先控件的defaultValue
+        changedData: undefined,         //已修改的数据
         originData: undefined,          //源数据，支持函数和Object，函数return Object
         dataScope: 'changed',           //changed修改了才提交，all全部提交
         controlSize: 'default',         //控件大小，size，default，large
         controlWidth: '100%',           //控件宽度
         fields: [],                     //控件定义
-        controlBetweenSpace: 0,         //控件之间的间距
+        controlBetweenSpace: 8,         //控件之间的间距
         controlProps: {},               //控件参数
 
         resetLabel: '重置',
@@ -67,6 +69,7 @@ export default class Form extends Component {
         fieldOriginData: {},                //从originData取出控件原值
         changedData: {},                    //变化值
         errorText: {},                      //错误信息
+        tabIndex: 0
     };
 
     constructor(props) {
@@ -87,6 +90,12 @@ export default class Form extends Component {
             this.state.originData = props.originData();
         } else if (props.originData !== undefined) {
             this.state.originData = props.originData;
+        }
+        if (props.changedData !== undefined) {
+            this.state.changedData = props.changedData;
+        }
+        if (props.tabIndex !== undefined) {
+            this.state.tabIndex = props.tabIndex;
         }
         //提取控件默认值
         this.state.fieldDefaultData = {};
@@ -254,6 +263,11 @@ export default class Form extends Component {
                                 //提交后，服务器返回的错误验证信息
                                 this.setFormStatus(STATUS_CHECKERROR);
                                 this.setState({errorText: json.validator});
+                            } else {
+                                this.setFormStatus(STATUS_ERROR);
+                            }
+                            if (this.props.afterSubmit) {
+                                this.props.afterSubmit(json);
                             }
                         })
                     } else {
@@ -276,6 +290,14 @@ export default class Form extends Component {
         });
         if (this.props.onReset) {
             this.props.onReset(this);
+        }
+    }
+
+    cancel() {
+        if (this.props.onCancel) {
+            this.props.onCancel(this);
+        } else {
+            history.go(-1);
         }
     }
 
@@ -345,7 +367,10 @@ export default class Form extends Component {
         let cols = this.props.cols || 1;
         return fields.map((field, index) => {
             let value = _.get(data, field.formKey || field.key);
-            let isShow = this.isShow(field, data);
+            let isShow = this.isShow(field, allExtraData);
+            if(!isShow) {
+                return null;
+            }
             //强制转换
             if (field.convert)
                 value = field.convert(allExtraData);
@@ -380,6 +405,7 @@ export default class Form extends Component {
                             value={value}
                             controlSize={this.props.controlSize}
                             data={allExtraData}
+                            context={this}
                             onChange={this.handleChange(field)}/>
                     </div>;
                 case 'multi':
@@ -393,9 +419,9 @@ export default class Form extends Component {
                                                 width: this.props.labelWidth,
                                                 minWidth: this.props.labelWidth
                                             }}>
-                                                {field.label}
+                                            {field.label}
                                             {field.required ? <span className="text-danger">*</span> : null}
-                                            </div> :
+                                        </div> :
                                         <div className="col col-full"
                                              style={{marginTop: 16}}>{field.label}</div>) : null
                             }
@@ -418,6 +444,7 @@ export default class Form extends Component {
                     return <div key={index} className={`col col-${fieldCols}`}>
                         <div style={{
                             width: field.width || this.props.controlWidth,
+                            paddingRight: field.paddingRight || this.props.controlPaddingRight,
                             marginBottom: this.props.controlBetweenSpace
                         }}>
                             {field.render(data, this)}
@@ -427,7 +454,7 @@ export default class Form extends Component {
                     let control = <Control ref={field.key}
                                            value={value}
                                            size={this.props.controlSize}
-                                           {...{...field, label: this.props.inline ? false : field.label}}
+                                           {...{...field, label: this.props.inline && field.type !== 'checkbox' ? false : field.label}}
                                            labelFixed={this.props.labelFixed}
                                            errorText={_.get(this.state.errorText, field.key)}
                                            validate={this.props.validate ? this.state.validate : false}
@@ -437,20 +464,24 @@ export default class Form extends Component {
                                            {...controlProps}
                     />;
                     if (this.props.inline) {
-                        return <div className={`col col-${fieldCols}`}
+                        return <div className={`col col-${fieldCols} ${!isShow ? 'hidden' : ''}`}
                                     style={{
-                                        marginBottom: this.props.inlineFlex ? 0 : this.props.controlBetweenSpace,
-                                        marginRight: this.props.inlineFlex ? this.props.controlBetweenSpace : 0
+                                        marginBottom: this.props.inlineFlex ? 8 : this.props.controlBetweenSpace,
+                                        marginRight: this.props.inlineFlex ? this.props.controlBetweenSpace : 0,
+                                        paddingRight: field.paddingRight || this.props.controlPaddingRight,
                                     }}
                                     key={index}>
                             <div className={`flex middle ${!isShow ? 'hidden' : ''}`}
                                  style={{width: field.width || this.props.controlWidth}}>
                                 {
-                                    field.label ? <div
+                                    field.type !== 'checkbox' && field.label ? <div
                                         style={{
                                             width: field.labelWidth || this.props.labelWidth,
-                                            minWidth: field.labelWidth || this.props.labelWidth
-                                        }}>{field.required ? <span className="text-danger">*</span> : null}{field.label}：</div> : null
+                                            minWidth: field.labelWidth || this.props.labelWidth,
+                                            paddingRight: 8,
+                                            paddingBottom: _.get(this.state.errorText, field.key) ? 16 : undefined
+                                        }}>{field.required ?
+                                        <span className="text-danger">*</span> : null}{field.label}：</div> : null
                                 }
                                 <div style={{flexGrow: 1, width: 0}}>
                                     <div>
@@ -458,7 +489,8 @@ export default class Form extends Component {
                                     </div>
                                 </div>
                             </div>
-                            {field.helperText ? <div className="helper-text">{field.helperText}</div> : null}
+                            {field.helperText ? <div
+                                className="helper-text">{_.isFunction(field.helperText) ? field.helperText(value, this) : field.helperText}</div> : null}
                         </div>
                     } else {
                         return <div className={`col col-${fieldCols} ${!isShow ? 'hidden' : ''}`} key={index}
@@ -488,10 +520,17 @@ export default class Form extends Component {
         });
     }
 
+    handleTabChange = (index) => {
+        this.setState({tabIndex: index});
+        if (this.props.onTabChange) {
+            this.props.onTabChange(index);
+        }
+    };
+
     render() {
         let footerHeight = 54;
         let contentHeight = this.props.height;
-        if (this.props.actions !== false) {
+        if (this.props.actions !== false && this.props.actions.length !== 0) {
             contentHeight = `calc(100% - ${footerHeight}px)`;
         }
         let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
@@ -505,8 +544,11 @@ export default class Form extends Component {
                 {
                     this.props.tabs ?
                         <div style={{height: contentHeight}}>
-                            <Tabs dataSource={this.getTabDataSource()}
-                                  labelStyle={{justifyContent: 'center', margin: 12}}/>
+                            <Tabs
+                                activeIndex={this.state.tabIndex}
+                                onChange={this.handleTabChange}
+                                dataSource={this.getTabDataSource()}
+                                labelStyle={{justifyContent: 'center', margin: 12}}/>
                         </div> :
                         <Scrollbars style={{height: contentHeight}}
                                     autoHeight={this.props.height == 'auto'}
@@ -516,7 +558,7 @@ export default class Form extends Component {
                                 overflowX: 'hidden',
                                 padding: this.props.padding !== undefined ? this.props.padding : borderStyle === 'border' ? 24 : 20,
                             }}>
-                                <div className={"form " + (this.props.inlineFlex ? "flex middle" : "row-space")}
+                                <div className={"form " + (this.props.inlineFlex ? "flex middle warp" : "row-space")}
                                      cols={this.props.cols}>
                                     {this.renderControls(this.props.fields)}
                                     {
@@ -560,7 +602,7 @@ class FormActions extends Component {
                 this.context.Form.submit.bind(this.context.Form)();
                 break;
             case 'cancel':
-                history.go(-1);
+                this.context.Form.cancel.bind(this.context.Form)();
                 break;
         }
     };
@@ -568,22 +610,37 @@ class FormActions extends Component {
     getActions() {
         let actions = [];
         let label = {
-            reset: {label: this.context.Form.props.resetLabel, onClick: this.handleClick('reset')},
+            reset: {
+                type: 'button',
+                label: this.context.Form.props.resetLabel,
+                buttonType: 'default',
+                onClick: this.handleClick('reset')
+            },
             submit: {
+                type: 'button',
                 label: this.context.Form.props.submitLabel + (this.context.state.formStatus == STATUS_SUBMITTING ? '中...' : ''),
-                type: this.context.state.formStatus == STATUS_SUBMITTING ? 'disabled' : 'primary',
+                buttonType: this.context.state.formStatus == STATUS_SUBMITTING ? 'disabled' : 'primary',
                 onClick: this.handleClick('submit')
             },
             cancel: {
+                type: 'button',
                 label: this.context.Form.props.cancelLabel,
+                buttonType: 'default',
                 onClick: this.handleClick('cancel')
             }
         };
         this.props.actions.map((action) => {
             if (_.isString(action)) {
                 actions.push({
-                    ...label[action]
+                    ...label[action],
                 })
+            } else if (label[action.key]) {
+                let disabled = _.isFunction(action.disabled) ? action.disabled(this.context.Form) : action.disabled;
+                actions.push({
+                    ...label[action.key],
+                    ...action,
+                    disabled: disabled
+                });
             } else {
                 actions.push(action);
             }
@@ -597,7 +654,14 @@ class FormActions extends Component {
             return <div className="flex middle">
                 {
                     actions.reverse().map((action, index) => {
-                        return <Button key={index} {...action} style={{marginRight: 12}}/>
+                        return <Button
+                            key={index}
+                            label={action.label}
+                            type={action.buttonType || 'default'}
+                            onClick={action.onClick}
+                            disabled={action.disabled}
+                            style={{marginRight: 12, marginBottom: 10}}
+                        />
                     })
                 }
             </div>
@@ -614,7 +678,18 @@ class FormActions extends Component {
                         }}>
                 {
                     actions.map((action, index) => {
-                        return <Button key={index} {...action} style={{marginLeft: 12}}/>
+                        if (action.type == 'text') {
+                            return <span key={index} style={{marginLeft: 12, ...action.style}}>{action.label}</span>
+                        } else {
+                            return <Button
+                                key={index}
+                                label={action.label}
+                                type={action.buttonType || 'default'}
+                                onClick={action.onClick}
+                                disabled={action.disabled}
+                                style={{marginLeft: 12}}
+                            />
+                        }
                     })
                 }
             </div>

@@ -4,10 +4,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -32,235 +28,161 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _layout = require('./layout');
+
+var _layout2 = _interopRequireDefault(_layout);
+
+var _contextMenu = require('./context-menu');
+
+var _contextMenu2 = _interopRequireDefault(_contextMenu);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var WindowTabs = function (_Component) {
-    (0, _inherits3.default)(WindowTabs, _Component);
+var Container = _layout2.default.Container,
+    Content = _layout2.default.Content;
 
-    function WindowTabs(props) {
-        (0, _classCallCheck3.default)(this, WindowTabs);
-
-        var _this = (0, _possibleConstructorReturn3.default)(this, (WindowTabs.__proto__ || (0, _getPrototypeOf2.default)(WindowTabs)).call(this, props));
-
-        _this.state = {
-            currentKey: ''
-        };
-
-        _this.removeOtherWindows = function (event, data) {
-            var windows = _this.lib.getWindows();
-            var key = data.key;
-            for (var i = windows.length - 1; i >= 0; i--) {
-                var window = windows[i];
-                if (window.key != key) {
-                    if (_this.props.shouldWindowRemove && _this.props.shouldWindowRemove(window.key, window.state) == false) {
-                        return false;
-                    }
-                    _this.lib.removeWindow(window.key);
-                }
-            }
-            _this.lib.saveSession();
-            if (_this.state.currentKey != key) {
-                _this.lib.switchWindow(key);
-            }
-            _this.forceUpdate();
-        };
-
-        _this.handleClick = function (window) {
-            return function (event) {
-                if (_this.state.currentKey != window.key) {
-                    _this.state.currentKey = window.key;
-                    _this.props.context.showMasker();
-                    _this.forceUpdate();
-                    setTimeout(function () {
-                        _this.lib.switchWindow(window.key);
-                    }, 50);
-                }
-            };
-        };
-
-        _this.lib = props.context.lib;
-        _this.state.currentKey = props.currentKey;
-        _this.lib.subscribe(function () {
-            var windows = _this.lib.getWindows();
-            windows.map(function (window) {
-                if (window.state.title == '') {
-                    window.state.title = _this.lib.getTitle(window.key);
-                }
-            });
-            _this.forceUpdate();
-        });
-        return _this;
-    }
-
-    (0, _createClass3.default)(WindowTabs, [{
-        key: 'componentWillReceiveProps',
-        value: function componentWillReceiveProps(nextProps) {
-            this.state.currentKey = nextProps.currentKey;
-        }
-    }, {
-        key: 'removeWindow',
-        value: function removeWindow() {
-            var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.lib.getCurrentKey();
-
-            if (this.props.shouldWindowRemove) {
-                var window = this.lib.getWindow(key);
-                if (this.props.shouldWindowRemove(key, window.state) == false) {
-                    return false;
-                }
-            }
-            this.lib.removeWindow(key);
-            if (this.lib.getCurrentKey() == key) {
-                var order = this.lib.getOrder();
-                var lastKey = _.last(order);
-                this.handleClick(this.lib.getWindow(lastKey))();
-            }
-            this.forceUpdate();
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var _this2 = this;
-
-            var width = 98 / this.lib.getWindowsNumber();
-            var windows = this.lib.getWindows();
-            return _react2.default.createElement(
-                'div',
-                { className: 'windows' },
-                windows.map(function (window, index) {
-                    return _react2.default.createElement(
-                        'div',
-                        { key: index,
-                            className: 'window-tab flex middle ' + (window.key == _this2.state.currentKey ? 'active text-primary' : ''),
-                            style: { width: width + '%' } },
-                        _react2.default.createElement(
-                            'div',
-                            { className: 'label', onClick: _this2.handleClick(window), title: window.state.title },
-                            _react2.default.createElement(
-                                ContextMenuTrigger,
-                                { id: 'contextMenu', ref: 'contextMenuTrigger', collect: function collect() {
-                                        return window;
-                                    } },
-                                window.state.title
-                            )
-                        ),
-                        windows.length > 1 ? _react2.default.createElement(
-                            'div',
-                            { className: 'window-close', onClick: _this2.removeWindow.bind(_this2, window.key) },
-                            _react2.default.createElement('i', { className: 'iconfont icon-reject' })
-                        ) : null
-                    );
-                }),
-                _react2.default.createElement(
-                    ContextMenu,
-                    { id: 'contextMenu',
-                        ref: 'contextMenu',
-                        style: { background: '#fff', boxShadow: '0 0 6px #888', padding: '6px 0', zIndex: 2 } },
-                    _react2.default.createElement(
-                        MenuItem,
-                        { onClick: this.removeOtherWindows },
-                        '\u5173\u95ED\u5176\u4ED6\u7A97\u53E3'
-                    )
-                )
-            );
-        }
-    }]);
-    return WindowTabs;
-}(_react.Component);
-
-var Windows = function (_Component2) {
-    (0, _inherits3.default)(Windows, _Component2);
-    (0, _createClass3.default)(Windows, [{
-        key: 'getChildContext',
-        value: function getChildContext() {
-            return {
-                window: this.lib
-            };
-        }
-    }]);
+var Windows = function (_Component) {
+    (0, _inherits3.default)(Windows, _Component);
 
     function Windows(props) {
         (0, _classCallCheck3.default)(this, Windows);
 
-        var _this3 = (0, _possibleConstructorReturn3.default)(this, (Windows.__proto__ || (0, _getPrototypeOf2.default)(Windows)).call(this, props));
+        var _this = (0, _possibleConstructorReturn3.default)(this, (Windows.__proto__ || (0, _getPrototypeOf2.default)(Windows)).call(this, props));
 
-        _this3.removeWindow = function () {
-            var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _this3.lib.getCurrentKey();
-
-            _this3.refs.tabs.removeWindow(key);
+        _this.state = {
+            pages: [],
+            track: []
         };
 
-        _this3.showMasker = function () {
-            _this3.hasMasker = true;
-            $(_this3.refs.masker).show();
+        _this.handleClick = function (page) {
+            return function (event) {
+                if (_this.getCurrentUrl() !== page.url) {
+                    _this.addTrack(page.url);
+                    _this.props.history.replace(page.url);
+                }
+            };
         };
 
-        _this3.hideMasker = function () {
-            _this3.hasMasker = false;
-            $(_this3.refs.masker).hide();
+        _this.closeWindow = function () {
+            var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { url: _this.getCurrentUrl() };
+            var handleChange = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+            if (_.isFunction(_this.props.shouldWindowRemove) && _this.props.shouldWindowRemove(page) === false) {
+                return false;
+            }
+            _.remove(_this.state.pages, function (n) {
+                return n.url == page.url;
+            });
+            _.remove(_this.state.track, function (n) {
+                return n == page.url;
+            });
+            if (page.url == _this.getCurrentUrl()) {
+                _this.handleClick(_.find(_this.state.pages, { url: _.last(_this.state.track) }))(event);
+            }
+            if (_this.props.onRequestClose) {
+                _this.props.onRequestClose(page);
+            }
+            if (handleChange) _this.handleChange();
+            _this.refs.tabs.forceUpdate();
+            return true;
         };
 
-        _this3.sessionKey = 'windows.' + props.group;
-        _this3.lib = App.lib(_this3.sessionKey);
-        _this3.lib.setComponent(_this3);
-        _this3.componentInit(props);
-        return _this3;
+        _this.closeOtherWindow = function () {
+            var currentPage = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { url: _this.getCurrentUrl() };
+
+            var pages = _.cloneDeep(_this.state.pages);
+            for (var i = 0; i < pages.length; i++) {
+                var page = pages[i];
+                if (currentPage.url !== page.url) {
+                    if (_this.closeWindow(page, false) === false) {
+                        _this.handleChange();
+                        return false;
+                    }
+                }
+            }
+            _this.handleChange();
+            return true;
+        };
+
+        _this.initData(props);
+        return _this;
     }
 
     (0, _createClass3.default)(Windows, [{
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(nextProps) {
-            this.componentInit(nextProps);
+            this.initData(nextProps);
         }
     }, {
-        key: 'componentDidUpdate',
-        value: function componentDidUpdate() {
-            this.hideMasker();
-        }
-    }, {
-        key: 'componentInit',
-        value: function componentInit(props) {
-            var currentUrl = props.location.pathname + props.location.search;
-            var key = currentUrl;
-            var currentWindow = this.lib.getWindow(key);
-            if (currentWindow) {
-                currentWindow.url = currentUrl;
-                this.lib.setCurrentKey(key);
-            } else {
-                currentWindow = {
-                    key: currentUrl,
+        key: 'initData',
+        value: function initData(props) {
+            this.state.pages = props.pages || [];
+            this.state.track = props.track || [];
+            var currentUrl = this.getCurrentUrl();
+            var currentPage = _.find(this.state.pages, { url: currentUrl });
+            if (!currentPage) {
+                this.addPage({
                     url: currentUrl,
-                    state: {
-                        title: this.lib.getTitle(props.location.pathname.replace(App.request.getRoot(), ''), currentUrl.replace(App.request.getRoot(), ''))
-                    }
-                };
-                this.lib.addWindow(currentWindow);
+                    title: window.document.title,
+                    state: {}
+                });
             }
-            this.lib.setCurrentKey(key);
+            this.addTrack(currentUrl);
+        }
+    }, {
+        key: 'getCurrentUrl',
+        value: function getCurrentUrl() {
+            return window.location.pathname + window.location.search;
+        }
+    }, {
+        key: 'getChildContext',
+        value: function getChildContext() {
+            return {
+                window: this
+            };
+        }
+    }, {
+        key: 'addPage',
+        value: function addPage(page) {
+            this.state.pages.push(page);
+        }
+    }, {
+        key: 'addTrack',
+        value: function addTrack(url) {
+            _.remove(this.state.track, function (n) {
+                return n == url;
+            });
+            this.state.track.push(url);
+            this.handleChange();
+        }
+    }, {
+        key: 'handleChange',
+        value: function handleChange() {
+            if (this.props.onChange) {
+                this.props.onChange(this.state);
+            }
         }
     }, {
         key: 'render',
         value: function render() {
             return _react2.default.createElement(
                 Container,
-                { fullScreen: true, direction: 'column' },
-                _react2.default.createElement(WindowTabs, (0, _extends3.default)({ context: this, ref: 'tabs' }, this.props, { currentKey: this.lib.getCurrentKey() })),
+                { direction: 'column', style: { flexGrow: 1 } },
+                _react2.default.createElement(WindowTabs, {
+                    ref: "tabs",
+                    currentUrl: this.getCurrentUrl(),
+                    pages: this.state.pages,
+                    closeWindow: this.closeWindow,
+                    closeOtherWindow: this.closeOtherWindow,
+                    handleClick: this.handleClick
+                }),
                 _react2.default.createElement(
                     Content,
-                    { className: 'space', style: { height: 0 } },
-                    _react2.default.createElement(
-                        'div',
-                        { ref: 'masker', className: 'masker hidden', style: { zIndex: 10 } },
-                        _react2.default.createElement(
-                            'div',
-                            { className: 'position-center' },
-                            _react2.default.createElement(Refresh, { size: 50,
-                                left: -25,
-                                top: -25,
-                                loadingColor: '#fff',
-                                style: { backgroundColor: 'transparent', boxShadow: 'none' }
-                            })
-                        )
-                    ),
+                    { className: this.props.contentClassName, style: { height: 0 } },
                     this.props.children
                 )
             );
@@ -270,9 +192,116 @@ var Windows = function (_Component2) {
 }(_react.Component);
 
 Windows.defaultProps = {
-    maxTabs: 8
+    maxTabs: 8,
+    pages: [],
+    shouldWindowRemove: undefined,
+    onChange: undefined,
+    track: [],
+    history: undefined,
+    onRequestClose: undefined,
+    contentClassName: undefined
 };
 Windows.childContextTypes = {
-    window: PropTypes.object
+    window: _propTypes2.default.object
 };
 exports.default = Windows;
+
+var WindowTabs = function (_Component2) {
+    (0, _inherits3.default)(WindowTabs, _Component2);
+
+    function WindowTabs() {
+        var _ref;
+
+        var _temp, _this2, _ret;
+
+        (0, _classCallCheck3.default)(this, WindowTabs);
+
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
+        return _ret = (_temp = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref = WindowTabs.__proto__ || (0, _getPrototypeOf2.default)(WindowTabs)).call.apply(_ref, [this].concat(args))), _this2), _this2.state = {
+            left: 20
+        }, _this2.handleClickLeftArrow = function (event) {
+            _this2.state.left += 100;
+            _this2.state.left = Math.min(_this2.state.left, 20);
+            _this2.forceUpdate();
+        }, _this2.handleClickRightArrow = function (event) {
+            var containerWidth = _this2.refs.container.clientWidth;
+            var contentWidth = _this2.refs.content.clientWidth;
+            if (contentWidth > containerWidth) {
+                _this2.state.left -= 100;
+                _this2.state.left = Math.max(_this2.state.left, -(contentWidth - containerWidth + 20));
+                _this2.forceUpdate();
+            }
+        }, _temp), (0, _possibleConstructorReturn3.default)(_this2, _ret);
+    }
+
+    (0, _createClass3.default)(WindowTabs, [{
+        key: 'render',
+        value: function render() {
+            var _this3 = this;
+
+            return _react2.default.createElement(
+                'div',
+                { ref: 'container', className: 'windows' },
+                _react2.default.createElement(
+                    'div',
+                    { ref: 'content', className: 'window-content', style: {
+                            left: this.state.left
+                        } },
+                    this.props.pages.map(function (page, index) {
+                        return _react2.default.createElement(
+                            'div',
+                            { key: index, className: 'window-tab flex middle' + (page.url == _this3.props.currentUrl ? ' active text-primary' : '') },
+                            _react2.default.createElement(
+                                _contextMenu2.default,
+                                { style: { width: '100%' }, dataSource: [{ label: '关闭其他窗口', onClick: _this3.props.closeOtherWindow.bind(_this3, page) }] },
+                                _react2.default.createElement(
+                                    'div',
+                                    { className: 'label', onClick: _this3.props.handleClick(page),
+                                        title: page.title },
+                                    page.title
+                                )
+                            ),
+                            _this3.props.pages.length > 1 ? _react2.default.createElement(
+                                'div',
+                                { className: 'window-close', onMouseOver: function onMouseOver(event) {
+                                        var target = event.target;
+                                        if (target.tagName == 'I') {
+                                            target = target.parentNode;
+                                        }
+                                        target.style.background = 'rgba(0,0,0,0.2)';
+                                    }, onMouseOut: function onMouseOut(event) {
+                                        var target = event.target;
+                                        if (target.tagName == 'I') {
+                                            target = target.parentNode;
+                                        }
+                                        target.style.background = 'none';
+                                    },
+                                    onClick: _this3.props.closeWindow.bind(_this3, page) },
+                                _react2.default.createElement('i', { className: 'iconfont icon-close', style: { fontSize: 12 } })
+                            ) : null
+                        );
+                    })
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'left-arrow', onClick: this.handleClickLeftArrow },
+                    _react2.default.createElement('i', { className: 'iconfont icon-left' })
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'right-arrow', onClick: this.handleClickRightArrow },
+                    _react2.default.createElement('i', { className: 'iconfont icon-right' })
+                )
+            );
+        }
+    }]);
+    return WindowTabs;
+}(_react.Component);
+
+WindowTabs.defaultProps = {
+    pages: [],
+    currentUrl: undefined
+};

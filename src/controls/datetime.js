@@ -149,7 +149,7 @@ export default class DateTime extends Component {
         let styleProps = style.getStyle('date', this.props);
         let label = this.props.label;
         return (
-            <div style={{position: 'relative'}}>
+            <div style={{position: 'relative', ...this.props.rootStyle}}>
                 {
                     label === false ? null : <div>
                         <span style={{

@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import TableHeader from './header';
 import TableBody from './body';
+import TableFooter from './footer';
 import FixedCol from './fixed-col';
 import Pager from './pager';
 import $ from 'jquery';
@@ -37,6 +38,8 @@ export default class Table extends Component {
         parentKey: 'parent_id',
         condensed: false,                       //是否紧凑的
         collapsible: false,                     //是否可折叠的
+        collapsibleKey: undefined,              //控制折叠字段，默认第一列
+        defaultCollapsible: false,              //折叠默认状态，false打开，true收起
         hideScrollBar: false,                   //是否自动隐藏滚动条
         bordered: true,                         //是否显示边框
         striped: true,                          //是否有条纹
@@ -70,6 +73,7 @@ export default class Table extends Component {
         fixedRightColumns: [],                  //右边列固定字段
         showSeries: false,                      //是否显示序号
         seriesColumnWidth: 50,                  //序号列宽度
+        showEllipsis: true,                     //显示省略内容
         checkboxStyle: {
             style: {
                 marginLeft: 15,
@@ -80,7 +84,7 @@ export default class Table extends Component {
                 width: 20,
                 height: 20,
             }
-        },
+        }
     };
 
     state = {
@@ -95,7 +99,6 @@ export default class Table extends Component {
         headerColumns: [],                      //显示的表头列
         checked: {},                            //当前勾选中的行
         collapsed: {},                          //折叠中的行
-        collapsedHidden: {},                    //折叠后被不显示的行
         iconEvents: {},                         //图标事件
         iconEventsBehavior: 'columnHover',      //图标事件出现的方式：columnHover移至当前列后显示，rowHover移至当前行后显示
         filterConfig: {},                       //过滤条件配置
@@ -148,12 +151,12 @@ export default class Table extends Component {
             headerColumns: props.headerColumns,
             checked: {...props.checked},
             collapsed: props.collapsed,
-            collapsedHidden: {...props.collapsedHidden},
             iconEvents: props.iconEvents,
             iconEventsBehavior: props.iconEventsBehavior,
             filter: props.filter || {},
             filterData: {...props.filterData},
             sortData: {...props.sortData},
+            selectedRow: this.state.selectedRow || props.selectedRow
         };
         for (let [key, value] of Object.entries(nextProps)) {
             if (value === undefined) {
@@ -221,34 +224,53 @@ export default class Table extends Component {
      * 处理列宽
      */
     handleColumnWidths() {
-        let undefinedWidthColumns = [], widthSum = 0;
+        let undefinedColumnWidths = [], widthSum = 0;
+        for (let [key, width] of Object.entries(this.state.columnWidths)) {
+            if(_.findIndex(this.state.dataColumns, {key: key}) < 0) {
+                delete this.state.columnWidths[key];
+            }
+        }
         this.state.dataColumns.map((column) => {
             if (this.state.columnWidths[column.key] === undefined) {
-                undefinedWidthColumns.push(column.key);
+                undefinedColumnWidths.push(column.key);
             } else {
                 widthSum += this.state.columnWidths[column.key];
             }
+            if(column.parent) {
+                this.state.columnWidths[column.parent.key] = 0;
+            }
         });
-        undefinedWidthColumns.map((key) => {
+        this.state.dataColumns.map((column) => {
+            //上级列宽度等于下级列之和
+            if(column.parent && this.state.columnWidths[column.key]) {
+                this.state.columnWidths[column.parent.key] += this.state.columnWidths[column.key];
+            }
+        });
+        undefinedColumnWidths.map((key) => {
             this.state.columnWidths[key] = $(this.refs.container).find(`.table-header th[data-key=${key}]`).outerWidth();
         });
-        if (undefinedWidthColumns.length == 0 && widthSum != this.state.tableWidth) {
+        if (undefinedColumnWidths.length == 0 && widthSum != this.state.tableWidth) {
             //定义的列宽和不等于表宽，需重新分配宽度
             let remainWidth = this.state.tableWidth - this.getCheckboxColumnWidth() - this.getSeriesColumnWidth();
+            let contentWidth = remainWidth;
             for (let [key, width] of Object.entries(this.state.columnWidths)) {
-                this.state.columnWidths[key] = Math.round((width / widthSum) * (this.state.tableWidth - this.getCheckboxColumnWidth() - this.getSeriesColumnWidth()));
+                this.state.columnWidths[key] = Math.round((width / widthSum) * contentWidth);
                 remainWidth -= this.state.columnWidths[key];
             }
-            this.state.columnWidths[this.state.dataColumns[this.state.dataColumns.length - 1].key] += remainWidth;
+            if(this.state.columnWidths[this.state.dataColumns[this.state.dataColumns.length - 1].key] + remainWidth > 0) {
+                this.state.columnWidths[this.state.dataColumns[this.state.dataColumns.length - 1].key] += remainWidth;
+            }
         }
     }
 
     componentDidUpdate() {
         let oldColumnWidths = {...this.state.columnWidths};
+        let state = this.state;
+        let props = this.props;
         this.handleColumnWidths();
         if (this.props.containerHeight) {
-            let containerHeight = $(this.refs.container).height();
-            this.state.headerHeight = $(this.refs.container).find('.table-header').height() || 0;
+            let containerHeight = $(this.refs.container).outerHeight();
+            this.state.headerHeight = props.headerRowHeight * state.headerColumns.length + state.headerColumns.length || $(this.refs.container).find('.table-header').height() || 0;
             this.state.footerHeight = $(this.refs.container).find('.table-footer').height() || 0;
             this.state.pagerHeight = $(this.refs.container).find('.table-pager').height() || 0;
             this.state.bodyHeight = containerHeight - this.state.headerHeight - this.state.pagerHeight - this.state.footerHeight;
@@ -256,7 +278,6 @@ export default class Table extends Component {
         if (this.state.bodyHeight) {
             $(this.refs.container).find('.table-body').css({height: this.state.bodyHeight});
         }
-        //$(this.refs.container).find('.table-body .table').css({width: this.state.tableWidth});
         if (!_.isEqual(oldColumnWidths, this.state.columnWidths)) {
             this.forceUpdate();
         }
@@ -372,18 +393,19 @@ export default class Table extends Component {
      * @param indent
      * @returns {Array}
      */
-    getFilteredRows(dataSource, indent = 0) {
+    getFilteredRows(dataSource, indent = 0, parent = null) {
         let rows = [];
+        let collapsibleKey = this.props.collapsibleKey || this.state.dataColumns[0].key;
         dataSource.map((data) => {
             let indentData = {};
-            indentData[`${this.state.dataColumns[0].key}_indent`] = indent;
-            let parent = Object.assign(indentData, data);
+            indentData[`${collapsibleKey}_indent`] = indent;
+            let current = Object.assign(indentData, data);
             let children = [];
             if (data.children && data.children.length > 0) {
-                children = this.getFilteredRows(data.children, indent + 16);
+                children = this.getFilteredRows(data.children, indent + 16, current);
             }
-            if (this.checkRow(parent) || children.length > 0) {
-                rows.push(parent);
+            if (this.checkRow(current) || children.length > 0) {
+                rows.push({...current, _parent: parent});
                 rows = rows.concat(children);
             }
         });
@@ -549,49 +571,13 @@ export default class Table extends Component {
                     onRowSelect={this.props.onRowSelect}
                 />
                 {
+                    this.props.footerData && this.props.footerData.length > 0 ? <TableFooter ref="footer"/> : null
+                }
+                {
                     this.props.pager ? <Pager/> : null
                 }
             </div>
         )
-    }
-}
-
-
-class TableFooter extends Component {
-
-    constructor(props) {
-        super(props);
-        this.state = state[props.stateKey];
-    }
-
-    setFooterData = (footerData) => {
-        this.state.footerData = footerData;
-        this.forceUpdate();
-    };
-
-    render() {
-        debug && console.log('render table footer');
-        return <div ref="container"
-                    className="table-footer"
-                    style={{overflow: 'hidden', width: this.state.containerWidth, ...this.props.style}}>
-            <table
-                className={`table ${this.props.bordered ? 'bordered' : ''} ${this.props.condensed ? 'condensed' : ''}`}
-                style={{width: this.state.tableWidth || '100%'}}>
-                <TableBodyColGroup ref="colGroup"
-                                   stateKey={this.props.stateKey}
-                                   showCheckboxes={this.props.showCheckboxes}/>
-                <tbody>
-                {this.state.footerData.map((row, i) => {
-                    return <tr key={i}>
-                        {row.map((col, j) => {
-                            return <td key={j} colSpan={col.colSpan || 1} rowSpan={col.rowSpan || 1}
-                                       style={{textAlign: col.textAlign || 'left'}}>{col.content}</td>
-                        })}
-                    </tr>
-                })}
-                </tbody>
-            </table>
-        </div>
     }
 }
 

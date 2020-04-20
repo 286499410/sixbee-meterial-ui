@@ -191,6 +191,7 @@ var Body = function (_Component) {
 
             var dataSource = this.handleData();
             var selectedValue = this.getValue(this.context.state.selected);
+            var props = this.context.props;
             return _react2.default.createElement(
                 'div',
                 { className: 'list-body', ref: 'container', style: { height: 'calc(100% - 40px)' } },
@@ -209,16 +210,17 @@ var Body = function (_Component) {
                                 hide: _this3.isHide(value) },
                             _react2.default.createElement(
                                 'div',
-                                { className: "flex middle", style: { paddingLeft: data.indent, height: _this3.context.props.rowHeight } },
-                                _react2.default.createElement(_icon2.default, { type: 'button',
+                                { className: "flex middle",
+                                    style: { paddingLeft: data.indent, height: _this3.context.props.rowHeight } },
+                                props.hasCollapsed ? _react2.default.createElement(_icon2.default, { type: 'button',
                                     name: isCollapsed ? "plus-square" : "minus-square",
                                     size: 14,
                                     buttonStyle: { opacity: data.children && data.children.length > 0 ? 1 : 0 },
-                                    onClick: _this3.handleCollapse(data, !isCollapsed) }),
-                                _react2.default.createElement(
+                                    onClick: _this3.handleCollapse(data, !isCollapsed) }) : null,
+                                _.isFunction(props.dataSourceConfig.text) ? props.dataSourceConfig.text(data) : _react2.default.createElement(
                                     'div',
                                     null,
-                                    _utils2.default.replaceText(_this3.context.props.dataSourceConfig.text, data)
+                                    _utils2.default.replaceText(props.dataSourceConfig.text, data)
                                 )
                             )
                         );

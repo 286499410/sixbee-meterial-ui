@@ -4,9 +4,9 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
+var _extends2 = require('babel-runtime/helpers/extends');
 
-var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
+var _extends3 = _interopRequireDefault(_extends2);
 
 var _entries = require('babel-runtime/core-js/object/entries');
 
@@ -15,6 +15,10 @@ var _entries2 = _interopRequireDefault(_entries);
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
+
+var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
+
+var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
@@ -86,9 +90,12 @@ var File = function (_Component) {
 
                     try {
                         for (var _iterator = (0, _getIterator3.default)((0, _entries2.default)(_this.props.uploader.header)), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                            var _step$value = (0, _slicedToArray3.default)(_step.value, 2),
-                                key = _step$value[0],
-                                value = _step$value[1];
+                            var _ref = _step.value;
+
+                            var _ref2 = (0, _slicedToArray3.default)(_ref, 2);
+
+                            var key = _ref2[0];
+                            var value = _ref2[1];
 
                             xhr.setRequestHeader(key, value);
                         }
@@ -174,7 +181,7 @@ var File = function (_Component) {
         value: function render() {
             return _react2.default.createElement(
                 'div',
-                { style: { padding: '8px 0' } },
+                { style: (0, _extends3.default)({ padding: '8px 0' }, this.props.rootStyle) },
                 _react2.default.createElement(
                     'div',
                     { className: 'flex middle' },

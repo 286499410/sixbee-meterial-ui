@@ -4,10 +4,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
-
-var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
-
 var _entries = require('babel-runtime/core-js/object/entries');
 
 var _entries2 = _interopRequireDefault(_entries);
@@ -19,6 +15,10 @@ var _getIterator3 = _interopRequireDefault(_getIterator2);
 var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
+
+var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
+
+var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
@@ -113,9 +113,12 @@ var List = function (_Component) {
 
             try {
                 for (var _iterator = (0, _getIterator3.default)((0, _entries2.default)(nextProps)), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var _step$value = (0, _slicedToArray3.default)(_step.value, 2),
-                        key = _step$value[0],
-                        value = _step$value[1];
+                    var _ref = _step.value;
+
+                    var _ref2 = (0, _slicedToArray3.default)(_ref, 2);
+
+                    var key = _ref2[0];
+                    var value = _ref2[1];
 
                     if (value === undefined) {
                         delete nextProps[key];
@@ -190,6 +193,7 @@ List.defaultProps = {
     filter: false,
     headerIconEvents: [],
     iconEvents: [],
+    hasCollapsed: true,
     defaultCollapsed: false,
     dataSource: [],
     dataSourceConfig: { text: 'text', value: 'value' },

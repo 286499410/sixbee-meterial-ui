@@ -124,7 +124,7 @@ var Image = function (_Component) {
             var min = Math.min(this.props.width, this.props.height);
             return _react2.default.createElement(
                 'div',
-                { style: { marginBottom: 6, marginTop: 6 } },
+                { style: (0, _extends3.default)({ marginBottom: 6, marginTop: 6 }, this.props.rootStyle) },
                 this.props.label ? _react2.default.createElement(
                     'div',
                     { style: {

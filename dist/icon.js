@@ -40,6 +40,10 @@ var _FontIcon = require('material-ui/FontIcon');
 
 var _FontIcon2 = _interopRequireDefault(_FontIcon);
 
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Icon = function (_Component) {
@@ -56,10 +60,22 @@ var Icon = function (_Component) {
             args[_key] = arguments[_key];
         }
 
-        return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = Icon.__proto__ || (0, _getPrototypeOf2.default)(Icon)).call.apply(_ref, [this].concat(args))), _this), _this.handleClick = function (event) {
+        return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = Icon.__proto__ || (0, _getPrototypeOf2.default)(Icon)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
+            currentTarget: undefined,
+            isHover: false
+        }, _this.handleClick = function (event) {
             if (!_this.props.disabled && _this.props.onClick) {
                 _this.props.onClick(event);
             }
+        }, _this.handleMouseEnter = function (event) {
+            _this.setState({
+                currentTarget: event.currentTarget,
+                isHover: true
+            });
+        }, _this.handleMouseLeave = function (event) {
+            _this.setState({
+                isHover: false
+            });
         }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
     }
 
@@ -67,6 +83,11 @@ var Icon = function (_Component) {
         key: 'render',
         value: function render() {
             var iconClassName = this.props.classPrefix + this.props.name;
+            var tooltip = this.props.tooltip;
+            if (tooltip && tooltip.indexOf("\n") >= 0) {
+                tooltip = tooltip.replace("\n", "<br/>");
+                tooltip = _react2.default.createElement('div', { dangerouslySetInnerHTML: { __html: '<div>' + tooltip + '</div>' } });
+            }
             if (this.props.type == 'button') {
                 return _react2.default.createElement(
                     _IconButton2.default,
@@ -85,8 +106,17 @@ var Icon = function (_Component) {
                             width: this.props.size,
                             height: this.props.size
                         },
-                        tooltip: this.props.tooltip,
                         title: this.props.title,
+                        tooltip: tooltip,
+                        tooltipPosition: this.props.tooltipPosition,
+                        tooltipStyles: {
+                            position: 'fixed',
+                            marginTop: this.state.isHover ? (0, _jquery2.default)(this.state.currentTarget).offset().top : -10000,
+                            marginLeft: this.state.isHover ? (0, _jquery2.default)(this.state.currentTarget).offset().left : -10000,
+                            padding: 4
+                        },
+                        onMouseEnter: this.handleMouseEnter,
+                        onMouseLeave: this.handleMouseLeave,
                         onClick: this.handleClick },
                     _react2.default.createElement(
                         'div',
@@ -94,7 +124,9 @@ var Icon = function (_Component) {
                         _react2.default.createElement(
                             'div',
                             { className: 'position-center' },
-                            _react2.default.createElement(_FontIcon2.default, { className: iconClassName, color: 'inherit', style: (0, _extends3.default)({
+                            _react2.default.createElement(_FontIcon2.default, { className: iconClassName,
+                                color: 'inherit',
+                                style: (0, _extends3.default)({
                                     fontSize: this.props.size
                                 }, this.props.iconStyle) }),
                             this.props.children
@@ -103,7 +135,7 @@ var Icon = function (_Component) {
                 );
             } else {
                 return _react2.default.createElement(_FontIcon2.default, { className: iconClassName,
-                    title: this.props.title,
+                    title: this.props.title || tooltip,
                     color: this.props.color,
                     hoverColor: this.props.hoverColor,
                     style: (0, _extends3.default)({

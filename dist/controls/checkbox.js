@@ -146,7 +146,8 @@ var Checkbox = function (_Component) {
     }, {
         key: 'setValue',
         value: function setValue(value) {
-            this.setState({ value: value });
+            this.state.value = value;
+            this.forceUpdate();
             if (this.props.onChange) {
                 this.props.onChange(value, this);
             }
@@ -178,7 +179,7 @@ var Checkbox = function (_Component) {
             if (options && options.length > 0) {
                 return _react2.default.createElement(
                     'div',
-                    { style: { width: '100%' } },
+                    { style: (0, _extends3.default)({}, this.props.style, this.props.rootStyle) },
                     _react2.default.createElement(
                         'div',
                         { style: (0, _extends3.default)({}, styleProps.labelStyle) },
@@ -215,7 +216,7 @@ var Checkbox = function (_Component) {
             } else {
                 return _react2.default.createElement(
                     'div',
-                    { style: (0, _extends3.default)({ width: '100%' }, this.props.style) },
+                    { style: (0, _extends3.default)({}, this.props.style, this.props.rootStyle) },
                     _react2.default.createElement(_Checkbox2.default, (0, _extends3.default)({
                         label: label,
                         disabled: this.props.disabled,

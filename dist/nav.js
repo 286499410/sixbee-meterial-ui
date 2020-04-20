@@ -226,8 +226,7 @@ var Nav = function (_Component) {
                                     'div',
                                     { key: j, 'auth-key': child.dataKey, className: 'flex middle hover-bg hover cursor-pointer relative text-small',
                                         style: { padding: 8, userSelect: 'none' },
-                                        onClick: _this2.handleClick(child)
-                                    },
+                                        onClick: _this2.handleClick(child) },
                                     _react2.default.createElement(
                                         'div',
                                         null,

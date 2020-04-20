@@ -36,6 +36,7 @@ export default class List extends Component {
         filter: false,
         headerIconEvents: [],           //header的icon事件
         iconEvents: [],                 //body的icon事件
+        hasCollapsed: true,             //是否可折叠
         defaultCollapsed: false,        //默认全部折叠/打开
         dataSource: [],                 //数据源
         dataSourceConfig: {text: 'text', value: 'value'},

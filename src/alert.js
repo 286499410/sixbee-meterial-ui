@@ -1,13 +1,26 @@
-
 import React, {Component} from 'react';
+import Icon from './icon';
+
+const style = {
+    content: {
+        marginTop: 12,
+        fontSize: 14
+    }
+};
 
 export default class Alert extends Component {
 
     state = {
         open: false,
         message: '',
-        type: 'info',
+        type: 'info',       //info|success|error
         autoHideDuration: 4000
+    };
+
+    icon = {
+        info: 'info-circle',
+        error: 'close-circle',
+        success: 'check-circle'
     };
 
     show(message, type = 'info', duration = 4000) {
@@ -46,7 +59,15 @@ export default class Alert extends Component {
             }, this.state.autoHideDuration);
             document.addEventListener('click', this.handleClose);
         }
-        return <div ref="container" className="alert bottom"
-                    style={{opacity: this.state.open ? 1 : 0}} onClick={this.handleClick}>{this.state.message}</div>
+        return <div ref="container"
+                    className="alert center"
+                    style={{display: this.state.open ? 'block' : 'none'}}
+                    onClick={this.handleClick}>
+            <div className="text-center">
+                {this.icon[this.state.type] ? <div><Icon name={this.icon[this.state.type]} size={50}/></div> : null}
+                <div style={style.content}>{this.state.message}</div>
+            </div>
+        </div>
     }
+
 }

@@ -12,6 +12,17 @@ import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import _ from 'lodash';
 
+const style = {
+    label: {
+        transform: "scale(0.75)",
+        transformOrigin: 'left top 0px',
+        color: 'rgba(0,0,0,0.3)',
+        fontSize: 15,
+        display: 'inline-block'
+    },
+    footerAction: {marginTop: -1}
+};
+
 export default class FormTable extends Component {
 
     static childContextTypes = {
@@ -92,6 +103,15 @@ export default class FormTable extends Component {
         this.checkMinRow(nextProps);
     }
 
+    componentDidUpdate() {
+
+    }
+
+    shouldComponentUpdate() {
+        //return false;
+        return true;
+    }
+
     initData(props) {
         if (_.isArray(props.value)) {
             this.state.value = props.value;
@@ -126,7 +146,8 @@ export default class FormTable extends Component {
                 row.sort = this.props.autoSortType == 'desc' ? value.length - index : index + 1;
             });
         }
-        this.setState({value: value});
+        this.state.value = value;
+        this.forceUpdate();
         if (this.props.onChange) {
             this.props.onChange(value, this);
         }
@@ -278,6 +299,10 @@ export default class FormTable extends Component {
      * @returns {Function}
      */
     handleBlur = (row, column) => (event, control) => {
+        if(column.onBlur) {
+            let value = _.get(this.getRowData(row), column.dataKey);
+            column.onBlur(value, control, this, row);
+        }
         if (this.props.onBlur) {
             this.props.onBlur(row, column, control, this);
         }
@@ -302,7 +327,7 @@ export default class FormTable extends Component {
      * @returns {Function}
      */
     handleChange = (row, column) => (value, control) => {
-        _.set(this.state.value[row], column.key, value);
+        _.set(this.state.value[row], column.formKey || column.key, value);
         if (column.onChange) {
             column.onChange(value, control, this, row);
         }
@@ -346,10 +371,12 @@ export default class FormTable extends Component {
      * @param row
      * @param data
      */
-    setRowData(row, data) {
+    setRowData(row, data, forceUpdate = true) {
         let value = this.state.value;
         Object.assign(value[row], data);
-        this.setValue(value);
+        if(forceUpdate) {
+            this.setValue(value);
+        }
     }
 
     /**
@@ -383,8 +410,8 @@ export default class FormTable extends Component {
                 style = this.props.editableStyle;
             }
             tableColumns.push({
-                style: style,
                 ...column,
+                style: style,
                 dataKey: undefined,
                 render: false,
                 width: columnWidths[column.key],
@@ -615,8 +642,16 @@ export default class FormTable extends Component {
                 tableState: this.state.tableState,
                 currentRow: this.state.currentRow,
                 pager: this.state.pager
-            });
+            }, this, this.props.context);
         }
+    }
+
+    setChecked(checked) {
+        this.state.tableState.checked = checked;
+        this.setTableState({
+            tableState: this.state.tableState
+        });
+        this.forceUpdate();
     }
 
     render() {
@@ -635,16 +670,10 @@ export default class FormTable extends Component {
             }
         }
         let footerData = this.props.footerData ? this.props.footerData(this) : null;
-        return <div style={{marginBottom: 16, ...this.props.style}}>
+        return <div style={{marginBottom: 16, ...this.props.style, ...this.props.rootStyle}}>
             {
                 this.props.label === false ? null : <div style={this.props.labelStyle}>
-                    <span style={{
-                        transform: "scale(0.75)",
-                        transformOrigin: 'left top 0px',
-                        color: 'rgba(0,0,0,0.3)',
-                        fontSize: 15,
-                        display: 'inline-block'
-                    }}>{this.props.label}</span>
+                    <span style={style.label}>{this.props.label}</span>
                 </div>
             }
             <Table ref="table"
@@ -672,7 +701,7 @@ export default class FormTable extends Component {
             {
                 this.props.hasFooterAddAction ? <div
                     className="border-primary text-center cursor-pointer"
-                    style={{marginTop: -1}}
+                    style={style.footerAction}
                     onClick={this.addRow.bind(this, this.state.value.length,  this.getDefaultRowData(), true)}>
                     <FontIcon className="iconfont icon-plus"/>
                 </div> : null

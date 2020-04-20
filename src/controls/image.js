@@ -80,7 +80,7 @@ export default class Image extends Component {
 
     render() {
         let min = Math.min(this.props.width, this.props.height);
-        return <div style={{marginBottom: 6, marginTop: 6}}>
+        return <div style={{marginBottom: 6, marginTop: 6, ...this.props.rootStyle}}>
             {this.props.label ? <div style={{
                 transform: 'scale(0.75)',
                 transformOrigin: 'left top 0px',

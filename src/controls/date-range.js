@@ -1,7 +1,11 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import Date from './date';
+import {DateRangePicker} from 'react-date-range';
+import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css file
+import * as rdrLocales from 'react-date-range/dist/locale';
+import Popover from 'material-ui/Popover';
 import utils from "../utils";
 
 export default class DateRange extends Component {
@@ -16,7 +20,7 @@ export default class DateRange extends Component {
         hintText: undefined,        //输入提示
         errorText: undefined,       //错误提示
         defaultValue: undefined,    //默认值
-        activeStartDate: undefined, //开始日期
+        activeStartDate: utils.date('Y-m-d', new Date().getTime() / 1000), //开始日期
         minDate: undefined,         //最小日期
         maxDate: undefined,         //最大日期
         timestamp: false,           //value是否为时间戳
@@ -24,7 +28,10 @@ export default class DateRange extends Component {
 
     state = {
         startDate: undefined,
-        endDate: undefined
+        endDate: undefined,
+        anchorEl: {},
+        open: false,
+        clickNum: 0
     };
 
     static contextTypes = {
@@ -44,7 +51,7 @@ export default class DateRange extends Component {
         if (_.isArray(props.value) && props.value.length == 2) {
             let value = props.value;
             [this.state.startDate, this.state.endDate] = this.convertValue(value);
-        } else if(props.hasOwnProperty('value') && props.value === undefined) {
+        } else if (props.hasOwnProperty('value') && (props.value === undefined || props.value === null)) {
             this.state.startDate = undefined;
             this.state.endDate = undefined;
         }
@@ -72,7 +79,9 @@ export default class DateRange extends Component {
      * @param value
      */
     setValue(value) {
-        let [startDate, endDate] = this.convertValue(value);
+        let [startDate, endDate] = value === undefined ? [undefined, undefined] : this.convertValue(value);
+        this.state.startDate = startDate;
+        this.state.endDate = endDate;
         if (this.props.onChange) {
             if (this.isEmpty(startDate) && this.isEmpty(endDate)) {
                 this.props.onChange(undefined, this);
@@ -85,10 +94,7 @@ export default class DateRange extends Component {
                 this.props.onChange([startDate, endDate], this);
             }
         }
-        this.setState({
-            startDate: startDate,
-            endDate: endDate
-        })
+        this.forceUpdate();
     }
 
     /**
@@ -108,9 +114,13 @@ export default class DateRange extends Component {
         }
     }
 
-    handleChange = (index) => (value) => {
+    handleChange = (ranges) => {
+        this.state.clickNum++;
+        let startDate = ranges.selection.startDate ? utils.dateToStr(ranges.selection.startDate) : undefined;
+        let endDate = ranges.selection.endDate ? utils.dateToStr(ranges.selection.endDate) : undefined;
         let originValue = this.getValue();
-        originValue[index] = value;
+        originValue[0] = startDate;
+        originValue[1] = endDate;
         if (this.props.timestamp) {
             this.setValue([
                 !this.isEmpty(originValue[0]) ? utils.strToTime(originValue[0]) : undefined,
@@ -119,40 +129,116 @@ export default class DateRange extends Component {
         } else {
             this.setValue(originValue);
         }
+        if (this.state.clickNum % 2 == 0) {
+            setTimeout(() => {
+                this.handleRequestClose();
+            }, 300);
+        }
+    };
+
+    /**
+     * 打开日历控件
+     */
+    openCalendar = (event) => {
+        this.setState({
+            open: true,
+            anchorEl: this.refs.container
+        });
+    };
+
+    /**
+     * 关闭日历控件
+     * @param event
+     */
+    handleRequestClose = (event) => {
+        this.setState({open: false});
+    };
+
+    /**
+     * 清除
+     * @param event
+     */
+    handleClear = (event) => {
+        event.stopPropagation();
+        this.setValue([null, null]);
     };
 
     render() {
         let label = this.props.label;
         let [startDate, endDate] = this.getValue();
         let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
-        let content = <div className="flex middle">
-            <div style={{width: 'calc(50% - 10px)', minWidth: 'calc(50% - 10px)'}}>
-                <Date
-                    borderShow={this.props.borderShow && borderStyle === 'underline'}
-                    hasClear={this.props.hasClear}
-                    disabled={this.props.disabled}
-                    immutable={this.props.immutable}
-                    fullWidth={this.props.fullWidth}
-                    value={startDate}
-                    maxDate={endDate}
-                    onChange={this.handleChange(0)}
-                />
+        let content = <div ref="container" className="flex middle relative full-width cursor-pointer hover"
+                           onClick={this.openCalendar}>
+            <div className="flex middle relative" style={{width: 'calc(100% - 16px)', height: 40, fontSize: 13}}>
+                <div style={{
+                    width: 'calc(50% - 10px)',
+                    minWidth: 'calc(50% - 10px)',
+                    textAlign: 'center'
+                }}>{startDate}</div>
+                <div className="text-center" style={{color: '#ccc', width: 20, minWidth: 20}}>-</div>
+                <div style={{
+                    width: 'calc(50% - 10px)',
+                    minWidth: 'calc(50% - 10px)',
+                    textAlign: 'center'
+                }}>{endDate}</div>
             </div>
-            <div className="text-center" style={{color: '#ccc', width: 20, minWidth: 20}}>-</div>
-            <div style={{width: 'calc(50% - 10px)', minWidth: 'calc(50% - 10px)'}}>
-                <Date
-                    borderShow={this.props.borderShow && borderStyle === 'underline'}
-                    hasClear={this.props.hasClear}
-                    disabled={this.props.disabled}
-                    immutable={this.props.immutable}
-                    fullWidth={this.props.fullWidth}
-                    value={endDate}
-                    minDate={startDate}
-                    onChange={this.handleChange(1)}
+            {
+                borderStyle === 'underline' && this.props.borderShow ?
+                    <hr aria-hidden="true"
+                        style={{
+                            borderTop: "none rgb(224, 224, 224)",
+                            borderLeft: "none rgb(224, 224, 224)",
+                            borderRight: "none rgb(224, 224, 224)",
+                            borderBottom: "1px solid rgb(224, 224, 224)",
+                            bottom: 6,
+                            boxSizing: "content-box",
+                            margin: 0,
+                            position: "absolute",
+                            width: "100%"
+                        }}/> : null
+            }
+            {
+                startDate ? <div className="relative" style={{width: 16}}>
+                    <div className="hover-hide"><i className="iconfont icon-calendar"/></div>
+                    <div className="hover-show" onClick={this.handleClear}><i
+                        className="iconfont icon-close-circle-fill" style={{color: 'rgba(0,0,0,0.3)'}}/></div>
+                </div> : <div className="relative" style={{width: 16}}>
+                    <i className="iconfont icon-calendar"/>
+                </div>
+            }
+            <Popover
+                ref="popover"
+                style={{
+                    left: -10000,
+                    boxShadow: '0 1px 10px #888',
+                    marginTop: 10,
+                    marginLeft: -6
+                }}
+                open={this.state.open}
+                anchorEl={this.state.anchorEl}
+                onRequestClose={this.handleRequestClose}>
+                <DateRangePicker
+                    ranges={[
+                        {
+                            startDate: startDate ? utils.strToDate(startDate) : new Date(),
+                            endDate: endDate ? utils.strToDate(endDate) : new Date(),
+                            key: 'selection'
+                        }
+                    ]}
+                    showSelectionPreview={false}
+                    showMonthAndYearPickers={true}
+                    showDateDisplay={false}
+                    showPreview={false}
+                    staticRanges={[]}
+                    inputRanges={[]}
+                    locale={rdrLocales['zhCN']}
+                    months={2}
+                    direction="horizontal"
+                    onChange={this.handleChange}
                 />
-            </div>
+            </Popover>
         </div>;
-        return <div>
+        return <div style={this.props.rootStyle}>
             {
                 label === false ? null : <div>
                     <span style={{
@@ -165,7 +251,8 @@ export default class DateRange extends Component {
                 </div>
             }
             {
-                borderStyle === 'border' && this.props.borderShow ? <div className="control-border">{content}</div> : content
+                borderStyle === 'border' && this.props.borderShow ?
+                    <div className="control-border">{content}</div> : content
             }
         </div>
     }

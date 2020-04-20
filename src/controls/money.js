@@ -48,9 +48,18 @@ export default class Money extends Component {
         this.initData(nextProps);
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (_.isEqual(this.state, nextState) && _.isEqual(this.props, nextProps)) {
+            return false;
+        }
+        return true;
+    }
+
     initData(props) {
         if (props.hasOwnProperty('value')) {
-            this.state.value = props.value === '' ? '' : utils.round(utils.parseNumber(props.value), props.float);
+            if (props.value != utils.parseNumber(this.state.value)) {
+                this.state.value = props.value === '' ? '' : utils.toFixed(utils.parseNumber(props.value), this.getFloat(props));
+            }
         }
     }
 
@@ -60,13 +69,12 @@ export default class Money extends Component {
      */
     setValue = (value) => {
         value = _.trim(value);
-        if (/^-?\d{0,3}((,\d{3})*)((,\d{0,3})?)((\.\d{0,9})?)$/.test(value) || /^-?\d*((\.\d{0,9})?)$/.test(value)) {
-            let number = value === '' ? '' : utils.round(utils.parseNumber(value), this.props.float);
-            this.setState({
-                value: number
-            });
+        if (/^-?\d{0,3}((,\d{3})*)((,\d{0,3})?)((\.\d{0,16})?)$/.test(value) || /^-?\d*((\.\d{0,16})?)$/.test(value)) {
+            value = value.toString().replace(/,/g, '');
+            this.state.value = value;
+            this.forceUpdate();
             if (this.props.onChange) {
-                this.props.onChange(number, this);
+                this.props.onChange(value, this);
             }
         }
     };
@@ -95,8 +103,24 @@ export default class Money extends Component {
      * @param event
      */
     handleBlur = (event) => {
-        this.state.value = this.state.value !== '' && this.state.value !== undefined ? utils.parseNumber(this.state.value) : this.state.value;
-        this.setState({focus: false});
+        //this.state.value = this.state.value !== '' && this.state.value !== undefined ? utils.parseNumber(this.state.value) : this.state.value;
+        this.state.focus = false;
+        let float = this.getFloat();
+        if (float) {
+            let value = this.getValue();
+            if (value === undefined || value === null || value === '') {
+                this.forceUpdate();
+                return;
+            }
+            value = utils.toFixed(value, float);
+            if (this.state.value !== value) {
+                this.setValue(utils.toFixed(value, float));
+            } else {
+                this.forceUpdate();
+            }
+        } else {
+            this.forceUpdate();
+        }
         if (this.props.onBlur) {
             this.props.onBlur(event, this)
         }
@@ -140,16 +164,23 @@ export default class Money extends Component {
         return styleProps;
     };
 
+    getFloat(props = this.props) {
+        if (_.isFunction(props.float)) {
+            return props.float();
+        }
+        return props.float;
+    }
+
     render() {
         let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
-        let value = this.getValue();
+        let value = this.getValue() || '';
         let label = this.props.label;
         let styleProps = this.getStyleProps();
-        if(!this.state.focus) {
-            if(!this.props.showZero && value == 0) {
+        if (!this.state.focus) {
+            if (!this.props.showZero && value == 0) {
                 value = '';
             } else {
-                value = value !== '' ? utils.parseMoney(value, this.props.float) : '';
+                value = value !== '' ? utils.parseMoney(value, this.getFloat()) : '';
             }
         }
         let textField = <TextField
@@ -171,7 +202,7 @@ export default class Money extends Component {
             {...styleProps}
         />;
         if (borderStyle === 'border' && this.props.borderShow) {
-            return <div className={"control-border" + (this.state.focus ? ' focus' : '')}>{textField}</div>
+            return <div className={"control-border" + (this.state.focus ? ' focus' : '')} style={this.props.rootStyle}>{textField}</div>
         } else {
             return textField;
         }

@@ -42,7 +42,8 @@ export default class SelectTag extends Component {
      * @param value
      */
     setValue(value) {
-        this.setState({value: value});
+        this.state.value = value;
+        this.forceUpdate();
         if (this.props.onChange) {
             this.props.onChange(value, this);
         }
@@ -120,7 +121,7 @@ export default class SelectTag extends Component {
 
     render() {
         let label = this.props.label;
-        return <div style={{marginTop: 12, ...this.props.style}}>
+        return <div style={{marginTop: 12, ...this.props.style, ...this.props.rootStyle}}>
             {
                 label === false ? null : <div>
                     <span style={{

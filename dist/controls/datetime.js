@@ -210,7 +210,7 @@ var DateTime = function (_Component) {
             var label = this.props.label;
             return _react2.default.createElement(
                 'div',
-                { style: { position: 'relative' } },
+                { style: (0, _extends3.default)({ position: 'relative' }, this.props.rootStyle) },
                 label === false ? null : _react2.default.createElement(
                     'div',
                     null,

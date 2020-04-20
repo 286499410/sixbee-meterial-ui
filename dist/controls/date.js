@@ -48,9 +48,15 @@ var _IconButton = require('material-ui/IconButton');
 
 var _IconButton2 = _interopRequireDefault(_IconButton);
 
-var _reactCalendar = require('react-calendar');
+var _reactDateRange = require('react-date-range');
 
-var _reactCalendar2 = _interopRequireDefault(_reactCalendar);
+require('react-date-range/dist/styles.css');
+
+require('react-date-range/dist/theme/default.css');
+
+var _locale = require('react-date-range/dist/locale');
+
+var rdrLocales = _interopRequireWildcard(_locale);
 
 var _style = require('../style');
 
@@ -60,15 +66,17 @@ var _utils = require('../utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Date = function (_Component) {
-    (0, _inherits3.default)(Date, _Component);
+var Date2 = function (_Component) {
+    (0, _inherits3.default)(Date2, _Component);
 
-    function Date(props) {
-        (0, _classCallCheck3.default)(this, Date);
+    function Date2(props) {
+        (0, _classCallCheck3.default)(this, Date2);
 
-        var _this = (0, _possibleConstructorReturn3.default)(this, (Date.__proto__ || (0, _getPrototypeOf2.default)(Date)).call(this, props));
+        var _this = (0, _possibleConstructorReturn3.default)(this, (Date2.__proto__ || (0, _getPrototypeOf2.default)(Date2)).call(this, props));
 
         _this.state = {
             anchorEl: {},
@@ -131,10 +139,18 @@ var Date = function (_Component) {
         return _this;
     }
 
-    (0, _createClass3.default)(Date, [{
+    (0, _createClass3.default)(Date2, [{
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(nextProps) {
             this.initData(nextProps);
+        }
+    }, {
+        key: 'shouldComponentUpdate',
+        value: function shouldComponentUpdate(nextProps, nextState) {
+            if (_.isEqual(this.state, nextState) && _.isEqual(this.props, nextProps)) {
+                return false;
+            }
+            return true;
         }
     }, {
         key: 'initData',
@@ -150,7 +166,8 @@ var Date = function (_Component) {
     }, {
         key: 'setValue',
         value: function setValue(value) {
-            this.setState({ value: value });
+            this.state.value = value;
+            this.forceUpdate();
             if (this.props.onChange) {
                 if (value && this.props.timestamp) {
                     value = _utils2.default.strToTime(value);
@@ -205,7 +222,7 @@ var Date = function (_Component) {
             });
             return _react2.default.createElement(
                 'div',
-                { ref: 'container', style: { position: 'relative' } },
+                { ref: 'container', style: (0, _extends3.default)({ position: 'relative' }, this.props.rootStyle) },
                 borderStyle === 'border' && this.props.borderShow ? _react2.default.createElement(
                     'div',
                     { className: 'full-width' },
@@ -222,7 +239,7 @@ var Date = function (_Component) {
                 ) : textField,
                 value !== undefined && value !== null && value !== '' && this.props.hasClear && !this.props.disabled && !this.props.immutable ? _react2.default.createElement(_IconButton2.default, { iconClassName: 'iconfont icon-close-circle-fill', onClick: this.handleClear,
                     style: (0, _extends3.default)({ position: 'absolute', right: 0 }, styleProps.iconStyle.style),
-                    iconStyle: (0, _extends3.default)({ color: '#e0e0e0' }, styleProps.iconStyle.iconStyle)
+                    iconStyle: (0, _extends3.default)({ color: "rgba(0,0,0,0.3)" }, styleProps.iconStyle.iconStyle)
 
                 }) : null,
                 _react2.default.createElement(
@@ -236,22 +253,22 @@ var Date = function (_Component) {
                     _react2.default.createElement(
                         'div',
                         null,
-                        _react2.default.createElement(_reactCalendar2.default, {
+                        _react2.default.createElement(_reactDateRange.Calendar, {
+                            locale: rdrLocales['zhCN'],
+                            date: value ? _utils2.default.strToDate(value) : new Date(),
                             onChange: this.handleChange,
-                            value: _utils2.default.strToDate(value),
-                            activeStartDate: this.props.activeStartDate ? _utils2.default.strToDate(this.props.activeStartDate) : null,
-                            minDate: this.props.minDate ? _utils2.default.strToDate(this.props.minDate) : null,
-                            maxDate: this.props.maxDate ? _utils2.default.strToDate(this.props.maxDate) : null
+                            minDate: this.props.minDate ? _utils2.default.strToDate(this.props.minDate) : undefined,
+                            maxDate: this.props.maxDate ? _utils2.default.strToDate(this.props.maxDate) : undefined
                         })
                     )
                 )
             );
         }
     }]);
-    return Date;
+    return Date2;
 }(_react.Component);
 
-Date.defaultProps = {
+Date2.defaultProps = {
     label: undefined,
     borderShow: true,
     timestamp: false,
@@ -268,7 +285,7 @@ Date.defaultProps = {
     activeStartDate: undefined,
     minDate: undefined,
     maxDate: undefined };
-Date.contextTypes = {
+Date2.contextTypes = {
     muiTheme: _propTypes2.default.object
 };
-exports.default = Date;
+exports.default = Date2;

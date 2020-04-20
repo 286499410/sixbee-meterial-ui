@@ -44,6 +44,10 @@ var _Checkbox = require('material-ui/Checkbox');
 
 var _Checkbox2 = _interopRequireDefault(_Checkbox);
 
+var _icon = require('../icon');
+
+var _icon2 = _interopRequireDefault(_icon);
+
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -136,7 +140,7 @@ var TableHeader = function (_Component) {
                     className: 'table-header',
                     style: (0, _extends3.default)({
                         overflow: 'hidden',
-                        width: this.props.width || props.containerWidth
+                        width: "calc(100% + 2px)"
                     }, props.headerStyle) },
                 _react2.default.createElement(
                     'table',
@@ -164,7 +168,7 @@ var TableHeader = function (_Component) {
                                         'data-key': 'checkbox',
                                         style: {
                                             width: props.checkboxColumnWidth,
-                                            height: props.headerRowHeight + 1
+                                            height: state.headerHeight || props.headerRowHeight * state.headerColumns.length + state.headerColumns.length
                                         } },
                                     _react2.default.createElement(_Checkbox2.default, (0, _extends3.default)({ checked: _this3.isChecked(),
                                         onCheck: _this3.handleCheck }, props.checkboxStyle))
@@ -174,25 +178,26 @@ var TableHeader = function (_Component) {
                                     { rowSpan: state.headerColumns.length,
                                         style: {
                                             width: props.seriesColumnWidth,
-                                            height: props.headerRowHeight,
+                                            height: state.headerHeight - 1,
                                             textAlign: props.headerTextAlign
                                         } },
                                     '\u5E8F\u53F7'
                                 ) : null,
                                 columns.map(function (col, j) {
                                     var style = {};
+                                    var rowSpan = col.children && col.children.length > 0 ? 1 : state.headerColumns.length - i;
                                     col.key = col.key || i + '-' + j;
                                     if (state.columnWidths[col.key] || col.width) {
                                         style.width = state.columnWidths[col.key] || col.width;
                                     }
                                     style.textAlign = col.headerTextAlign || props.headerTextAlign;
                                     if (props.headerRowHeight) {
-                                        style.height = props.headerRowHeight;
+                                        style.height = props.headerRowHeight * rowSpan + rowSpan;
                                     }
                                     return _react2.default.createElement(
                                         'th',
                                         { key: j, 'data-key': col.key,
-                                            rowSpan: col.children && col.children.length > 0 ? 1 : state.headerColumns.length - i,
+                                            rowSpan: rowSpan,
                                             colSpan: col.colSpan, style: style },
                                         _react2.default.createElement(
                                             'div',
@@ -205,7 +210,13 @@ var TableHeader = function (_Component) {
                                             col.filter ? _react2.default.createElement(_filter2.default, { field: col.filter === true ? col : (0, _extends3.default)({}, col, col.filter),
                                                 onFilter: _this3.handleFilter(col),
                                                 value: _lodash2.default.get(filterData, col.formKey || col.key) }) : null,
-                                            col.sortable ? _react2.default.createElement(_sort2.default, { field: col, onSort: _this3.handleSort(col) }) : null
+                                            col.sortable ? _react2.default.createElement(_sort2.default, { field: col, onSort: _this3.handleSort(col) }) : null,
+                                            col.required ? _react2.default.createElement(
+                                                'span',
+                                                { className: 'text-danger' },
+                                                '*'
+                                            ) : null,
+                                            col.icon ? _react2.default.createElement(_icon2.default, col.icon) : null
                                         ),
                                         props.resize ? _react2.default.createElement('div', { className: 'resize',
                                             onMouseDown: _this3.handleResize(col) }) : null

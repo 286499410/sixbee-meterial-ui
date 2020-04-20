@@ -15,10 +15,12 @@ import MoneyRange from './controls/money-range';
 import Radio from './controls/radio';
 import Select from './controls/select';
 import Text from './controls/text';
+import Number from './controls/number';
 import Time from './controls/time';
 import Image from './controls/image';
 import Editor from './controls/editor';
 import SelectTag from './controls/select-tag';
+import SelectCheck from './controls/select-check';
 import Static from './controls/static';
 
 export default class Control extends Component {
@@ -31,7 +33,7 @@ export default class Control extends Component {
     controls = {
         text: Text,
         password: Text,
-        number: Text,
+        number: Number,
         mobile: Text,
         textarea: Text,
         money: Money,
@@ -48,6 +50,7 @@ export default class Control extends Component {
         image: Image,
         editor: Editor,
         selectTag: SelectTag,
+        'select-check': SelectCheck,
         static: Static
     };
 
@@ -56,24 +59,34 @@ export default class Control extends Component {
     }
 
     componentDidMount() {
-        if(this.props.onComponentDidMount) {
+        if (this.props.onComponentDidMount) {
             this.props.onComponentDidMount(this);
         }
     }
 
     setValue(value) {
-        return this.refs.control.setValue(value);
+        return this.getControl().setValue(value);
     }
 
     getValue() {
-        return this.refs.control.getValue();
+        return this.getControl().getValue();
+    }
+
+    getControl() {
+        return this.refs.control;
+    }
+
+    focus() {
+        if (this.getControl()) {
+            this.getControl().focus();
+        }
     }
 
     render() {
         let props = {...this.props};
         let type = props.type;
         let Component = this.controls[type];
-        if(typeof props.disabled === 'function') {
+        if (typeof props.disabled === 'function') {
             props.disabled = props.disabled(props.data, props.context);
         }
         delete props.type;
@@ -94,6 +107,6 @@ export default class Control extends Component {
                 Component = props.component;
                 break;
         }
-        return <Component ref={"control"} {...props}/>
+        return <Component ref={type === 'render' ? undefined : "control"} {...props}/>
     }
 }

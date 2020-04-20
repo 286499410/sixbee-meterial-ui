@@ -113,6 +113,10 @@ var utils = {
     parseMoney: function parseMoney(number) {
         var float = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
 
+        if (_lodash2.default.isFunction(float)) {
+            float = float();
+        }
+        float = parseInt(float);
         if (number === undefined || number === null) {
             return '';
         }
@@ -259,6 +263,7 @@ var utils = {
             case 'money':
                 return value == 0 && column.showZero !== true ? '' : utils.parseMoney(value, column.float);
             case 'select':
+            case 'select-check':
             case 'radio':
                 if (_lodash2.default.isArray(column.dataSource)) {
                     var dataSource = column.dataSource;

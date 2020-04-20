@@ -54,6 +54,17 @@ export default class Filter extends Component {
             open: true,
             anchorEl: event.currentTarget
         });
+        let type = this.getFilterType();
+        if (type == 'text' || type == 'auto' || type == 'date') {
+            setTimeout(() => {
+                this.refs.control.focus();
+            }, 50);
+        }
+        if(type == 'date-range') {
+            // setTimeout(() => {
+            //     this.refs.control.refs.control.refs.container.click();
+            // }, 50);
+        }
     };
 
     handleRequestClose = (event) => {
@@ -61,6 +72,7 @@ export default class Filter extends Component {
     };
 
     handleReset = (event) => {
+        this.state.value = undefined;
         this.refs.control.setValue(undefined);
         this.filter();
     };
@@ -71,15 +83,19 @@ export default class Filter extends Component {
 
     filter() {
         this.setState({open: false});
-        let value = this.refs.control.getValue();
         if (this.props.onFilter) {
-            this.props.onFilter(value, this.props.field);
+            this.props.onFilter(this.state.value, this.props.field);
         }
+    }
+
+    getFilterType() {
+        return this.props.field.filterType || this.props.field.type;
     }
 
     render() {
         let hintText;
-        if(this.props.field.type == 'text' || this.props.field.type == 'auto') {
+        let type = this.getFilterType();
+        if (type == 'text' || type == 'auto') {
             hintText = '输入关键字查询';
         }
         return <div ref="container" style={{display: 'inline-block', position: 'relative', lineHeight: 1}}>
@@ -94,7 +110,7 @@ export default class Filter extends Component {
                      open={this.state.open}
                      anchorEl={this.state.anchorEl}
                      onRequestClose={this.handleRequestClose}>
-                <div className="space-small">
+                <div className="space" style={{width: this.props.field.filterWidth || 'auto'}}>
                     <Control
                         ref="control"
                         hintText={hintText}
@@ -104,21 +120,23 @@ export default class Filter extends Component {
                         filter={undefined}
                         hasClear={false}
                         defaultValue={undefined}
+                        onEnter={(event) => {
+                            this.handleSubmit(event);
+                        }}
+                        type={type}
                         onChange={(value) => {
                             this.state.value = value;
                             if (this.props.field.onChange) {
                                 this.props.field.onChange(value);
                             }
                         }}/>
-                    <div className="row text-center text-primary" cols="2" style={{padding: '6px 0', marginTop: 6}}>
-                        {this.props.reset ? <div className="col text-left">
-                            <span className="cursor-pointer" style={{padding: 6}}
-                                  onClick={this.handleReset}>{this.props.resetLabel}</span>
-                        </div> : <div></div>}
-                        {this.props.submit ? <div className="col text-right">
-                            <span className="cursor-pointer" style={{padding: 6}}
-                                  onClick={this.handleSubmit}>{this.props.submitLabel}</span>
-                        </div> : <div></div>}
+                    <div className="flex text-center right" style={{marginTop: 12, flexDirection: 'row-reverse'}}>
+                        {this.props.submit ? <div className="text-primary cursor-pointer" style={{marginLeft: 12}} onClick={this.handleSubmit}>
+                            {this.props.submitLabel}
+                        </div> : null}
+                        {this.props.reset ? <div className="text-muted cursor-pointer" onClick={this.handleReset}>
+                            {this.props.resetLabel}
+                        </div> : null}
                     </div>
                 </div>
             </Popover>

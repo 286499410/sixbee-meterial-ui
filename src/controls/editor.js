@@ -86,7 +86,7 @@ export default class Radio extends Component {
         let value = this.getValue();
         let label = this.props.label;
         let styleProps = style.getStyle('radio', this.props);
-        return <div style={{width: '100%', zIndex: 1, position: 'relative'}}>
+        return <div style={{width: '100%', zIndex: 1, position: 'relative', ...this.props.rootStyle}}>
             {
                 label === false ? null : <div style={styleProps.labelStyle}>
                     <span style={{display: 'inline-block', transform: "scale(0.75)"}}>{label}</span>

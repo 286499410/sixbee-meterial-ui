@@ -73,12 +73,13 @@ var Text = function (_Component) {
         _this.state = {
             value: undefined,
             errorText: '',
-            focus: false
+            focus: false,
+            pyInputing: false
         };
 
         _this.setValue = function (value) {
             _this.state.value = value;
-            if (_this.props.onChange) {
+            if (_this.props.onChange && !_this.state.pyInputing) {
                 _this.props.onChange(value, _this);
             }
             _this.forceUpdate();
@@ -140,6 +141,14 @@ var Text = function (_Component) {
             this.initData(nextProps);
         }
     }, {
+        key: 'shouldComponentUpdate',
+        value: function shouldComponentUpdate(nextProps, nextState) {
+            if (_lodash2.default.isEqual(this.state, nextState) && _lodash2.default.isEqual(this.props, nextProps)) {
+                return false;
+            }
+            return true;
+        }
+    }, {
         key: 'initData',
         value: function initData(props) {
             if (props.hasOwnProperty('value')) {
@@ -163,6 +172,8 @@ var Text = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
+            var _this2 = this;
+
             var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
             var value = this.getValue();
             var label = this.props.label;
@@ -189,7 +200,14 @@ var Text = function (_Component) {
                 errorText: borderStyle === 'underline' ? this.props.errorText : undefined,
                 floatingLabelFixed: this.props.labelFixed,
                 underlineShow: borderStyle === 'underline' && this.props.borderShow,
-                autoComplete: this.props.autoComplete
+                autoComplete: this.props.autoComplete,
+                onCompositionStart: function onCompositionStart() {
+                    _this2.state.pyInputing = true;
+                },
+                onCompositionEnd: function onCompositionEnd(event) {
+                    _this2.state.pyInputing = false;
+                    _this2.handleChange(event);
+                }
             }, styleProps));
             var content = textField;
             if (this.props.leftIcon) {
@@ -207,11 +225,10 @@ var Text = function (_Component) {
             if (borderStyle === 'border' && this.props.borderShow) {
                 return _react2.default.createElement(
                     'div',
-                    { className: 'full-width' },
+                    { className: 'full-width', style: (0, _extends3.default)({}, this.props.rootStyle) },
                     _react2.default.createElement(
                         'div',
-                        {
-                            className: "control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '') },
+                        { className: "control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '') },
                         content
                     ),
                     _react2.default.createElement(
@@ -221,7 +238,11 @@ var Text = function (_Component) {
                     )
                 );
             } else {
-                return content;
+                return _react2.default.createElement(
+                    'div',
+                    { className: 'full-width', style: (0, _extends3.default)({}, this.props.rootStyle) },
+                    content
+                );
             }
         }
     }]);

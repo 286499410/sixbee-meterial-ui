@@ -76,6 +76,10 @@ var _text = require('./controls/text');
 
 var _text2 = _interopRequireDefault(_text);
 
+var _number = require('./controls/number');
+
+var _number2 = _interopRequireDefault(_number);
+
 var _time = require('./controls/time');
 
 var _time2 = _interopRequireDefault(_time);
@@ -91,6 +95,10 @@ var _editor2 = _interopRequireDefault(_editor);
 var _selectTag = require('./controls/select-tag');
 
 var _selectTag2 = _interopRequireDefault(_selectTag);
+
+var _selectCheck = require('./controls/select-check');
+
+var _selectCheck2 = _interopRequireDefault(_selectCheck);
 
 var _static = require('./controls/static');
 
@@ -109,7 +117,7 @@ var Control = function (_Component) {
         _this.controls = {
             text: _text2.default,
             password: _text2.default,
-            number: _text2.default,
+            number: _number2.default,
             mobile: _text2.default,
             textarea: _text2.default,
             money: _money2.default,
@@ -126,6 +134,7 @@ var Control = function (_Component) {
             image: _image2.default,
             editor: _editor2.default,
             selectTag: _selectTag2.default,
+            'select-check': _selectCheck2.default,
             static: _static2.default
         };
         return _this;
@@ -141,12 +150,24 @@ var Control = function (_Component) {
     }, {
         key: 'setValue',
         value: function setValue(value) {
-            return this.refs.control.setValue(value);
+            return this.getControl().setValue(value);
         }
     }, {
         key: 'getValue',
         value: function getValue() {
-            return this.refs.control.getValue();
+            return this.getControl().getValue();
+        }
+    }, {
+        key: 'getControl',
+        value: function getControl() {
+            return this.refs.control;
+        }
+    }, {
+        key: 'focus',
+        value: function focus() {
+            if (this.getControl()) {
+                this.getControl().focus();
+            }
         }
     }, {
         key: 'render',
@@ -175,7 +196,7 @@ var Control = function (_Component) {
                     Component = props.component;
                     break;
             }
-            return _react2.default.createElement(Component, (0, _extends3.default)({ ref: "control" }, props));
+            return _react2.default.createElement(Component, (0, _extends3.default)({ ref: type === 'render' ? undefined : "control" }, props));
         }
     }]);
     return Control;

@@ -32,13 +32,18 @@ export default class FixedCol extends Component {
 
     render() {
         let state = this.context.state;
+        let props = this.context.props;
         let width = this.getWidth();
         let style = {
             position: 'absolute',
             top: 0,
             zIndex: 3,
-            width: width,
+            width: width - 1,
             backgroundColor: '#fff',
+            overflow: 'hidden',
+            // maxHeight: state.headerHeight + state.bodyHeight,
+            // height: state.headerHeight + state.dataSource.length * props.bodyRowHeight,
+            // overflow: 'hidden'
         };
         if (this.props.position == 'right') {
             style.right = 0;
@@ -53,6 +58,9 @@ export default class FixedCol extends Component {
             }
         }
         if (state.containerWidth > state.tableWidth) {
+            return null;
+        }
+        if (state.dataSource.length == 0) {
             return null;
         }
         return <div style={style}>
@@ -70,6 +78,7 @@ export default class FixedCol extends Component {
                     hasEmptyTip={false}
                     hasLoading={false}
                     width={width}
+                    height={20}
                     showColumns={this.props.columns}
                     showCheckboxes={this.props.position == 'left'}
                     showSeries={this.props.position == 'left'}

@@ -10,12 +10,20 @@ import SelectField from 'material-ui/SelectField';
 import Menu from 'material-ui/Menu';
 import {Scrollbars} from 'react-custom-scrollbars';
 import TextField from 'material-ui/TextField';
+import IconButton from 'material-ui/IconButton';
+import Divider from 'material-ui/Divider';
 import _ from 'lodash';
 import Dialog from '../dialog';
 import style from '../style'
 import utils from '../utils';
 import Table from '../table';
 import Button from "../button";
+import Icon from '../icon';
+
+const selectStyle = {
+    wrapper: {},
+    filter: {marginTop: 12, paddingLeft: 16, paddingRight: 16}
+};
 
 export default class Select extends Component {
 
@@ -42,6 +50,8 @@ export default class Select extends Component {
         menuWidth: 'auto',
         mode: 'inline',             //选择模式，inline，dialog
         tableProps: undefined,      //若传了该参数，这启用表格模式选择，要穿columns,columnWidths等
+        footer: undefined,
+        emptyTip: '没有数据',
     };
 
     indent = {
@@ -104,7 +114,7 @@ export default class Select extends Component {
      * 清除所有值
      */
     clearValue = () => {
-        if(this.props.multiple) {
+        if (this.props.multiple) {
             this.setValue([]);
         } else {
             this.setValue(null);
@@ -210,6 +220,15 @@ export default class Select extends Component {
         return index >= 0 ? this.state.dataSource[index] : undefined;
     }
 
+    handleClick = (event) => {
+        if (!this.props.disabled) {
+            this.setState({
+                open: true,
+                anchorEl: event.currentTarget,
+            })
+        }
+    };
+
     handleChange = (data) => {
         if (this.props.multiple === false) {
             this.state.open = false;
@@ -225,12 +244,6 @@ export default class Select extends Component {
     handleRequestClose = () => {
         this.setState({open: false});
     };
-
-    indexOf(value) {
-        return _.findIndex(this.state.value, (n) => {
-            return this.props.carryKey ? _.get(n, this.props.dataSourceConfig.value) == value : n == value;
-        });
-    }
 
     handleDelete = (value) => (event) => {
         let originValue = this.state.value;
@@ -261,6 +274,25 @@ export default class Select extends Component {
         }
     }
 
+    /**
+     * 获取已选择的文本
+     */
+    getSelectedText() {
+        let selectedText = [];
+        let value = this.getValue();
+        let options = this.getAllOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]);
+        options.map((data) => {
+            if (this.props.multiple) {
+                if (value.indexOf(data.value) >= 0) {
+                    selectedText.push(data.selectText || data.text);
+                }
+            } else if (value == data.value) {
+                selectedText.push(data.selectText || data.text);
+            }
+        });
+        return selectedText.join(',');
+    }
+
     handleStateChange = (state) => {
         let dataSource = this.getFilterDataSource(this.state.dataSource);
         let originValue = _.cloneDeep(this.getValue());
@@ -277,7 +309,7 @@ export default class Select extends Component {
         });
         dataSource.map(data => {
             let value = _.get(data, this.props.dataSourceConfig.value);
-            if(!state.checked[data.id]) {
+            if (!state.checked[data.id]) {
                 //未选的，在原值中删除
                 if (this.isChecked(value)) {
                     originValue.splice(this.indexOf(value, originValue), 1);
@@ -296,7 +328,7 @@ export default class Select extends Component {
         if (this.props.tableProps === undefined) {
             return <div>
                 {
-                    this.props.hasFilter ? <div style={{marginTop: 12, paddingLeft: 16, paddingRight: 16}}>
+                    this.props.hasFilter ? <div style={selectStyle.filter}>
                         <TextField hintText="输入关键字筛选"
                                    name="filterText"
                                    fullWidth
@@ -317,6 +349,9 @@ export default class Select extends Component {
                             carryKey={this.props.carryKey}
                             dataSourceConfig={this.props.dataSourceConfig}
                             cancel={this.props.cancel}
+                            footer={this.props.footer}
+                            context={this}
+                            emptyTip={this.props.emptyTip}
                         />
                     </div>
                     {
@@ -344,7 +379,7 @@ export default class Select extends Component {
             let dataSource = this.getFilterDataSource(this.state.dataSource);
             dataSource.map(data => {
                 let value = _.get(data, this.props.dataSourceConfig.value);
-                if(this.isChecked(value)) {
+                if (this.isChecked(value)) {
                     checked[data.id] = true;
                 }
             });
@@ -413,7 +448,17 @@ export default class Select extends Component {
         let styleProps = _.merge(style.getStyle('select', this.props), this.props.styleProps);
         let label = this.props.label;
         let selectValue = (this.props.multiple && this.props.carryKey) ? (value || []).map((n) => (_.get(n, this.props.dataSourceConfig.value))) : value;
-        let selectField = <SelectField value={selectValue}
+        let selectField;
+        if (borderStyle !== 'underline') {
+            selectField =
+                <div className={"flex middle between full-width" + (this.props.disabled ? ' text-disabled' : '')}>
+                    <div style={{textAlign: this.props.textAlign || 'left', flexGrow: 1}}>{this.getSelectedText()}</div>
+                    <div style={{width: 16, textAlign: 'right'}}>
+                        <i className="iconfont icon-caret-down" style={{fontSize: 12, color: 'rgba(0,0,0,0.3)'}}/>
+                    </div>
+                </div>;
+        } else {
+            selectField = <SelectField value={selectValue}
                                        name={this.props.name || this.props.dataKey || utils.uuid()}
                                        floatingLabelText={label}
                                        multiple={this.props.multiple}
@@ -424,42 +469,63 @@ export default class Select extends Component {
                                        floatingLabelFixed={this.props.labelFixed}
                                        underlineShow={borderStyle === 'underline' && this.props.borderShow}
                                        {...styleProps}>
-            {this.getAllOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]).map((option, index) => {
-                return <MenuItem key={index}
-                                 value={option.value}
-                                 label={option.text}
-                                 primaryText={option.selectText || option.label}
-                                 disabled={option.disabled}
-                                 innerDivStyle={styleProps.menuItemStyle.innerDivStyle}
-                                 style={{textIndent: option.indent}}
-                />
-            })}
-        </SelectField>;
+                {this.getAllOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]).map((option, index) => {
+                    return <MenuItem key={index}
+                                     value={option.value}
+                                     label={option.text}
+                                     primaryText={option.selectText || option.label}
+                                     disabled={option.disabled}
+                                     innerDivStyle={styleProps.menuItemStyle.innerDivStyle}
+                                     style={{textIndent: option.indent}}
+                    />
+                })}
+            </SelectField>;
+        }
         let content = this.getContent();
-        return <div className="relative" style={{overflow: 'hidden', ...this.props.style}}>
-            <div className="relative cursor-pointer" onClick={(event) => {
-                if (!this.props.disabled) {
-                    this.setState({
-                        open: true,
-                        anchorEl: event.currentTarget,
-                    })
-                }
-            }}>
+        return <div className="flex middle relative" style={{overflow: 'hidden', ...this.props.style, ...this.props.rootStyle}}>
+            <div style={{flexGrow: 1}}
+                 className={"relative" + (this.props.disabled ? ' text-disabled' : ' cursor-pointer')}
+                 onClick={this.handleClick}>
                 {
                     borderStyle === 'border' && this.props.borderShow ? <div className="full-width">
-                            <div className={"control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>{selectField}</div>
-                            <div className="text-small text-danger" style={{marginTop: 2}}>{this.props.errorText}</div>
-                        </div> : selectField
+                        <div
+                            className={"control-border" + (this.state.focus || this.state.open ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>{selectField}</div>
+                        <div className="text-small text-danger" style={{marginTop: 2}}>{this.props.errorText}</div>
+                    </div> : <div>{selectField}
+                        <div className="full-screen"></div>
+                    </div>
                 }
-                <div className="full-screen"></div>
             </div>
+            {
+                this.props.events ?
+                    <div style={{
+                        position: 'relative',
+                        top: borderStyle === "underline" ? 18 : 0,
+                        paddingLeft: 6,
+                        width: this.props.events.length * 20 + 6,
+                        paddingBottom: 1,
+                        height: 30
+                    }}
+                         className="flex middle center">
+                        {
+                            this.props.events.map((event) => {
+                                return <IconButton iconStyle={{color: '#aaa', fontSize: 20, ...event.iconStyle}}
+                                                   title={event.title}
+                                                   key={event.icon}
+                                                   iconClassName={"iconfont icon-" + event.icon}
+                                                   onClick={event.onClick.bind(this, this)}
+                                                   style={event.style}
+                                />
+                            })
+                        }
+                    </div> : null
+            }
             {
                 this.props.mode == 'inline' ? <Popover
                     open={this.state.open}
                     anchorEl={this.state.anchorEl}
                     anchorOrigin={{horizontal: "left", vertical: "bottom"}}
                     targetOrigin={{horizontal: "left", vertical: "top"}}
-                    //style={{width: this.state.anchorEl ? this.state.anchorEl.clientWidth : 'auto'}}
                     onRequestClose={this.handleRequestClose}>
                     {content}
                 </Popover> : (this.state.open ? <Dialog
@@ -526,34 +592,52 @@ class Options extends Component {
     }
 
     render() {
-        return <Scrollbars style={{maxHeight: 300}} autoHeight>
-            <Menu style={this.props.styleProps.dropDownMenuProps}
-                  listStyle={this.props.styleProps.listStyle}
-                  menuItemStyle={this.props.styleProps.menuItemStyle}
-                  disableAutoFocus={true}
-                  onItemClick={this.handleItemClick}>
-                {this.props.dataSource.map((option, index) => {
-                    let style = {textIndent: option.indent};
-                    if (this.isChecked(option.value)) {
-                        style.color = '#FF0099';
-                    }
-                    return <MenuItem key={index}
-                                     value={option.value}
-                                     label={option.text}
-                                     primaryText={option.selectText || option.label}
-                                     disabled={option.disabled}
-                                     innerDivStyle={this.props.styleProps.menuItemStyle.innerDivStyle}
-                                     style={style}
-                    />
-                })}
-                {
-                    this.props.cancel ? <MenuItem value={null}
-                                                  primaryText={"取消选择"}
-                                                  innerDivStyle={this.props.styleProps.menuItemStyle.innerDivStyle}
-                                                  style={{color: '#9b9b9b'}}
-                    /> : null
-                }
-            </Menu>
-        </Scrollbars>
+        return <div>
+            {
+                this.props.dataSource.length > 0 ? <Scrollbars style={{maxHeight: 300}} autoHeight>
+                    <Menu style={this.props.styleProps.dropDownMenuProps}
+                          listStyle={this.props.styleProps.listStyle}
+                          menuItemStyle={this.props.styleProps.menuItemStyle}
+                          disableAutoFocus={true}
+                          onItemClick={this.handleItemClick}>
+                        {this.props.dataSource.map((option, index) => {
+                            let style = {textIndent: option.indent};
+                            if (this.isChecked(option.value)) {
+                                style.color = '#FF0099';
+                            }
+                            return <MenuItem key={index}
+                                             value={option.value}
+                                             label={option.text}
+                                             primaryText={option.selectText || option.label}
+                                             disabled={option.disabled}
+                                             innerDivStyle={this.props.styleProps.menuItemStyle.innerDivStyle}
+                                             style={style}
+                            />
+                        })}
+                        {
+                            this.props.cancel ? <MenuItem value={null}
+                                                          primaryText={"取消选择"}
+                                                          innerDivStyle={this.props.styleProps.menuItemStyle.innerDivStyle}
+                                                          style={{color: '#9b9b9b'}}
+                            /> : null
+                        }
+                    </Menu>
+                </Scrollbars> : <div className="space-small text-muted">{this.props.emptyTip}</div>
+            }
+            {
+                this.props.footer ? <div>
+                    <Divider/>
+                    <div className="flex center middle text-primary hover-bg border-top cursor-pointer relative"
+                         style={{height: 40}}
+                         onClick={() => {
+                             this.props.context.setState({open: false});
+                             this.props.footer.onClick(this.props.context);
+                         }}>
+                        <Icon name={this.props.footer.icon}/>
+                        <div>{this.props.footer.title}</div>
+                    </div>
+                </div> : null
+            }
+        </div>
     }
 }

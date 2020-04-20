@@ -8,10 +8,6 @@ var _values = require('babel-runtime/core-js/object/values');
 
 var _values2 = _interopRequireDefault(_values);
 
-var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
-
-var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
-
 var _entries = require('babel-runtime/core-js/object/entries');
 
 var _entries2 = _interopRequireDefault(_entries);
@@ -23,6 +19,10 @@ var _getIterator3 = _interopRequireDefault(_getIterator2);
 var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
+
+var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
+
+var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 
 var _extends2 = require('babel-runtime/helpers/extends');
 
@@ -71,6 +71,10 @@ var _header2 = _interopRequireDefault(_header);
 var _body = require('./body');
 
 var _body2 = _interopRequireDefault(_body);
+
+var _footer = require('./footer');
+
+var _footer2 = _interopRequireDefault(_footer);
 
 var _fixedCol = require('./fixed-col');
 
@@ -126,7 +130,6 @@ var Table = function (_Component) {
             headerColumns: [],
             checked: {},
             collapsed: {},
-            collapsedHidden: {},
             iconEvents: {},
             iconEventsBehavior: 'columnHover',
             filterConfig: {},
@@ -230,12 +233,12 @@ var Table = function (_Component) {
                 headerColumns: props.headerColumns,
                 checked: (0, _extends3.default)({}, props.checked),
                 collapsed: props.collapsed,
-                collapsedHidden: (0, _extends3.default)({}, props.collapsedHidden),
                 iconEvents: props.iconEvents,
                 iconEventsBehavior: props.iconEventsBehavior,
                 filter: props.filter || {},
                 filterData: (0, _extends3.default)({}, props.filterData),
-                sortData: (0, _extends3.default)({}, props.sortData)
+                sortData: (0, _extends3.default)({}, props.sortData),
+                selectedRow: this.state.selectedRow || props.selectedRow
             };
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
@@ -243,9 +246,12 @@ var Table = function (_Component) {
 
             try {
                 for (var _iterator = (0, _getIterator3.default)((0, _entries2.default)(nextProps)), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var _step$value = (0, _slicedToArray3.default)(_step.value, 2),
-                        key = _step$value[0],
-                        value = _step$value[1];
+                    var _ref = _step.value;
+
+                    var _ref2 = (0, _slicedToArray3.default)(_ref, 2);
+
+                    var key = _ref2[0];
+                    var value = _ref2[1];
 
                     if (value === undefined) {
                         delete nextProps[key];
@@ -325,59 +331,107 @@ var Table = function (_Component) {
         value: function handleColumnWidths() {
             var _this2 = this;
 
-            var undefinedWidthColumns = [],
+            var undefinedColumnWidths = [],
                 widthSum = 0;
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+                for (var _iterator2 = (0, _getIterator3.default)((0, _entries2.default)(this.state.columnWidths)), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var _ref3 = _step2.value;
+
+                    var _ref4 = (0, _slicedToArray3.default)(_ref3, 2);
+
+                    var key = _ref4[0];
+                    var width = _ref4[1];
+
+                    if (_lodash2.default.findIndex(this.state.dataColumns, { key: key }) < 0) {
+                        delete this.state.columnWidths[key];
+                    }
+                }
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
+                }
+            }
+
             this.state.dataColumns.map(function (column) {
                 if (_this2.state.columnWidths[column.key] === undefined) {
-                    undefinedWidthColumns.push(column.key);
+                    undefinedColumnWidths.push(column.key);
                 } else {
                     widthSum += _this2.state.columnWidths[column.key];
                 }
+                if (column.parent) {
+                    _this2.state.columnWidths[column.parent.key] = 0;
+                }
             });
-            undefinedWidthColumns.map(function (key) {
+            this.state.dataColumns.map(function (column) {
+                if (column.parent && _this2.state.columnWidths[column.key]) {
+                    _this2.state.columnWidths[column.parent.key] += _this2.state.columnWidths[column.key];
+                }
+            });
+            undefinedColumnWidths.map(function (key) {
                 _this2.state.columnWidths[key] = (0, _jquery2.default)(_this2.refs.container).find('.table-header th[data-key=' + key + ']').outerWidth();
             });
-            if (undefinedWidthColumns.length == 0 && widthSum != this.state.tableWidth) {
+            if (undefinedColumnWidths.length == 0 && widthSum != this.state.tableWidth) {
                 var remainWidth = this.state.tableWidth - this.getCheckboxColumnWidth() - this.getSeriesColumnWidth();
-                var _iteratorNormalCompletion2 = true;
-                var _didIteratorError2 = false;
-                var _iteratorError2 = undefined;
+                var contentWidth = remainWidth;
+                var _iteratorNormalCompletion3 = true;
+                var _didIteratorError3 = false;
+                var _iteratorError3 = undefined;
 
                 try {
-                    for (var _iterator2 = (0, _getIterator3.default)((0, _entries2.default)(this.state.columnWidths)), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                        var _step2$value = (0, _slicedToArray3.default)(_step2.value, 2),
-                            key = _step2$value[0],
-                            width = _step2$value[1];
+                    for (var _iterator3 = (0, _getIterator3.default)((0, _entries2.default)(this.state.columnWidths)), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                        var _ref5 = _step3.value;
 
-                        this.state.columnWidths[key] = Math.round(width / widthSum * (this.state.tableWidth - this.getCheckboxColumnWidth() - this.getSeriesColumnWidth()));
-                        remainWidth -= this.state.columnWidths[key];
+                        var _ref6 = (0, _slicedToArray3.default)(_ref5, 2);
+
+                        var _key = _ref6[0];
+                        var _width = _ref6[1];
+
+                        this.state.columnWidths[_key] = Math.round(_width / widthSum * contentWidth);
+                        remainWidth -= this.state.columnWidths[_key];
                     }
                 } catch (err) {
-                    _didIteratorError2 = true;
-                    _iteratorError2 = err;
+                    _didIteratorError3 = true;
+                    _iteratorError3 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                            _iterator2.return();
+                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                            _iterator3.return();
                         }
                     } finally {
-                        if (_didIteratorError2) {
-                            throw _iteratorError2;
+                        if (_didIteratorError3) {
+                            throw _iteratorError3;
                         }
                     }
                 }
 
-                this.state.columnWidths[this.state.dataColumns[this.state.dataColumns.length - 1].key] += remainWidth;
+                if (this.state.columnWidths[this.state.dataColumns[this.state.dataColumns.length - 1].key] + remainWidth > 0) {
+                    this.state.columnWidths[this.state.dataColumns[this.state.dataColumns.length - 1].key] += remainWidth;
+                }
             }
         }
     }, {
         key: 'componentDidUpdate',
         value: function componentDidUpdate() {
             var oldColumnWidths = (0, _extends3.default)({}, this.state.columnWidths);
+            var state = this.state;
+            var props = this.props;
             this.handleColumnWidths();
             if (this.props.containerHeight) {
-                var containerHeight = (0, _jquery2.default)(this.refs.container).height();
-                this.state.headerHeight = (0, _jquery2.default)(this.refs.container).find('.table-header').height() || 0;
+                var containerHeight = (0, _jquery2.default)(this.refs.container).outerHeight();
+                this.state.headerHeight = props.headerRowHeight * state.headerColumns.length + state.headerColumns.length || (0, _jquery2.default)(this.refs.container).find('.table-header').height() || 0;
                 this.state.footerHeight = (0, _jquery2.default)(this.refs.container).find('.table-footer').height() || 0;
                 this.state.pagerHeight = (0, _jquery2.default)(this.refs.container).find('.table-pager').height() || 0;
                 this.state.bodyHeight = containerHeight - this.state.headerHeight - this.state.pagerHeight - this.state.footerHeight;
@@ -385,7 +439,6 @@ var Table = function (_Component) {
             if (this.state.bodyHeight) {
                 (0, _jquery2.default)(this.refs.container).find('.table-body').css({ height: this.state.bodyHeight });
             }
-
             if (!_lodash2.default.isEqual(oldColumnWidths, this.state.columnWidths)) {
                 this.forceUpdate();
             }
@@ -467,18 +520,20 @@ var Table = function (_Component) {
             var _this4 = this;
 
             var indent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+            var parent = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
             var rows = [];
+            var collapsibleKey = this.props.collapsibleKey || this.state.dataColumns[0].key;
             dataSource.map(function (data) {
                 var indentData = {};
-                indentData[_this4.state.dataColumns[0].key + '_indent'] = indent;
-                var parent = (0, _assign2.default)(indentData, data);
+                indentData[collapsibleKey + '_indent'] = indent;
+                var current = (0, _assign2.default)(indentData, data);
                 var children = [];
                 if (data.children && data.children.length > 0) {
-                    children = _this4.getFilteredRows(data.children, indent + 16);
+                    children = _this4.getFilteredRows(data.children, indent + 16, current);
                 }
-                if (_this4.checkRow(parent) || children.length > 0) {
-                    rows.push(parent);
+                if (_this4.checkRow(current) || children.length > 0) {
+                    rows.push((0, _extends3.default)({}, current, { _parent: parent }));
                     rows = rows.concat(children);
                 }
             });
@@ -574,6 +629,7 @@ var Table = function (_Component) {
                     rowSelected: this.props.rowSelected,
                     onRowSelect: this.props.onRowSelect
                 }),
+                this.props.footerData && this.props.footerData.length > 0 ? _react2.default.createElement(_footer2.default, { ref: 'footer' }) : null,
                 this.props.pager ? _react2.default.createElement(_pager2.default, null) : null
             );
         }
@@ -601,6 +657,8 @@ Table.defaultProps = {
     parentKey: 'parent_id',
     condensed: false,
     collapsible: false,
+    collapsibleKey: undefined,
+    defaultCollapsible: false,
     hideScrollBar: false,
     bordered: true,
     striped: true,
@@ -634,6 +692,7 @@ Table.defaultProps = {
     fixedRightColumns: [],
     showSeries: false,
     seriesColumnWidth: 50,
+    showEllipsis: true,
     checkboxStyle: {
         style: {
             marginLeft: 15,
@@ -647,62 +706,3 @@ Table.defaultProps = {
     }
 };
 exports.default = Table;
-
-var TableFooter = function (_Component2) {
-    (0, _inherits3.default)(TableFooter, _Component2);
-
-    function TableFooter(props) {
-        (0, _classCallCheck3.default)(this, TableFooter);
-
-        var _this6 = (0, _possibleConstructorReturn3.default)(this, (TableFooter.__proto__ || (0, _getPrototypeOf2.default)(TableFooter)).call(this, props));
-
-        _this6.setFooterData = function (footerData) {
-            _this6.state.footerData = footerData;
-            _this6.forceUpdate();
-        };
-
-        _this6.state = state[props.stateKey];
-        return _this6;
-    }
-
-    (0, _createClass3.default)(TableFooter, [{
-        key: 'render',
-        value: function render() {
-            debug && console.log('render table footer');
-            return _react2.default.createElement(
-                'div',
-                { ref: 'container',
-                    className: 'table-footer',
-                    style: (0, _extends3.default)({ overflow: 'hidden', width: this.state.containerWidth }, this.props.style) },
-                _react2.default.createElement(
-                    'table',
-                    {
-                        className: 'table ' + (this.props.bordered ? 'bordered' : '') + ' ' + (this.props.condensed ? 'condensed' : ''),
-                        style: { width: this.state.tableWidth || '100%' } },
-                    _react2.default.createElement(TableBodyColGroup, { ref: 'colGroup',
-                        stateKey: this.props.stateKey,
-                        showCheckboxes: this.props.showCheckboxes }),
-                    _react2.default.createElement(
-                        'tbody',
-                        null,
-                        this.state.footerData.map(function (row, i) {
-                            return _react2.default.createElement(
-                                'tr',
-                                { key: i },
-                                row.map(function (col, j) {
-                                    return _react2.default.createElement(
-                                        'td',
-                                        { key: j, colSpan: col.colSpan || 1, rowSpan: col.rowSpan || 1,
-                                            style: { textAlign: col.textAlign || 'left' } },
-                                        col.content
-                                    );
-                                })
-                            );
-                        })
-                    )
-                )
-            );
-        }
-    }]);
-    return TableFooter;
-}(_react.Component);

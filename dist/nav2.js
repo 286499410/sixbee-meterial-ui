@@ -70,6 +70,9 @@ var Nav2 = function (_Component) {
         _this.getDataSource = function () {
             return new _promise2.default(function (resolve, reject) {
                 var dataSource = _this.props.dataSource;
+                if (_lodash2.default.isFunction(dataSource)) {
+                    dataSource = dataSource();
+                }
                 if (_lodash2.default.isArray(dataSource)) {
                     resolve(dataSource);
                 } else if (_lodash2.default.isFunction(dataSource)) {
@@ -174,9 +177,13 @@ var Nav2 = function (_Component) {
             if (_lodash2.default.isArray(item.children) && item.children.length > 0) {
                 var children = [],
                     selected = false;
-                item.children.map(function (subitem) {
+                item.children.map(function (subitem, index) {
+                    var col = parseInt(index / 7);
                     var ret = _this.renderNavItem(subitem, key);
-                    children.push(ret.component);
+                    if (!children[col]) {
+                        children[col] = [];
+                    }
+                    children[col].push(ret.component);
                     selected = selected || ret.selected;
                 });
                 return {
@@ -188,10 +195,17 @@ var Nav2 = function (_Component) {
                             itemKey: key,
                             label: item.label || item.title,
                             icon: item.icon,
+                            iconPrefix: _this.props.iconPrefix,
                             folded: _this.isFolded(item),
                             selected: selected,
                             onClick: _this.handleFold(item, parentKey) },
-                        children
+                        children.map(function (data, index) {
+                            return _react2.default.createElement(
+                                'ul',
+                                { key: index, className: 'sub-nav' },
+                                data
+                            );
+                        })
                     ),
                     selected: selected
                 };
@@ -205,6 +219,7 @@ var Nav2 = function (_Component) {
                         selected: _this.isSelected(item),
                         onClick: _this.handleSelect(item),
                         icon: item.icon,
+                        iconPrefix: _this.props.iconPrefix,
                         label: item.label || item.title }),
                     selected: _selected
                 };
@@ -239,14 +254,21 @@ var Nav2 = function (_Component) {
     }, {
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(nextProps) {
+            var _this2 = this;
+
             if (nextProps.selectedKey) {
                 this.state.selectedKey = nextProps.selectedKey;
+            }
+            if (nextProps.dataSource) {
+                this.getDataSource().then(function (dataSource) {
+                    _this2.updateDataSource(dataSource);
+                });
             }
         }
     }, {
         key: 'initFold',
         value: function initFold() {
-            var _this2 = this;
+            var _this3 = this;
 
             var dataSource = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.state.dataSource;
             var parent = arguments[1];
@@ -254,15 +276,15 @@ var Nav2 = function (_Component) {
             var parentKey = parent ? parent.key || parent.dataKey : '';
             dataSource.map(function (item) {
                 var key = item.key || item.dataKey;
-                if (item.url == _this2.state.selectedKey) {
+                if (item.url == _this3.state.selectedKey) {
                     if (parent) {
-                        _this2.state.unFoldedKeySet.add(parentKey);
+                        _this3.state.unFoldedKeySet.add(parentKey);
                     }
                 }
                 if (item.children) {
-                    _this2.initFold(item.children, item);
-                    if (_this2.state.unFoldedKeySet.has(key) && parent) {
-                        _this2.state.unFoldedKeySet.add(parentKey);
+                    _this3.initFold(item.children, item);
+                    if (_this3.state.unFoldedKeySet.has(key) && parent) {
+                        _this3.state.unFoldedKeySet.add(parentKey);
                     }
                 }
             });
@@ -270,7 +292,7 @@ var Nav2 = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            var _this3 = this;
+            var _this4 = this;
 
             return _react2.default.createElement(
                 'ul',
@@ -278,7 +300,7 @@ var Nav2 = function (_Component) {
                     className: 'nav ' + this.props.mode + ' ' + this.props.theme + ' ' + (this.isCollapsed() ? 'collapsed' : ''),
                     style: this.props.style },
                 this.state.dataSource.map(function (item) {
-                    return _this3.renderNavItem(item).component;
+                    return _this4.renderNavItem(item).component;
                 })
             );
         }
@@ -291,7 +313,8 @@ Nav2.defaultProps = {
     mode: 'vertical',
     theme: 'light',
     onClick: undefined,
-    selectedKey: undefined
+    selectedKey: undefined,
+    iconPrefix: 'iconfont icon-'
 };
 exports.default = Nav2;
 
@@ -301,7 +324,7 @@ var Subnav = function (_Component2) {
     function Subnav() {
         var _ref;
 
-        var _temp, _this4, _ret;
+        var _temp, _this5, _ret;
 
         (0, _classCallCheck3.default)(this, Subnav);
 
@@ -309,21 +332,21 @@ var Subnav = function (_Component2) {
             args[_key] = arguments[_key];
         }
 
-        return _ret = (_temp = (_this4 = (0, _possibleConstructorReturn3.default)(this, (_ref = Subnav.__proto__ || (0, _getPrototypeOf2.default)(Subnav)).call.apply(_ref, [this].concat(args))), _this4), _this4.state = {
+        return _ret = (_temp = (_this5 = (0, _possibleConstructorReturn3.default)(this, (_ref = Subnav.__proto__ || (0, _getPrototypeOf2.default)(Subnav)).call.apply(_ref, [this].concat(args))), _this5), _this5.state = {
             popHidden: false
-        }, _this4.handleClick = function (event) {
-            if (_this4.props.onClick) {
-                _this4.props.onClick(event);
+        }, _this5.handleClick = function (event) {
+            if (_this5.props.onClick) {
+                _this5.props.onClick(event);
             }
-        }, _this4.handleDoubleClick = function (event) {
-            if (_this4.props.onDoubleClick) {
-                _this4.props.onDoubleClick(event);
+        }, _this5.handleDoubleClick = function (event) {
+            if (_this5.props.onDoubleClick) {
+                _this5.props.onDoubleClick(event);
             }
-        }, _this4.handleMouseEnter = function (event) {
-            if (_this4.state.popHidden == true) {
-                _this4.setState({ popHidden: false });
+        }, _this5.handleMouseEnter = function (event) {
+            if (_this5.state.popHidden == true) {
+                _this5.setState({ popHidden: false });
             }
-        }, _temp), (0, _possibleConstructorReturn3.default)(_this4, _ret);
+        }, _temp), (0, _possibleConstructorReturn3.default)(_this5, _ret);
     }
 
     (0, _createClass3.default)(Subnav, [{
@@ -335,8 +358,9 @@ var Subnav = function (_Component2) {
                     className: 'nav-item' + (this.props.folded ? ' folded' : '') + (this.props.selected ? ' as-selected' : '') + (this.state.popHidden ? ' pop-hidden' : '') },
                 _react2.default.createElement(
                     'label',
-                    { className: 'folder', onClick: this.handleClick, onDoubleClick: this.handleDoubleClick, onMouseEnter: this.handleMouseEnter },
-                    _react2.default.createElement(_icon2.default, { name: this.props.icon }),
+                    { className: 'folder', onClick: this.handleClick, onDoubleClick: this.handleDoubleClick,
+                        onMouseEnter: this.handleMouseEnter },
+                    this.props.icon ? _react2.default.createElement(_icon2.default, { name: this.props.icon, classPrefix: this.props.iconPrefix, iconStyle: { paddingRight: 6 } }) : null,
                     _react2.default.createElement(
                         'span',
                         { className: 'label' },
@@ -347,11 +371,7 @@ var Subnav = function (_Component2) {
                 _react2.default.createElement(
                     'div',
                     { className: 'sub-nav-container' },
-                    _react2.default.createElement(
-                        'ul',
-                        { className: 'sub-nav', ref: 'subnav' },
-                        this.props.children
-                    )
+                    this.props.children
                 )
             );
         }
@@ -365,7 +385,7 @@ var NavItem = function (_Component3) {
     function NavItem() {
         var _ref2;
 
-        var _temp2, _this5, _ret2;
+        var _temp2, _this6, _ret2;
 
         (0, _classCallCheck3.default)(this, NavItem);
 
@@ -373,11 +393,11 @@ var NavItem = function (_Component3) {
             args[_key2] = arguments[_key2];
         }
 
-        return _ret2 = (_temp2 = (_this5 = (0, _possibleConstructorReturn3.default)(this, (_ref2 = NavItem.__proto__ || (0, _getPrototypeOf2.default)(NavItem)).call.apply(_ref2, [this].concat(args))), _this5), _this5.handleClick = function (event) {
-            if (_this5.props.onClick) {
-                _this5.props.onClick(event);
+        return _ret2 = (_temp2 = (_this6 = (0, _possibleConstructorReturn3.default)(this, (_ref2 = NavItem.__proto__ || (0, _getPrototypeOf2.default)(NavItem)).call.apply(_ref2, [this].concat(args))), _this6), _this6.handleClick = function (event) {
+            if (_this6.props.onClick) {
+                _this6.props.onClick(event);
             }
-        }, _temp2), (0, _possibleConstructorReturn3.default)(_this5, _ret2);
+        }, _temp2), (0, _possibleConstructorReturn3.default)(_this6, _ret2);
     }
 
     (0, _createClass3.default)(NavItem, [{
@@ -385,11 +405,12 @@ var NavItem = function (_Component3) {
         value: function render() {
             return _react2.default.createElement(
                 'li',
-                { className: 'nav-item' + (this.props.selected ? ' selected' : ''), 'data-key': this.props.itemKey, 'auth-key': this.props.itemKey },
+                { className: 'nav-item' + (this.props.selected ? ' selected' : ''), 'data-key': this.props.itemKey,
+                    'auth-key': this.props.itemKey },
                 _react2.default.createElement(
                     'label',
                     { onClick: this.handleClick },
-                    _react2.default.createElement(_icon2.default, { name: this.props.icon }),
+                    this.props.icon ? _react2.default.createElement(_icon2.default, { name: this.props.icon, classPrefix: this.props.iconPrefix, style: { paddingRight: 6 } }) : null,
                     _react2.default.createElement(
                         'span',
                         { className: 'label' },

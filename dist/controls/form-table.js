@@ -66,6 +66,17 @@ var _lodash2 = _interopRequireDefault(_lodash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var style = {
+    label: {
+        transform: "scale(0.75)",
+        transformOrigin: 'left top 0px',
+        color: 'rgba(0,0,0,0.3)',
+        fontSize: 15,
+        display: 'inline-block'
+    },
+    footerAction: { marginTop: -1 }
+};
+
 var FormTable = function (_Component) {
     (0, _inherits3.default)(FormTable, _Component);
     (0, _createClass3.default)(FormTable, [{
@@ -110,6 +121,10 @@ var FormTable = function (_Component) {
 
         _this.handleBlur = function (row, column) {
             return function (event, control) {
+                if (column.onBlur) {
+                    var value = _lodash2.default.get(_this.getRowData(row), column.dataKey);
+                    column.onBlur(value, control, _this, row);
+                }
                 if (_this.props.onBlur) {
                     _this.props.onBlur(row, column, control, _this);
                 }
@@ -126,7 +141,7 @@ var FormTable = function (_Component) {
 
         _this.handleChange = function (row, column) {
             return function (value, control) {
-                _lodash2.default.set(_this.state.value[row], column.key, value);
+                _lodash2.default.set(_this.state.value[row], column.formKey || column.key, value);
                 if (column.onChange) {
                     column.onChange(value, control, _this, row);
                 }
@@ -202,6 +217,14 @@ var FormTable = function (_Component) {
             this.checkMinRow(nextProps);
         }
     }, {
+        key: 'componentDidUpdate',
+        value: function componentDidUpdate() {}
+    }, {
+        key: 'shouldComponentUpdate',
+        value: function shouldComponentUpdate() {
+            return true;
+        }
+    }, {
         key: 'initData',
         value: function initData(props) {
             if (_lodash2.default.isArray(props.value)) {
@@ -238,7 +261,8 @@ var FormTable = function (_Component) {
                     row.sort = _this2.props.autoSortType == 'desc' ? value.length - index : index + 1;
                 });
             }
-            this.setState({ value: value });
+            this.state.value = value;
+            this.forceUpdate();
             if (this.props.onChange) {
                 this.props.onChange(value, this);
             }
@@ -357,9 +381,13 @@ var FormTable = function (_Component) {
     }, {
         key: 'setRowData',
         value: function setRowData(row, data) {
+            var forceUpdate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
             var value = this.state.value;
             (0, _assign2.default)(value[row], data);
-            this.setValue(value);
+            if (forceUpdate) {
+                this.setValue(value);
+            }
         }
     }, {
         key: 'getLastRowData',
@@ -387,9 +415,8 @@ var FormTable = function (_Component) {
                 if (!column.static && column.type != 'static' && ['text', 'auto', 'money', 'number', 'date', 'datetime', 'select', 'time', 'calendar'].indexOf(column.type) >= 0) {
                     style = _this3.props.editableStyle;
                 }
-                tableColumns.push((0, _extends3.default)({
-                    style: style
-                }, column, {
+                tableColumns.push((0, _extends3.default)({}, column, {
+                    style: style,
                     dataKey: undefined,
                     render: false,
                     width: columnWidths[column.key]
@@ -565,8 +592,17 @@ var FormTable = function (_Component) {
                     tableState: this.state.tableState,
                     currentRow: this.state.currentRow,
                     pager: this.state.pager
-                });
+                }, this, this.props.context);
             }
+        }
+    }, {
+        key: 'setChecked',
+        value: function setChecked(checked) {
+            this.state.tableState.checked = checked;
+            this.setTableState({
+                tableState: this.state.tableState
+            });
+            this.forceUpdate();
         }
     }, {
         key: 'render',
@@ -587,19 +623,13 @@ var FormTable = function (_Component) {
             var footerData = this.props.footerData ? this.props.footerData(this) : null;
             return _react2.default.createElement(
                 'div',
-                { style: (0, _extends3.default)({ marginBottom: 16 }, this.props.style) },
+                { style: (0, _extends3.default)({ marginBottom: 16 }, this.props.style, this.props.rootStyle) },
                 this.props.label === false ? null : _react2.default.createElement(
                     'div',
                     { style: this.props.labelStyle },
                     _react2.default.createElement(
                         'span',
-                        { style: {
-                                transform: "scale(0.75)",
-                                transformOrigin: 'left top 0px',
-                                color: 'rgba(0,0,0,0.3)',
-                                fontSize: 15,
-                                display: 'inline-block'
-                            } },
+                        { style: style.label },
                         this.props.label
                     )
                 ),
@@ -629,7 +659,7 @@ var FormTable = function (_Component) {
                     'div',
                     {
                         className: 'border-primary text-center cursor-pointer',
-                        style: { marginTop: -1 },
+                        style: style.footerAction,
                         onClick: this.addRow.bind(this, this.state.value.length, this.getDefaultRowData(), true) },
                     _react2.default.createElement(_FontIcon2.default, { className: 'iconfont icon-plus' })
                 ) : null

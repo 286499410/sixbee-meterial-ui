@@ -1,211 +1,247 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import Layout from './layout';
+import ContextMenu from './context-menu';
 
-class WindowTabs extends Component {
-
-    state = {
-        currentKey: ''
-    };
-
-    constructor(props) {
-        super(props);
-        this.lib = props.context.lib;
-        this.state.currentKey = props.currentKey;
-        this.lib.subscribe(() => {
-            let windows = this.lib.getWindows();
-            windows.map(window => {
-                if (window.state.title == '') {
-                    window.state.title = this.lib.getTitle(window.key);
-                }
-            });
-            this.forceUpdate();
-        })
-    }
-
-    componentWillReceiveProps(nextProps) {
-        this.state.currentKey = nextProps.currentKey;
-    }
-
-    /**
-     * 移除窗口
-     * @param win
-     */
-    removeWindow(key = this.lib.getCurrentKey()) {
-        /**
-         * 前置条件检查，是否允许删除
-         */
-        if (this.props.shouldWindowRemove) {
-            let window = this.lib.getWindow(key);
-            if (this.props.shouldWindowRemove(key, window.state) == false) {
-                return false;
-            }
-        }
-        this.lib.removeWindow(key);
-        if (this.lib.getCurrentKey() == key) {
-            //删除当前窗口，回到上一个浏览的窗口
-            let order = this.lib.getOrder();
-            let lastKey = _.last(order);
-            this.handleClick(this.lib.getWindow(lastKey))();
-        }
-        this.forceUpdate();
-    }
-
-    /**
-     * 关闭其他窗口
-     * @param key
-     */
-    removeOtherWindows = (event, data) => {
-        let windows = this.lib.getWindows();
-        let key = data.key;
-        for (let i = windows.length - 1; i >= 0; i--) {
-            let window = windows[i];
-            if (window.key != key) {
-                /**
-                 * 前置条件检查，是否允许删除
-                 */
-                if (this.props.shouldWindowRemove && this.props.shouldWindowRemove(window.key, window.state) == false) {
-                    return false;
-                }
-                this.lib.removeWindow(window.key);
-            }
-        }
-        this.lib.saveSession();
-        if (this.state.currentKey != key) {
-            this.lib.switchWindow(key);
-        }
-        this.forceUpdate();
-    };
-
-    /**
-     * 切换窗口
-     * @param window
-     * @returns {Function}
-     */
-    handleClick = (window) => (event) => {
-        if (this.state.currentKey != window.key) {
-            this.state.currentKey = window.key;
-            this.props.context.showMasker();
-            this.forceUpdate();
-            setTimeout(() => {
-                this.lib.switchWindow(window.key);
-            }, 50);
-        }
-    };
-
-    render() {
-        let width = 98 / this.lib.getWindowsNumber();
-        let windows = this.lib.getWindows();
-        return <div className="windows">
-            {windows.map((window, index) => {
-                return <div key={index}
-                            className={`window-tab flex middle ${window.key == this.state.currentKey ? 'active text-primary' : ''}`}
-                            style={{width: width + '%'}}>
-                    <div className="label" onClick={this.handleClick(window)} title={window.state.title}>
-                        <ContextMenuTrigger id="contextMenu" ref="contextMenuTrigger" collect={() => {
-                            return window;
-                        }}>
-                            {window.state.title}
-                        </ContextMenuTrigger>
-                    </div>
-                    {
-                        windows.length > 1 ?
-                            <div className="window-close" onClick={this.removeWindow.bind(this, window.key)}>
-                                <i className="iconfont icon-reject"/>
-                            </div> : null
-                    }
-                </div>
-            })}
-            <ContextMenu id="contextMenu"
-                         ref="contextMenu"
-                         style={{background: '#fff', boxShadow: '0 0 6px #888', padding: '6px 0', zIndex: 2}}>
-                <MenuItem onClick={this.removeOtherWindows}>关闭其他窗口</MenuItem>
-            </ContextMenu>
-        </div>
-    }
-}
+let {Container, Content} = Layout;
 
 export default class Windows extends Component {
 
     static defaultProps = {
-        maxTabs: 8
+        maxTabs: 8,
+        pages: [
+            //示例
+            // {url: '/finance/voucher', title: '凭证列表', state: {}},
+            // {url: '/finance/voucher/add', title: '录凭证', state: {}}
+        ],
+        shouldWindowRemove: undefined,      //是否关闭窗口，函数，return false时不关闭
+        onChange: undefined,                //当前页面改变
+        track: [],                          //足迹
+        history: undefined,                 //
+        onRequestClose: undefined,          //窗口关闭后的触发事件
+        contentClassName: undefined
     };
 
     static childContextTypes = {
-        window: PropTypes.object,
+        window: PropTypes.object
     };
 
-    getChildContext() {
-        return {
-            window: this.lib
-        }
-    }
+    state = {
+        pages: [],
+        track: []
+    };
 
     constructor(props) {
         super(props);
-        this.sessionKey = 'windows.' + props.group;
-        this.lib = App.lib(this.sessionKey);
-        this.lib.setComponent(this);
-        this.componentInit(props);
+        this.initData(props);
     }
 
     componentWillReceiveProps(nextProps) {
-        this.componentInit(nextProps);
+        this.initData(nextProps);
     }
 
-    componentDidUpdate() {
-        this.hideMasker();
-    }
-
-    componentInit(props) {
-        let currentUrl = props.location.pathname + props.location.search;
-        let key = currentUrl;
-        let currentWindow = this.lib.getWindow(key);
-        if (currentWindow) {
-            currentWindow.url = currentUrl;
-            this.lib.setCurrentKey(key);
-        } else {
-            currentWindow = {
-                key: currentUrl,
+    initData(props) {
+        this.state.pages = props.pages || [];
+        this.state.track = props.track || [];
+        let currentUrl = this.getCurrentUrl();
+        let currentPage = _.find(this.state.pages, {url: currentUrl});
+        if (!currentPage) {
+            this.addPage({
                 url: currentUrl,
-                state: {
-                    title: this.lib.getTitle(props.location.pathname.replace(App.request.getRoot(), ''), currentUrl.replace(App.request.getRoot(), ''))
-                }
-            };
-            this.lib.addWindow(currentWindow);
+                title: window.document.title,
+                state: {}
+            });
         }
-        this.lib.setCurrentKey(key);
+        this.addTrack(currentUrl);
     }
 
-    removeWindow = (key = this.lib.getCurrentKey()) => {
-        this.refs.tabs.removeWindow(key);
+    /**
+     * 当前URL
+     * @returns {string}
+     */
+    getCurrentUrl() {
+        return window.location.pathname + window.location.search;
+    }
+
+    getChildContext() {
+        return {
+            window: this
+        }
+    }
+
+    /**
+     * 新增Page
+     * @param page
+     */
+    addPage(page) {
+        this.state.pages.push(page);
+    }
+
+    /**
+     * 添加浏览足迹
+     * @param page
+     */
+    addTrack(url) {
+        _.remove(this.state.track, (n) => {
+            return n == url;
+        });
+        this.state.track.push(url);
+        this.handleChange();
+    }
+
+    handleChange() {
+        if (this.props.onChange) {
+            this.props.onChange(this.state);
+        }
+    }
+
+    /**
+     * 选择窗口
+     * @param page
+     */
+    handleClick = (page) => (event) => {
+        if (this.getCurrentUrl() !== page.url) {
+            this.addTrack(page.url);
+            this.props.history.replace(page.url);
+        }
     };
 
-    showMasker = () => {
-        this.hasMasker = true;
-        $(this.refs.masker).show();
+    /**
+     * 关闭窗口
+     * @param key
+     */
+    closeWindow = (page = {url: this.getCurrentUrl()}, handleChange = true) => {
+        if (_.isFunction(this.props.shouldWindowRemove) && this.props.shouldWindowRemove(page) === false) {
+            return false;
+        }
+        _.remove(this.state.pages, (n) => {
+            return n.url == page.url;
+        });
+        _.remove(this.state.track, (n) => {
+            return n == page.url;
+        });
+        if (page.url == this.getCurrentUrl()) {
+            //关闭的当前窗口
+            this.handleClick(_.find(this.state.pages, {url: _.last(this.state.track)}))(event);
+        }
+        if(this.props.onRequestClose) {
+            this.props.onRequestClose(page);
+        }
+        if (handleChange)
+            this.handleChange();
+        this.refs.tabs.forceUpdate();
+        return true;
     };
 
-    hideMasker = () => {
-        this.hasMasker = false;
-        $(this.refs.masker).hide();
+    /**
+     * 关闭其他窗口
+     */
+    closeOtherWindow = (currentPage = {url: this.getCurrentUrl()}) => {
+        let pages = _.cloneDeep(this.state.pages);
+        for (let i = 0; i < pages.length; i++) {
+            let page = pages[i];
+            if (currentPage.url !== page.url) {
+                if (this.closeWindow(page, false) === false) {
+                    this.handleChange();
+                    return false;
+                }
+            }
+        }
+        this.handleChange();
+        return true;
     };
 
     render() {
-        return <Container fullScreen direction="column">
-            <WindowTabs context={this} ref="tabs" {...this.props} currentKey={this.lib.getCurrentKey()}/>
-            <Content className="space" style={{height: 0}}>
-                <div ref="masker" className="masker hidden" style={{zIndex: 10}}>
-                    <div className="position-center">
-                        <Refresh size={50}
-                                 left={-25}
-                                 top={-25}
-                                 loadingColor="#fff"
-                                 style={{backgroundColor: 'transparent', boxShadow: 'none'}}
-                        />
-                    </div>
-                </div>
+        return <Container direction="column" style={{flexGrow: 1}}>
+            <WindowTabs
+                ref={"tabs"}
+                currentUrl={this.getCurrentUrl()}
+                pages={this.state.pages}
+                closeWindow={this.closeWindow}
+                closeOtherWindow={this.closeOtherWindow}
+                handleClick={this.handleClick}
+            />
+            <Content className={this.props.contentClassName} style={{height: 0}}>
                 {this.props.children}
             </Content>
         </Container>
+    }
+
+}
+
+class WindowTabs extends Component {
+
+    static defaultProps = {
+        pages: [],
+        currentUrl: undefined
+    };
+
+    state = {
+        left: 20
+    };
+
+    handleClickLeftArrow = (event) => {
+        this.state.left += 100;
+        this.state.left = Math.min(this.state.left, 20);
+        this.forceUpdate();
+    };
+
+    handleClickRightArrow = (event) => {
+        let containerWidth = this.refs.container.clientWidth;
+        let contentWidth = this.refs.content.clientWidth;
+        if(contentWidth > containerWidth) {
+            this.state.left -= 100;
+            this.state.left = Math.max(this.state.left, -(contentWidth - containerWidth + 20));
+            this.forceUpdate();
+        }
+    };
+
+    render() {
+        return <div ref="container" className="windows">
+            <div ref="content" className="window-content" style={{
+                left: this.state.left
+            }}>
+                {
+                    this.props.pages.map((page, index) => {
+                        return (
+                            <div key={index} className={'window-tab flex middle' + (page.url == this.props.currentUrl ? ' active text-primary' : '')}>
+                                <ContextMenu style={{width: '100%'}} dataSource={[
+                                    {label: '关闭其他窗口', onClick: this.props.closeOtherWindow.bind(this, page)}
+                                ]}>
+                                    <div className="label" onClick={this.props.handleClick(page)}
+                                         title={page.title}>{page.title}</div>
+                                </ContextMenu>
+                                {
+                                    this.props.pages.length > 1 ?
+                                        <div className="window-close" onMouseOver={(event) => {
+                                            let target = event.target;
+                                            if (target.tagName == 'I') {
+                                                target = target.parentNode;
+                                            }
+                                            target.style.background = 'rgba(0,0,0,0.2)';
+                                        }} onMouseOut={(event) => {
+                                            let target = event.target;
+                                            if (target.tagName == 'I') {
+                                                target = target.parentNode;
+                                            }
+                                            target.style.background = 'none';
+                                        }}
+                                             onClick={this.props.closeWindow.bind(this, page)}>
+                                            <i className="iconfont icon-close" style={{fontSize: 12}}/>
+                                        </div> : null
+                                }
+                            </div>
+                        )
+                    })
+                }
+            </div>
+            <div className="left-arrow" onClick={this.handleClickLeftArrow}>
+                <i className="iconfont icon-left"></i>
+            </div>
+            <div className="right-arrow" onClick={this.handleClickRightArrow}>
+                <i className="iconfont icon-right"></i>
+            </div>
+        </div>
     }
 
 }

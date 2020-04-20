@@ -45,6 +45,8 @@ import RefreshIndicator from './refresh-indicator';
 import {Scrollbars} from 'react-custom-scrollbars';
 import ContextMenu from './context-menu';
 import utils from './utils';
+import Windows from './windows';
+import FullScreen from './full-screen';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -97,5 +99,7 @@ export {
     RefreshIndicator,
     utils,
     MuiThemeProvider,
-    getMuiTheme
+    getMuiTheme,
+    Windows,
+    FullScreen
 };

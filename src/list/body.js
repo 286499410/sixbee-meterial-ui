@@ -162,6 +162,7 @@ export default class Body extends Component {
     render() {
         let dataSource = this.handleData();
         let selectedValue = this.getValue(this.context.state.selected);
+        let props = this.context.props;
         return <div className="list-body" ref="container" style={{height: 'calc(100% - 40px)'}}>
             <Scrollbars ref="scrollBar" style={{height: '100%'}} onScroll={this.handleScroll}>
                 {
@@ -174,15 +175,17 @@ export default class Body extends Component {
                                   selected={value == selectedValue}
                                   onClick={this.handleClick(data)}
                                   hide={this.isHide(value)}>
-                                <div className={"flex middle"} style={{paddingLeft: data.indent, height: this.context.props.rowHeight}}>
-                                    <Icon type="button"
-                                          name={isCollapsed ? "plus-square" : "minus-square"}
-                                          size={14}
-                                          buttonStyle={{opacity: data.children && data.children.length > 0 ? 1 : 0}}
-                                          onClick={this.handleCollapse(data, !isCollapsed)}/>
-                                    <div>
-                                        {utils.replaceText(this.context.props.dataSourceConfig.text, data)}
-                                    </div>
+                                <div className={"flex middle"}
+                                     style={{paddingLeft: data.indent, height: this.context.props.rowHeight}}>
+                                    {
+                                        props.hasCollapsed ? <Icon type="button"
+                                                                   name={isCollapsed ? "plus-square" : "minus-square"}
+                                                                   size={14}
+                                                                   buttonStyle={{opacity: data.children && data.children.length > 0 ? 1 : 0}}
+                                                                   onClick={this.handleCollapse(data, !isCollapsed)}/> : null
+                                    }
+                                    {_.isFunction(props.dataSourceConfig.text) ? props.dataSourceConfig.text(data) :
+                                        <div>{utils.replaceText(props.dataSourceConfig.text, data)}</div>}
                                 </div>
                             </Item>
                         )

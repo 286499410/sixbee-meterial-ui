@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.getMuiTheme = exports.MuiThemeProvider = exports.utils = exports.RefreshIndicator = exports.MaterialMenuItem = exports.MaterialMenu = exports.MaterialList = exports.Popover = exports.LinearProgress = exports.Stepper = exports.Scrollbars = exports.Tabs = exports.Nav2 = exports.Nav = exports.Button = exports.List = exports.DropDown = exports.Toolbar = exports.Dialog = exports.Layout = exports.Drawer = exports.Badge = exports.Avatar = exports.Paper = exports.Detail = exports.SvgIcon = exports.Icon = exports.TableHeader = exports.Table = exports.Form = exports.Editor = exports.Control = exports.Image = exports.FormTable = exports.Time = exports.Text = exports.SelectTag = exports.Select = exports.Radio = exports.MoneyRange = exports.Money = exports.File = exports.DateRange = exports.DateTime = exports.Date = exports.ContextMenu = exports.Checkbox = exports.Auto = exports.Alert = undefined;
+exports.FullScreen = exports.Windows = exports.getMuiTheme = exports.MuiThemeProvider = exports.utils = exports.RefreshIndicator = exports.MaterialMenuItem = exports.MaterialMenu = exports.MaterialList = exports.Popover = exports.LinearProgress = exports.Stepper = exports.Scrollbars = exports.Tabs = exports.Nav2 = exports.Nav = exports.Button = exports.List = exports.DropDown = exports.Toolbar = exports.Dialog = exports.Layout = exports.Drawer = exports.Badge = exports.Avatar = exports.Paper = exports.Detail = exports.SvgIcon = exports.Icon = exports.TableHeader = exports.Table = exports.Form = exports.Editor = exports.Control = exports.Image = exports.FormTable = exports.Time = exports.Text = exports.SelectTag = exports.Select = exports.Radio = exports.MoneyRange = exports.Money = exports.File = exports.DateRange = exports.DateTime = exports.Date = exports.ContextMenu = exports.Checkbox = exports.Auto = exports.Alert = undefined;
 
 var _auto = require('./controls/auto');
 
@@ -191,6 +191,14 @@ var _utils = require('./utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
+var _windows = require('./windows');
+
+var _windows2 = _interopRequireDefault(_windows);
+
+var _fullScreen = require('./full-screen');
+
+var _fullScreen2 = _interopRequireDefault(_fullScreen);
+
 var _MuiThemeProvider = require('material-ui/styles/MuiThemeProvider');
 
 var _MuiThemeProvider2 = _interopRequireDefault(_MuiThemeProvider);
@@ -250,3 +258,5 @@ exports.RefreshIndicator = _refreshIndicator2.default;
 exports.utils = _utils2.default;
 exports.MuiThemeProvider = _MuiThemeProvider2.default;
 exports.getMuiTheme = _getMuiTheme2.default;
+exports.Windows = _windows2.default;
+exports.FullScreen = _fullScreen2.default;

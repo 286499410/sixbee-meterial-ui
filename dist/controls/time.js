@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -171,7 +175,8 @@ var Time = function (_Component) {
         key: 'setValue',
         value: function setValue(value) {
             if (value !== undefined && value !== '' && /^[0-5]\d:[0-5]\d$/.test(value)) {
-                this.setState({ value: value });
+                this.state.value = value;
+                this.forceUpdate();
                 if (this.props.onChange) {
                     this.props.onChange(value);
                 }
@@ -194,7 +199,7 @@ var Time = function (_Component) {
             var value = this.getValue();
             return _react2.default.createElement(
                 'div',
-                { ref: 'container', style: { position: 'relative' } },
+                { ref: 'container', style: (0, _extends3.default)({ position: 'relative' }, this.props.rootStyle) },
                 _react2.default.createElement(_text2.default, {
                     ref: 'text',
                     name: this.props.name || this.props.dataKey || _utils2.default.uuid(),

@@ -40,13 +40,25 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _date = require('./date');
+var _reactDateRange = require('react-date-range');
 
-var _date2 = _interopRequireDefault(_date);
+require('react-date-range/dist/styles.css');
+
+require('react-date-range/dist/theme/default.css');
+
+var _locale = require('react-date-range/dist/locale');
+
+var rdrLocales = _interopRequireWildcard(_locale);
+
+var _Popover = require('material-ui/Popover');
+
+var _Popover2 = _interopRequireDefault(_Popover);
 
 var _utils = require('../utils');
 
 var _utils2 = _interopRequireDefault(_utils);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -60,19 +72,45 @@ var DateRange = function (_Component) {
 
         _this.state = {
             startDate: undefined,
-            endDate: undefined
+            endDate: undefined,
+            anchorEl: {},
+            open: false,
+            clickNum: 0
         };
 
-        _this.handleChange = function (index) {
-            return function (value) {
-                var originValue = _this.getValue();
-                originValue[index] = value;
-                if (_this.props.timestamp) {
-                    _this.setValue([!_this.isEmpty(originValue[0]) ? _utils2.default.strToTime(originValue[0]) : undefined, !_this.isEmpty(originValue[1]) ? _utils2.default.strToTime(originValue[1]) : undefined]);
-                } else {
-                    _this.setValue(originValue);
-                }
-            };
+        _this.handleChange = function (ranges) {
+            _this.state.clickNum++;
+            var startDate = ranges.selection.startDate ? _utils2.default.dateToStr(ranges.selection.startDate) : undefined;
+            var endDate = ranges.selection.endDate ? _utils2.default.dateToStr(ranges.selection.endDate) : undefined;
+            var originValue = _this.getValue();
+            originValue[0] = startDate;
+            originValue[1] = endDate;
+            if (_this.props.timestamp) {
+                _this.setValue([!_this.isEmpty(originValue[0]) ? _utils2.default.strToTime(originValue[0]) : undefined, !_this.isEmpty(originValue[1]) ? _utils2.default.strToTime(originValue[1]) : undefined]);
+            } else {
+                _this.setValue(originValue);
+            }
+            if (_this.state.clickNum % 2 == 0) {
+                setTimeout(function () {
+                    _this.handleRequestClose();
+                }, 300);
+            }
+        };
+
+        _this.openCalendar = function (event) {
+            _this.setState({
+                open: true,
+                anchorEl: _this.refs.container
+            });
+        };
+
+        _this.handleRequestClose = function (event) {
+            _this.setState({ open: false });
+        };
+
+        _this.handleClear = function (event) {
+            event.stopPropagation();
+            _this.setValue([null, null]);
         };
 
         _this.initData(props);
@@ -96,7 +134,7 @@ var DateRange = function (_Component) {
 
                 this.state.startDate = _convertValue2[0];
                 this.state.endDate = _convertValue2[1];
-            } else if (props.hasOwnProperty('value') && props.value === undefined) {
+            } else if (props.hasOwnProperty('value') && (props.value === undefined || props.value === null)) {
                 this.state.startDate = undefined;
                 this.state.endDate = undefined;
             }
@@ -126,11 +164,13 @@ var DateRange = function (_Component) {
     }, {
         key: 'setValue',
         value: function setValue(value) {
-            var _convertValue3 = this.convertValue(value),
-                _convertValue4 = (0, _slicedToArray3.default)(_convertValue3, 2),
-                startDate = _convertValue4[0],
-                endDate = _convertValue4[1];
+            var _ref = value === undefined ? [undefined, undefined] : this.convertValue(value),
+                _ref2 = (0, _slicedToArray3.default)(_ref, 2),
+                startDate = _ref2[0],
+                endDate = _ref2[1];
 
+            this.state.startDate = startDate;
+            this.state.endDate = endDate;
             if (this.props.onChange) {
                 if (this.isEmpty(startDate) && this.isEmpty(endDate)) {
                     this.props.onChange(undefined, this);
@@ -140,10 +180,7 @@ var DateRange = function (_Component) {
                     this.props.onChange([startDate, endDate], this);
                 }
             }
-            this.setState({
-                startDate: startDate,
-                endDate: endDate
-            });
+            this.forceUpdate();
         }
     }, {
         key: 'getValue',
@@ -167,44 +204,101 @@ var DateRange = function (_Component) {
             var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
             var content = _react2.default.createElement(
                 'div',
-                { className: 'flex middle' },
+                { ref: 'container', className: 'flex middle relative full-width cursor-pointer hover',
+                    onClick: this.openCalendar },
                 _react2.default.createElement(
                     'div',
-                    { style: { width: 'calc(50% - 10px)', minWidth: 'calc(50% - 10px)' } },
-                    _react2.default.createElement(_date2.default, {
-                        borderShow: this.props.borderShow && borderStyle === 'underline',
-                        hasClear: this.props.hasClear,
-                        disabled: this.props.disabled,
-                        immutable: this.props.immutable,
-                        fullWidth: this.props.fullWidth,
-                        value: startDate,
-                        maxDate: endDate,
-                        onChange: this.handleChange(0)
-                    })
+                    { className: 'flex middle relative', style: { width: 'calc(100% - 16px)', height: 40, fontSize: 13 } },
+                    _react2.default.createElement(
+                        'div',
+                        { style: {
+                                width: 'calc(50% - 10px)',
+                                minWidth: 'calc(50% - 10px)',
+                                textAlign: 'center'
+                            } },
+                        startDate
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'text-center', style: { color: '#ccc', width: 20, minWidth: 20 } },
+                        '-'
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { style: {
+                                width: 'calc(50% - 10px)',
+                                minWidth: 'calc(50% - 10px)',
+                                textAlign: 'center'
+                            } },
+                        endDate
+                    )
+                ),
+                borderStyle === 'underline' && this.props.borderShow ? _react2.default.createElement('hr', { 'aria-hidden': 'true',
+                    style: {
+                        borderTop: "none rgb(224, 224, 224)",
+                        borderLeft: "none rgb(224, 224, 224)",
+                        borderRight: "none rgb(224, 224, 224)",
+                        borderBottom: "1px solid rgb(224, 224, 224)",
+                        bottom: 6,
+                        boxSizing: "content-box",
+                        margin: 0,
+                        position: "absolute",
+                        width: "100%"
+                    } }) : null,
+                startDate ? _react2.default.createElement(
+                    'div',
+                    { className: 'relative', style: { width: 16 } },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'hover-hide' },
+                        _react2.default.createElement('i', { className: 'iconfont icon-calendar' })
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'hover-show', onClick: this.handleClear },
+                        _react2.default.createElement('i', {
+                            className: 'iconfont icon-close-circle-fill', style: { color: 'rgba(0,0,0,0.3)' } })
+                    )
+                ) : _react2.default.createElement(
+                    'div',
+                    { className: 'relative', style: { width: 16 } },
+                    _react2.default.createElement('i', { className: 'iconfont icon-calendar' })
                 ),
                 _react2.default.createElement(
-                    'div',
-                    { className: 'text-center', style: { color: '#ccc', width: 20, minWidth: 20 } },
-                    '-'
-                ),
-                _react2.default.createElement(
-                    'div',
-                    { style: { width: 'calc(50% - 10px)', minWidth: 'calc(50% - 10px)' } },
-                    _react2.default.createElement(_date2.default, {
-                        borderShow: this.props.borderShow && borderStyle === 'underline',
-                        hasClear: this.props.hasClear,
-                        disabled: this.props.disabled,
-                        immutable: this.props.immutable,
-                        fullWidth: this.props.fullWidth,
-                        value: endDate,
-                        minDate: startDate,
-                        onChange: this.handleChange(1)
+                    _Popover2.default,
+                    {
+                        ref: 'popover',
+                        style: {
+                            left: -10000,
+                            boxShadow: '0 1px 10px #888',
+                            marginTop: 10,
+                            marginLeft: -6
+                        },
+                        open: this.state.open,
+                        anchorEl: this.state.anchorEl,
+                        onRequestClose: this.handleRequestClose },
+                    _react2.default.createElement(_reactDateRange.DateRangePicker, {
+                        ranges: [{
+                            startDate: startDate ? _utils2.default.strToDate(startDate) : new Date(),
+                            endDate: endDate ? _utils2.default.strToDate(endDate) : new Date(),
+                            key: 'selection'
+                        }],
+                        showSelectionPreview: false,
+                        showMonthAndYearPickers: true,
+                        showDateDisplay: false,
+                        showPreview: false,
+                        staticRanges: [],
+                        inputRanges: [],
+                        locale: rdrLocales['zhCN'],
+                        months: 2,
+                        direction: 'horizontal',
+                        onChange: this.handleChange
                     })
                 )
             );
             return _react2.default.createElement(
                 'div',
-                null,
+                { style: this.props.rootStyle },
                 label === false ? null : _react2.default.createElement(
                     'div',
                     null,
@@ -241,7 +335,7 @@ DateRange.defaultProps = {
     hintText: undefined,
     errorText: undefined,
     defaultValue: undefined,
-    activeStartDate: undefined,
+    activeStartDate: _utils2.default.date('Y-m-d', new Date().getTime() / 1000),
     minDate: undefined,
     maxDate: undefined,
     timestamp: false };

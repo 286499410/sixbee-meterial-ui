@@ -70,13 +70,15 @@ var FixedCol = function (_Component) {
         key: 'render',
         value: function render() {
             var state = this.context.state;
+            var props = this.context.props;
             var width = this.getWidth();
             var style = {
                 position: 'absolute',
                 top: 0,
                 zIndex: 3,
-                width: width,
-                backgroundColor: '#fff'
+                width: width - 1,
+                backgroundColor: '#fff',
+                overflow: 'hidden'
             };
             if (this.props.position == 'right') {
                 style.right = 0;
@@ -91,6 +93,9 @@ var FixedCol = function (_Component) {
                 }
             }
             if (state.containerWidth > state.tableWidth) {
+                return null;
+            }
+            if (state.dataSource.length == 0) {
                 return null;
             }
             return _react2.default.createElement(
@@ -112,6 +117,7 @@ var FixedCol = function (_Component) {
                         hasEmptyTip: false,
                         hasLoading: false,
                         width: width,
+                        height: 20,
                         showColumns: this.props.columns,
                         showCheckboxes: this.props.position == 'left',
                         showSeries: this.props.position == 'left'

@@ -86,7 +86,7 @@ export default class DateRange extends Component {
     render() {
         let label = this.props.label;
         let [startMoney, endMoney] = this.getValue();
-        return <div>
+        return <div style={this.props.rootStyle}>
             {
                 label === false ? null : <div>
                     <span style={{

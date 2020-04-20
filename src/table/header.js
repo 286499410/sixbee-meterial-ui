@@ -1,10 +1,12 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types'
 import Checkbox from 'material-ui/Checkbox';
+import Icon from '../icon';
 import _ from 'lodash';
 import Filter from './filter';
 import Sort from './sort';
 import utils from '../utils';
+
 
 export default class TableHeader extends Component {
 
@@ -210,7 +212,7 @@ export default class TableHeader extends Component {
                     className="table-header"
                     style={{
                         overflow: 'hidden',
-                        width: this.props.width || props.containerWidth,
+                        width: "calc(100% + 2px)",
                         ...props.headerStyle
                     }}>
             <table className={className} style={{width: this.props.width || state.tableWidth, tableLayout: 'fixed'}}>
@@ -235,7 +237,7 @@ export default class TableHeader extends Component {
                                             data-key="checkbox"
                                             style={{
                                                 width: props.checkboxColumnWidth,
-                                                height: props.headerRowHeight + 1
+                                                height: state.headerHeight || props.headerRowHeight * state.headerColumns.length + state.headerColumns.length
                                             }}>
                                             <Checkbox checked={this.isChecked()}
                                                       onCheck={this.handleCheck} {...props.checkboxStyle}/>
@@ -246,7 +248,7 @@ export default class TableHeader extends Component {
                                         <th rowSpan={state.headerColumns.length}
                                             style={{
                                                 width: props.seriesColumnWidth,
-                                                height: props.headerRowHeight,
+                                                height: state.headerHeight - 1,
                                                 textAlign: props.headerTextAlign
                                             }}>序号
                                         </th> : null
@@ -254,17 +256,18 @@ export default class TableHeader extends Component {
                                 {
                                     columns.map((col, j) => {
                                         let style = {};
+                                        let rowSpan = (col.children && col.children.length > 0) ? 1 : state.headerColumns.length - i;
                                         col.key = col.key || `${i}-${j}`;
                                         if (state.columnWidths[col.key] || col.width) {
                                             style.width = state.columnWidths[col.key] || col.width;
                                         }
                                         style.textAlign = col.headerTextAlign || props.headerTextAlign;
                                         if (props.headerRowHeight) {
-                                            style.height = props.headerRowHeight;
+                                            style.height = props.headerRowHeight * rowSpan + rowSpan;
                                         }
                                         return (
                                             <th key={j} data-key={col.key}
-                                                rowSpan={(col.children && col.children.length > 0) ? 1 : state.headerColumns.length - i}
+                                                rowSpan={rowSpan}
                                                 colSpan={col.colSpan} style={style}>
                                                 <div className="flex middle center">
                                                     <div>{col.label}</div>
@@ -274,6 +277,12 @@ export default class TableHeader extends Component {
                                                                 value={_.get(filterData, col.formKey || col.key)}/> : null}
                                                     {col.sortable ?
                                                         <Sort field={col} onSort={this.handleSort(col)}/> : null}
+                                                    {
+                                                        col.required ? <span className="text-danger">*</span> : null
+                                                    }
+                                                    {
+                                                        col.icon ? <Icon {...col.icon}/> : null
+                                                    }
                                                 </div>
                                                 {
                                                     props.resize ?

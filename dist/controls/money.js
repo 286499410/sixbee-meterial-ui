@@ -69,13 +69,12 @@ var Money = function (_Component) {
 
         _this.setValue = function (value) {
             value = _lodash2.default.trim(value);
-            if (/^-?\d{0,3}((,\d{3})*)((,\d{0,3})?)((\.\d{0,9})?)$/.test(value) || /^-?\d*((\.\d{0,9})?)$/.test(value)) {
-                var number = value === '' ? '' : _utils2.default.round(_utils2.default.parseNumber(value), _this.props.float);
-                _this.setState({
-                    value: number
-                });
+            if (/^-?\d{0,3}((,\d{3})*)((,\d{0,3})?)((\.\d{0,16})?)$/.test(value) || /^-?\d*((\.\d{0,16})?)$/.test(value)) {
+                value = value.toString().replace(/,/g, '');
+                _this.state.value = value;
+                _this.forceUpdate();
                 if (_this.props.onChange) {
-                    _this.props.onChange(number, _this);
+                    _this.props.onChange(value, _this);
                 }
             }
         };
@@ -88,8 +87,23 @@ var Money = function (_Component) {
         };
 
         _this.handleBlur = function (event) {
-            _this.state.value = _this.state.value !== '' && _this.state.value !== undefined ? _utils2.default.parseNumber(_this.state.value) : _this.state.value;
-            _this.setState({ focus: false });
+            _this.state.focus = false;
+            var float = _this.getFloat();
+            if (float) {
+                var value = _this.getValue();
+                if (value === undefined || value === null || value === '') {
+                    _this.forceUpdate();
+                    return;
+                }
+                value = _utils2.default.toFixed(value, float);
+                if (_this.state.value !== value) {
+                    _this.setValue(_utils2.default.toFixed(value, float));
+                } else {
+                    _this.forceUpdate();
+                }
+            } else {
+                _this.forceUpdate();
+            }
             if (_this.props.onBlur) {
                 _this.props.onBlur(event, _this);
             }
@@ -118,10 +132,20 @@ var Money = function (_Component) {
             this.initData(nextProps);
         }
     }, {
+        key: 'shouldComponentUpdate',
+        value: function shouldComponentUpdate(nextProps, nextState) {
+            if (_lodash2.default.isEqual(this.state, nextState) && _lodash2.default.isEqual(this.props, nextProps)) {
+                return false;
+            }
+            return true;
+        }
+    }, {
         key: 'initData',
         value: function initData(props) {
             if (props.hasOwnProperty('value')) {
-                this.state.value = props.value === '' ? '' : _utils2.default.round(_utils2.default.parseNumber(props.value), props.float);
+                if (props.value != _utils2.default.parseNumber(this.state.value)) {
+                    this.state.value = props.value === '' ? '' : _utils2.default.toFixed(_utils2.default.parseNumber(props.value), this.getFloat(props));
+                }
             }
         }
     }, {
@@ -144,17 +168,27 @@ var Money = function (_Component) {
             return styleProps;
         }
     }, {
+        key: 'getFloat',
+        value: function getFloat() {
+            var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props;
+
+            if (_lodash2.default.isFunction(props.float)) {
+                return props.float();
+            }
+            return props.float;
+        }
+    }, {
         key: 'render',
         value: function render() {
             var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
-            var value = this.getValue();
+            var value = this.getValue() || '';
             var label = this.props.label;
             var styleProps = this.getStyleProps();
             if (!this.state.focus) {
                 if (!this.props.showZero && value == 0) {
                     value = '';
                 } else {
-                    value = value !== '' ? _utils2.default.parseMoney(value, this.props.float) : '';
+                    value = value !== '' ? _utils2.default.parseMoney(value, this.getFloat()) : '';
                 }
             }
             var textField = _react2.default.createElement(_TextField2.default, (0, _extends3.default)({
@@ -177,7 +211,7 @@ var Money = function (_Component) {
             if (borderStyle === 'border' && this.props.borderShow) {
                 return _react2.default.createElement(
                     'div',
-                    { className: "control-border" + (this.state.focus ? ' focus' : '') },
+                    { className: "control-border" + (this.state.focus ? ' focus' : ''), style: this.props.rootStyle },
                     textField
                 );
             } else {

@@ -6,6 +6,7 @@
 import React, {Component} from 'react';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
+import $ from 'jquery';
 
 export default class Icon extends Component {
 
@@ -25,14 +26,37 @@ export default class Icon extends Component {
         buttonStyle: undefined,         //按钮样式，type=button生效
     };
 
+    state = {
+        currentTarget: undefined,
+        isHover: false
+    };
+
     handleClick = (event) => {
         if (!this.props.disabled && this.props.onClick) {
             this.props.onClick(event);
         }
     };
 
+    handleMouseEnter = (event) => {
+        this.setState({
+            currentTarget: event.currentTarget,
+            isHover: true
+        });
+    };
+
+    handleMouseLeave = (event) => {
+        this.setState({
+            isHover: false
+        });
+    };
+
     render() {
         let iconClassName = this.props.classPrefix + this.props.name;
+        let tooltip = this.props.tooltip;
+        if(tooltip && tooltip.indexOf("\n") >= 0) {
+            tooltip = tooltip.replace("\n", "<br/>");
+            tooltip = <div dangerouslySetInnerHTML={{__html: `<div>${tooltip}</div>`}}/>;
+        }
         if (this.props.type == 'button') {
             return <IconButton
                 disabled={this.props.disabled}
@@ -50,22 +74,33 @@ export default class Icon extends Component {
                     width: this.props.size,
                     height: this.props.size
                 }}
-                tooltip={this.props.tooltip}
                 title={this.props.title}
+                tooltip={tooltip}
+                tooltipPosition={this.props.tooltipPosition}
+                tooltipStyles={{
+                    position: 'fixed',
+                    marginTop: this.state.isHover ? $(this.state.currentTarget).offset().top: -10000,
+                    marginLeft: this.state.isHover ? $(this.state.currentTarget).offset().left : -10000,
+                    padding: 4
+                }}
+                onMouseEnter={this.handleMouseEnter}
+                onMouseLeave={this.handleMouseLeave}
                 onClick={this.handleClick}>
                 <div className="relative">
                     <div className="position-center">
-                        <FontIcon className={iconClassName} color={'inherit'} style={{
-                            fontSize: this.props.size,
-                            ...this.props.iconStyle
-                        }}/>
+                        <FontIcon className={iconClassName}
+                                  color={'inherit'}
+                                  style={{
+                                      fontSize: this.props.size,
+                                      ...this.props.iconStyle
+                                  }}/>
                         {this.props.children}
                     </div>
                 </div>
             </IconButton>
         } else {
             return <FontIcon className={iconClassName}
-                             title={this.props.title}
+                             title={this.props.title || tooltip}
                              color={this.props.color}
                              hoverColor={this.props.hoverColor}
                              style={{

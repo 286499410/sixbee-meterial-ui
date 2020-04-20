@@ -7,11 +7,14 @@ import TextField from 'material-ui/TextField';
 import PropTypes from 'prop-types';
 import Popover from 'material-ui/Popover';
 import IconButton from 'material-ui/IconButton';
-import ReactCalendar from 'react-calendar';
+import {Calendar} from 'react-date-range';
+import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css file
+import * as rdrLocales from 'react-date-range/dist/locale';
 import style from '../style';
 import utils from '../utils';
 
-export default class Date extends Component {
+export default class Date2 extends Component {
 
     static defaultProps = {
         label: undefined,           //标签
@@ -52,6 +55,13 @@ export default class Date extends Component {
         this.initData(nextProps);
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (_.isEqual(this.state, nextState) && _.isEqual(this.props, nextProps)) {
+            return false;
+        }
+        return true;
+    }
+
     initData(props) {
         if (props.hasOwnProperty('value')) {
             let value = props.value;
@@ -67,7 +77,8 @@ export default class Date extends Component {
      * @param value
      */
     setValue(value) {
-        this.setState({value: value});
+        this.state.value = value;
+        this.forceUpdate();
         if (this.props.onChange) {
             if (value && this.props.timestamp) {
                 value = utils.strToTime(value);
@@ -200,7 +211,7 @@ export default class Date extends Component {
             inputStyle={styleProps.inputStyle}
             style={styleProps.style}
         />;
-        return <div ref="container" style={{position: 'relative'}}>
+        return <div ref="container" style={{position: 'relative', ...this.props.rootStyle}}>
             {
                 borderStyle === 'border' && this.props.borderShow ? <div className="full-width">
                         <div className={"control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>{textField}</div>
@@ -211,7 +222,7 @@ export default class Date extends Component {
                 (value !== undefined && value !== null && value !== '') && this.props.hasClear && !this.props.disabled && !this.props.immutable ?
                     <IconButton iconClassName="iconfont icon-close-circle-fill" onClick={this.handleClear}
                                 style={{position: 'absolute', right: 0, ...styleProps.iconStyle.style}}
-                                iconStyle={{color: '#e0e0e0', ...styleProps.iconStyle.iconStyle}}
+                                iconStyle={{color: "rgba(0,0,0,0.3)", ...styleProps.iconStyle.iconStyle}}
 
                     /> : null
             }
@@ -222,12 +233,12 @@ export default class Date extends Component {
                 anchorEl={this.state.anchorEl}
                 onRequestClose={this.handleRequestClose}>
                 <div>
-                    <ReactCalendar
+                    <Calendar
+                        locale={rdrLocales['zhCN']}
+                        date={value ? utils.strToDate(value) : new Date()}
                         onChange={this.handleChange}
-                        value={utils.strToDate(value)}
-                        activeStartDate={this.props.activeStartDate ? utils.strToDate(this.props.activeStartDate) : null}
-                        minDate={this.props.minDate ? utils.strToDate(this.props.minDate) : null}
-                        maxDate={this.props.maxDate ? utils.strToDate(this.props.maxDate) : null}
+                        minDate={this.props.minDate ? utils.strToDate(this.props.minDate) : undefined}
+                        maxDate={this.props.maxDate ? utils.strToDate(this.props.maxDate) : undefined}
                     />
                 </div>
             </Popover>
