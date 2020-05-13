@@ -58,7 +58,7 @@ export default class Money extends Component {
     initData(props) {
         if (props.hasOwnProperty('value')) {
             if (props.value != utils.parseNumber(this.state.value)) {
-                this.state.value = props.value === '' || props.value === '-' ? props.value : utils.toFixed(utils.parseNumber(props.value), this.getFloat(props));
+                this.state.value = props.value === undefined || props.value === '' || props.value === '-' ? props.value : utils.toFixed(utils.parseNumber(props.value), this.getFloat(props));
             }
         }
     }

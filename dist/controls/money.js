@@ -144,7 +144,7 @@ var Money = function (_Component) {
         value: function initData(props) {
             if (props.hasOwnProperty('value')) {
                 if (props.value != _utils2.default.parseNumber(this.state.value)) {
-                    this.state.value = props.value === '' || props.value === '-' ? props.value : _utils2.default.toFixed(_utils2.default.parseNumber(props.value), this.getFloat(props));
+                    this.state.value = props.value === undefined || props.value === '' || props.value === '-' ? props.value : _utils2.default.toFixed(_utils2.default.parseNumber(props.value), this.getFloat(props));
                 }
             }
         }
