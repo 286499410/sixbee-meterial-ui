@@ -228,7 +228,6 @@ export default class DateRange extends Component {
                     showSelectionPreview={false}
                     showMonthAndYearPickers={true}
                     showDateDisplay={false}
-                    showPreview={false}
                     staticRanges={[]}
                     inputRanges={[]}
                     locale={rdrLocales['zhCN']}

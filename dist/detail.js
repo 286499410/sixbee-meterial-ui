@@ -65,20 +65,38 @@ var Detail = function (_Component) {
                     );
                 } else {
                     var text = _utils2.default.render(_this2.props.data, field);
+                    var value = field.render ? field.render(_this2.props.data) : text === '' || text === undefined || text === null ? '-' : text;
                     return _react2.default.createElement(
                         'div',
-                        { key: index, className: 'col col-' + (field.cols || 1), style: { marginTop: 12, marginBottom: 8 } },
-                        _react2.default.createElement(
+                        { key: index, className: 'col col-' + (field.cols || 1),
+                            style: { marginTop: 12, marginBottom: 8 } },
+                        field.inline === true ? _react2.default.createElement(
                             'div',
-                            { className: 'text-muted text-small', style: { marginBottom: 6 } },
-                            field.label
-                        ),
-                        _react2.default.createElement(
+                            { className: 'flex middle' },
+                            _react2.default.createElement(
+                                'div',
+                                { className: 'text-muted',
+                                    style: { width: field.labelWidth || _this2.props.labelWidth } },
+                                field.label
+                            ),
+                            _react2.default.createElement(
+                                'div',
+                                { className: "text-normal", style: { flowGrow: 1 } },
+                                value
+                            )
+                        ) : _react2.default.createElement(
                             'div',
-                            { className: "text-normal",
-                                style: { minHeight: 20 } },
-                            field.render ? field.render(_this2.props.data) : text === '' || text === undefined || text === null ? '-' : text,
-                            ' '
+                            null,
+                            _react2.default.createElement(
+                                'div',
+                                { className: 'text-muted text-small', style: { marginBottom: 6 } },
+                                field.label
+                            ),
+                            _react2.default.createElement(
+                                'div',
+                                { className: "text-normal", style: { minHeight: 20 } },
+                                value
+                            )
                         )
                     );
                 }
@@ -100,6 +118,7 @@ var Detail = function (_Component) {
 Detail.defaultProps = {
     data: {},
     cols: 2,
-    fields: []
+    fields: [],
+    labelWidth: 90
 };
 exports.default = Detail;

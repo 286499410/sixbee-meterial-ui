@@ -1,6 +1,6 @@
 {
   "name": "sixbee-material-ui",
-  "version": "1.0.33",
+  "version": "1.0.34",
   "description": "model & view",
   "author": "joey",
   "license": "ISC",
@@ -36,7 +36,7 @@
     "material-ui-persian-date-picker-utils": "^0.1.2",
     "react-calendar": "^2.19.2",
     "react-custom-scrollbars": "^4.2.1",
-    "react-date-range": "^1.0.1",
+    "react-date-range": "^1.0.3",
     "react-sortablejs": "^1.5.1",
     "react-swipeable-views": "^0.13.1",
     "sortablejs": "^1.6.1"

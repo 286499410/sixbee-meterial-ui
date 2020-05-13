@@ -22,6 +22,7 @@ import Editor from './controls/editor';
 import SelectTag from './controls/select-tag';
 import SelectCheck from './controls/select-check';
 import Static from './controls/static';
+import Table from './controls/form-table';
 
 export default class Control extends Component {
 
@@ -51,7 +52,8 @@ export default class Control extends Component {
         editor: Editor,
         selectTag: SelectTag,
         'select-check': SelectCheck,
-        static: Static
+        static: Static,
+        table: Table
     };
 
     constructor(props) {
@@ -96,6 +98,9 @@ export default class Control extends Component {
             case 'number':
             case 'mobile':
                 props.type = type;
+                break;
+            case 'table':
+                props.columns = props.fields;
                 break;
             case 'textarea':
                 props.multiLine = true;

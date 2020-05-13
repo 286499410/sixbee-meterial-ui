@@ -156,7 +156,7 @@ export default class TableBody extends Component {
                     }}>
                         <div className="position-center text-center" style={{zIndex: 1}}>
                             <div>
-                                <div><img src={props.emptyDataImage} style={{maxWidth: 180, maxHeight: state.bodyHeight * 0.7}}/></div>
+                                <div><img src={props.emptyDataImage} style={{maxWidth: 180, maxHeight: state.bodyHeight * 0.7 || undefined}}/></div>
                                 <div>{props.emptyDataTip}</div>
                             </div>
                         </div>

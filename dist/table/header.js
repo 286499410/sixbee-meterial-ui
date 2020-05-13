@@ -168,7 +168,7 @@ var TableHeader = function (_Component) {
                                         'data-key': 'checkbox',
                                         style: {
                                             width: props.checkboxColumnWidth,
-                                            height: state.headerHeight || props.headerRowHeight * state.headerColumns.length + state.headerColumns.length
+                                            height: state.headerHeight || props.headerRowHeight * state.headerColumns.length + state.headerColumns.length || undefined
                                         } },
                                     _react2.default.createElement(_Checkbox2.default, (0, _extends3.default)({ checked: _this3.isChecked(),
                                         onCheck: _this3.handleCheck }, props.checkboxStyle))
@@ -178,7 +178,7 @@ var TableHeader = function (_Component) {
                                     { rowSpan: state.headerColumns.length,
                                         style: {
                                             width: props.seriesColumnWidth,
-                                            height: state.headerHeight - 1,
+                                            height: state.headerHeight - 1 || undefined,
                                             textAlign: props.headerTextAlign
                                         } },
                                     '\u5E8F\u53F7'
@@ -192,7 +192,7 @@ var TableHeader = function (_Component) {
                                     }
                                     style.textAlign = col.headerTextAlign || props.headerTextAlign;
                                     if (props.headerRowHeight) {
-                                        style.height = props.headerRowHeight * rowSpan + rowSpan;
+                                        style.height = props.headerRowHeight * rowSpan + rowSpan || undefined;
                                     }
                                     return _react2.default.createElement(
                                         'th',
@@ -202,6 +202,11 @@ var TableHeader = function (_Component) {
                                         _react2.default.createElement(
                                             'div',
                                             { className: 'flex middle center' },
+                                            col.required ? _react2.default.createElement(
+                                                'span',
+                                                { className: 'text-danger' },
+                                                '*'
+                                            ) : null,
                                             _react2.default.createElement(
                                                 'div',
                                                 null,
@@ -211,11 +216,6 @@ var TableHeader = function (_Component) {
                                                 onFilter: _this3.handleFilter(col),
                                                 value: _lodash2.default.get(filterData, col.formKey || col.key) }) : null,
                                             col.sortable ? _react2.default.createElement(_sort2.default, { field: col, onSort: _this3.handleSort(col) }) : null,
-                                            col.required ? _react2.default.createElement(
-                                                'span',
-                                                { className: 'text-danger' },
-                                                '*'
-                                            ) : null,
                                             col.icon ? _react2.default.createElement(_icon2.default, col.icon) : null
                                         ),
                                         props.resize ? _react2.default.createElement('div', { className: 'resize',

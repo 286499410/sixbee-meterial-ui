@@ -58,7 +58,7 @@ export default class Money extends Component {
     initData(props) {
         if (props.hasOwnProperty('value')) {
             if (props.value != utils.parseNumber(this.state.value)) {
-                this.state.value = props.value === '' ? '' : utils.toFixed(utils.parseNumber(props.value), this.getFloat(props));
+                this.state.value = props.value === '' || props.value === '-' ? props.value : utils.toFixed(utils.parseNumber(props.value), this.getFloat(props));
             }
         }
     }
@@ -195,14 +195,19 @@ export default class Money extends Component {
             onFocus={this.handleFocus}
             onKeyUp={this.handleKeyUp}
             hintText={this.props.hintText}
-            errorText={this.props.errorText}
+            errorText={borderStyle === 'underline' ? this.props.errorText : undefined}
             floatingLabelFixed={this.props.labelFixed}
             underlineShow={borderStyle === 'underline' && this.props.borderShow}
             autoComplete={this.props.autoComplete}
             {...styleProps}
         />;
         if (borderStyle === 'border' && this.props.borderShow) {
-            return <div className={"control-border" + (this.state.focus ? ' focus' : '')} style={this.props.rootStyle}>{textField}</div>
+            return <div className="full-width">
+                <div
+                    className={"control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>{textField}</div>
+                <div className="text-small text-danger"
+                     style={{marginTop: 2}}>{this.props.errorText}</div>
+            </div>
         } else {
             return textField;
         }

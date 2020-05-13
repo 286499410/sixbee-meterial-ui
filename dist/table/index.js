@@ -313,7 +313,11 @@ var Table = function (_Component) {
         key: 'componentDidMount',
         value: function componentDidMount() {
             this.state.containerWidth = (0, _jquery2.default)(this.refs.container).outerWidth() || '100%';
-            this.state.tableWidth = this.state.tableWidth || this.state.containerWidth;
+            if (this.props.tableMinWidth) {
+                this.state.tableWidth = Math.max(!this.state.tableWidth || this.state.tableWidth == '100%' ? this.state.containerWidth : this.state.tableWidth, this.props.tableMinWidth);
+            } else {
+                this.state.tableWidth = this.state.tableWidth || this.state.containerWidth;
+            }
             this.componentDidUpdate();
         }
     }, {

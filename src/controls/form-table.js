@@ -692,6 +692,7 @@ export default class FormTable extends Component {
                    headerTextAlign="center"
                    showCheckboxes={this.props.showCheckboxes}
                    rowCheckboxEnabled={this.props.rowCheckboxEnabled}
+                   //fixedRightColumns={this.props.fixedRightColumns}
                    emptyDataTip="还没添加数据"
                    pager={pager}
                    mode={pager ? 'local' : undefined}

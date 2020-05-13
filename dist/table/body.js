@@ -169,7 +169,7 @@ var TableBody = function (_Component) {
                             _react2.default.createElement(
                                 'div',
                                 null,
-                                _react2.default.createElement('img', { src: props.emptyDataImage, style: { maxWidth: 180, maxHeight: state.bodyHeight * 0.7 } })
+                                _react2.default.createElement('img', { src: props.emptyDataImage, style: { maxWidth: 180, maxHeight: state.bodyHeight * 0.7 || undefined } })
                             ),
                             _react2.default.createElement(
                                 'div',

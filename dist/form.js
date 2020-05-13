@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _promise = require('babel-runtime/core-js/promise');
 
 var _promise2 = _interopRequireDefault(_promise);
@@ -15,10 +19,6 @@ var _keys2 = _interopRequireDefault(_keys);
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
-
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
 
 var _assign = require('babel-runtime/core-js/object/assign');
 
@@ -125,6 +125,17 @@ var Form = function (_Component) {
             }
         }
     }, {
+        key: 'setChangedData',
+        value: function setChangedData(data) {
+            (0, _assign2.default)(this.state.changedData, data);
+        }
+    }, {
+        key: 'setOriginData',
+        value: function setOriginData(data) {
+            (0, _assign2.default)(this.state.originData, data);
+            this.setFieldOriginData(this.props.fields);
+        }
+    }, {
         key: 'setFieldDefaultData',
         value: function setFieldDefaultData(fields) {
             var _this2 = this;
@@ -192,12 +203,27 @@ var Form = function (_Component) {
 
             switch (dataScope) {
                 case 'all':
-                    return (0, _extends3.default)({}, defaultData, this.state.feildOriginData, this.state.changedData);
+                    return _lodash2.default.merge({}, defaultData, this.state.feildOriginData, this.state.changedData);
                 case 'changed':
-                    return (0, _extends3.default)({}, defaultData, this.state.changedData);
+                    return _lodash2.default.merge({}, defaultData, this.state.changedData);
                 case 'all-extra':
-                    return (0, _extends3.default)({}, defaultData, this.state.originData, this.state.changedData);
+                    return _lodash2.default.merge({}, defaultData, this.state.originData, this.state.changedData);
             }
+        }
+    }, {
+        key: 'getAllData',
+        value: function getAllData() {
+            return this.getData('all');
+        }
+    }, {
+        key: 'getAllExtraData',
+        value: function getAllExtraData() {
+            return this.getData('all-extra');
+        }
+    }, {
+        key: 'getChangedData',
+        value: function getChangedData() {
+            return this.getData('changed');
         }
     }, {
         key: 'beforeSubmit',
@@ -210,8 +236,10 @@ var Form = function (_Component) {
     }, {
         key: 'check',
         value: function check(data) {
+            var alert = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
             if (this.props.check) {
-                var errorMsg = this.props.check(data);
+                var errorMsg = this.props.check(data, alert);
                 if (errorMsg !== true) {
                     console.log('errorMsg', errorMsg);
                     this.setState({ errorText: errorMsg });
@@ -494,7 +522,7 @@ var _initialiseProps = function _initialiseProps() {
             }
             if ((0, _keys2.default)(_this6.state.errorText).length > 0) {
                 var allData = _this6.getData('all');
-                _this6.check(allData);
+                _this6.check(allData, false);
             }
             _this6.forceUpdate();
         };
@@ -621,7 +649,9 @@ var _initialiseProps = function _initialiseProps() {
                     var control = _react2.default.createElement(_control2.default, (0, _extends3.default)({ ref: field.key,
                         value: value,
                         size: _this6.props.controlSize
-                    }, (0, _extends3.default)({}, field, { label: _this6.props.inline && field.type !== 'checkbox' ? false : field.label }), {
+                    }, (0, _extends3.default)({}, field, {
+                        label: _this6.props.inline && field.type !== 'checkbox' ? false : field.label
+                    }), {
                         labelFixed: _this6.props.labelFixed,
                         errorText: _lodash2.default.get(_this6.state.errorText, field.key),
                         validate: _this6.props.validate ? _this6.state.validate : false,

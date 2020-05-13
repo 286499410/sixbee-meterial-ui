@@ -144,7 +144,7 @@ var Money = function (_Component) {
         value: function initData(props) {
             if (props.hasOwnProperty('value')) {
                 if (props.value != _utils2.default.parseNumber(this.state.value)) {
-                    this.state.value = props.value === '' ? '' : _utils2.default.toFixed(_utils2.default.parseNumber(props.value), this.getFloat(props));
+                    this.state.value = props.value === '' || props.value === '-' ? props.value : _utils2.default.toFixed(_utils2.default.parseNumber(props.value), this.getFloat(props));
                 }
             }
         }
@@ -203,7 +203,7 @@ var Money = function (_Component) {
                 onFocus: this.handleFocus,
                 onKeyUp: this.handleKeyUp,
                 hintText: this.props.hintText,
-                errorText: this.props.errorText,
+                errorText: borderStyle === 'underline' ? this.props.errorText : undefined,
                 floatingLabelFixed: this.props.labelFixed,
                 underlineShow: borderStyle === 'underline' && this.props.borderShow,
                 autoComplete: this.props.autoComplete
@@ -211,8 +211,19 @@ var Money = function (_Component) {
             if (borderStyle === 'border' && this.props.borderShow) {
                 return _react2.default.createElement(
                     'div',
-                    { className: "control-border" + (this.state.focus ? ' focus' : ''), style: this.props.rootStyle },
-                    textField
+                    { className: 'full-width' },
+                    _react2.default.createElement(
+                        'div',
+                        {
+                            className: "control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '') },
+                        textField
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'text-small text-danger',
+                            style: { marginTop: 2 } },
+                        this.props.errorText
+                    )
                 );
             } else {
                 return textField;

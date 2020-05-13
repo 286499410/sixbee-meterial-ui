@@ -81,6 +81,7 @@ var FixedCol = function (_Component) {
                 overflow: 'hidden'
             };
             if (this.props.position == 'right') {
+                style.width--;
                 style.right = 0;
                 if (state.scrollLeft < state.tableWidth - state.containerWidth - 1) {
                     style.boxShadow = '-6px 0 6px rgba(0,0,0,0.1)';

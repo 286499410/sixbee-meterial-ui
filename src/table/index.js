@@ -200,7 +200,14 @@ export default class Table extends Component {
 
     componentDidMount() {
         this.state.containerWidth = $(this.refs.container).outerWidth() || '100%';
-        this.state.tableWidth = this.state.tableWidth || this.state.containerWidth;
+        if(this.props.tableMinWidth) {
+            this.state.tableWidth = Math.max(
+                (!this.state.tableWidth || this.state.tableWidth == '100%') ? this.state.containerWidth : this.state.tableWidth,
+                this.props.tableMinWidth
+            );
+        } else {
+            this.state.tableWidth = this.state.tableWidth || this.state.containerWidth;
+        }
         this.componentDidUpdate();
     }
 

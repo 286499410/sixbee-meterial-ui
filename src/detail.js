@@ -6,7 +6,8 @@ export default class Detail extends Component {
     static defaultProps = {
         data: {},
         cols: 2,
-        fields: []
+        fields: [],
+        labelWidth: 90
     };
 
     renderFields(fields) {
@@ -20,10 +21,19 @@ export default class Detail extends Component {
                 </div>
             } else {
                 let text = utils.render(this.props.data, field);
-                return <div key={index} className={`col col-${field.cols || 1}`} style={{marginTop: 12, marginBottom: 8}}>
-                    <div className="text-muted text-small" style={{marginBottom: 6}}>{field.label}</div>
-                    <div className={"text-normal"}
-                         style={{minHeight: 20}}>{field.render ? field.render(this.props.data) : (text === '' || text === undefined || text === null ? '-' : text)} </div>
+                let value = field.render ? field.render(this.props.data) : (text === '' || text === undefined || text === null ? '-' : text);
+                return <div key={index} className={`col col-${field.cols || 1}`}
+                            style={{marginTop: 12, marginBottom: 8}}>
+                    {
+                        field.inline === true ? <div className="flex middle">
+                            <div className="text-muted"
+                                 style={{width: field.labelWidth || this.props.labelWidth}}>{field.label}</div>
+                            <div className={"text-normal"} style={{flowGrow: 1}}>{value}</div>
+                        </div> : <div>
+                            <div className="text-muted text-small" style={{marginBottom: 6}}>{field.label}</div>
+                            <div className={"text-normal"} style={{minHeight: 20}}>{value}</div>
+                        </div>
+                    }
                 </div>
             }
         });

@@ -237,7 +237,7 @@ export default class TableHeader extends Component {
                                             data-key="checkbox"
                                             style={{
                                                 width: props.checkboxColumnWidth,
-                                                height: state.headerHeight || props.headerRowHeight * state.headerColumns.length + state.headerColumns.length
+                                                height: state.headerHeight || props.headerRowHeight * state.headerColumns.length + state.headerColumns.length || undefined
                                             }}>
                                             <Checkbox checked={this.isChecked()}
                                                       onCheck={this.handleCheck} {...props.checkboxStyle}/>
@@ -248,7 +248,7 @@ export default class TableHeader extends Component {
                                         <th rowSpan={state.headerColumns.length}
                                             style={{
                                                 width: props.seriesColumnWidth,
-                                                height: state.headerHeight - 1,
+                                                height: state.headerHeight - 1 || undefined,
                                                 textAlign: props.headerTextAlign
                                             }}>序号
                                         </th> : null
@@ -263,13 +263,16 @@ export default class TableHeader extends Component {
                                         }
                                         style.textAlign = col.headerTextAlign || props.headerTextAlign;
                                         if (props.headerRowHeight) {
-                                            style.height = props.headerRowHeight * rowSpan + rowSpan;
+                                            style.height = props.headerRowHeight * rowSpan + rowSpan || undefined;
                                         }
                                         return (
                                             <th key={j} data-key={col.key}
                                                 rowSpan={rowSpan}
                                                 colSpan={col.colSpan} style={style}>
                                                 <div className="flex middle center">
+                                                    {
+                                                        col.required ? <span className="text-danger">*</span> : null
+                                                    }
                                                     <div>{col.label}</div>
                                                     {col.filter ?
                                                         <Filter field={col.filter === true ? col : {...col, ...col.filter}}
@@ -277,9 +280,6 @@ export default class TableHeader extends Component {
                                                                 value={_.get(filterData, col.formKey || col.key)}/> : null}
                                                     {col.sortable ?
                                                         <Sort field={col} onSort={this.handleSort(col)}/> : null}
-                                                    {
-                                                        col.required ? <span className="text-danger">*</span> : null
-                                                    }
                                                     {
                                                         col.icon ? <Icon {...col.icon}/> : null
                                                     }

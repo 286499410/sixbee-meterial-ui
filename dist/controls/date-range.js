@@ -286,7 +286,6 @@ var DateRange = function (_Component) {
                         showSelectionPreview: false,
                         showMonthAndYearPickers: true,
                         showDateDisplay: false,
-                        showPreview: false,
                         staticRanges: [],
                         inputRanges: [],
                         locale: rdrLocales['zhCN'],

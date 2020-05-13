@@ -649,6 +649,7 @@ var FormTable = function (_Component) {
                     headerTextAlign: 'center',
                     showCheckboxes: this.props.showCheckboxes,
                     rowCheckboxEnabled: this.props.rowCheckboxEnabled,
+
                     emptyDataTip: '\u8FD8\u6CA1\u6DFB\u52A0\u6570\u636E',
                     pager: pager,
                     mode: pager ? 'local' : undefined

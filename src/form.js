@@ -118,6 +118,23 @@ export default class Form extends Component {
     }
 
     /**
+     * 设置改变的数据
+     * @param data
+     */
+    setChangedData(data) {
+        Object.assign(this.state.changedData, data);
+    }
+
+    /**
+     * 设置原数据
+     * @param data
+     */
+    setOriginData(data) {
+        Object.assign(this.state.originData, data);
+        this.setFieldOriginData(this.props.fields);
+    }
+
+    /**
      * 提取控件默认值
      * @param fields
      */
@@ -167,24 +184,39 @@ export default class Form extends Component {
         }
         switch (dataScope) {
             case 'all': //所有控件的值
-                return {
-                    ...defaultData,
-                    ...this.state.feildOriginData,
-                    ...this.state.changedData
-                };
+                return _.merge(
+                    {},
+                    defaultData,
+                    this.state.feildOriginData,
+                    this.state.changedData
+                );
             case 'changed': //修改控件的值
-                return {
-                    ...defaultData,
-                    ...this.state.changedData
-                };
+                return _.merge(
+                    {},
+                    defaultData,
+                    this.state.changedData
+                );
             case 'all-extra': //所有值
-                return {
-                    ...defaultData,
-                    ...this.state.originData,
-                    ...this.state.changedData
-                }
+                return _.merge(
+                    {},
+                    defaultData,
+                    this.state.originData,
+                    this.state.changedData
+                );
         }
     };
+
+    getAllData() {
+        return this.getData('all');
+    }
+
+    getAllExtraData() {
+        return this.getData('all-extra');
+    }
+
+    getChangedData() {
+        return this.getData('changed');
+    }
 
     /**
      * 数据改时执行事件
@@ -203,7 +235,7 @@ export default class Form extends Component {
         }
         if (Object.keys(this.state.errorText).length > 0) {
             let allData = this.getData('all');
-            this.check(allData);
+            this.check(allData, false);
         }
         this.forceUpdate();
     };
@@ -221,9 +253,9 @@ export default class Form extends Component {
         return true;
     }
 
-    check(data) {
+    check(data, alert = true) {
         if (this.props.check) {
-            let errorMsg = this.props.check(data);
+            let errorMsg = this.props.check(data, alert);
             if (errorMsg !== true) {
                 console.log('errorMsg', errorMsg);
                 this.setState({errorText: errorMsg});
@@ -368,7 +400,7 @@ export default class Form extends Component {
         return fields.map((field, index) => {
             let value = _.get(data, field.formKey || field.key);
             let isShow = this.isShow(field, allExtraData);
-            if(!isShow) {
+            if (!isShow) {
                 return null;
             }
             //强制转换
@@ -454,7 +486,10 @@ export default class Form extends Component {
                     let control = <Control ref={field.key}
                                            value={value}
                                            size={this.props.controlSize}
-                                           {...{...field, label: this.props.inline && field.type !== 'checkbox' ? false : field.label}}
+                                           {...{
+                                               ...field,
+                                               label: this.props.inline && field.type !== 'checkbox' ? false : field.label
+                                           }}
                                            labelFixed={this.props.labelFixed}
                                            errorText={_.get(this.state.errorText, field.key)}
                                            validate={this.props.validate ? this.state.validate : false}

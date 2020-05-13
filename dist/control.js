@@ -104,6 +104,10 @@ var _static = require('./controls/static');
 
 var _static2 = _interopRequireDefault(_static);
 
+var _formTable = require('./controls/form-table');
+
+var _formTable2 = _interopRequireDefault(_formTable);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Control = function (_Component) {
@@ -135,7 +139,8 @@ var Control = function (_Component) {
             editor: _editor2.default,
             selectTag: _selectTag2.default,
             'select-check': _selectCheck2.default,
-            static: _static2.default
+            static: _static2.default,
+            table: _formTable2.default
         };
         return _this;
     }
@@ -185,6 +190,9 @@ var Control = function (_Component) {
                 case 'number':
                 case 'mobile':
                     props.type = type;
+                    break;
+                case 'table':
+                    props.columns = props.fields;
                     break;
                 case 'textarea':
                     props.multiLine = true;
