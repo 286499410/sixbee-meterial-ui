@@ -81,12 +81,12 @@ var TableBody = function (_Component) {
     (0, _createClass3.default)(TableBody, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-            if (this.refs.scrollBar) {
+            if (this.scrollBar) {
                 if (this.context.props.scrollTop) {
-                    this.refs.scrollBar.scrollTop(this.context.props.scrollTop);
+                    this.scrollBar.scrollTop(this.context.props.scrollTop);
                 }
                 if (this.context.props.scrollLeft) {
-                    this.refs.scrollBar.scrollLeft(this.context.props.scrollLeft);
+                    this.scrollBar.scrollLeft(this.context.props.scrollLeft);
                 }
             }
         }
@@ -130,14 +130,14 @@ var TableBody = function (_Component) {
                 'div',
                 { ref: 'container',
                     className: 'table-body',
+                    onScroll: this.handleScroll,
                     style: (0, _extends3.default)({
                         overflow: 'hidden',
                         position: 'relative',
                         width: "calc(100% + 2px)",
                         height: state.bodyHeight,
                         marginTop: -1
-                    }, props.bodyStyle),
-                    onScroll: this.handleScroll },
+                    }, props.bodyStyle) },
                 props.loading ? _react2.default.createElement(
                     'div',
                     { ref: 'masker', className: 'masker', style: { zIndex: 1 } },
@@ -156,7 +156,7 @@ var TableBody = function (_Component) {
                 ) : null,
                 state.dataSource.length == 0 && !props.loading && this.props.hasEmptyTip !== false ? _react2.default.createElement(
                     _reactCustomScrollbars.Scrollbars,
-                    { ref: 'scrollBar', style: {
+                    { ref: this.scrollBarRef, style: {
                             width: '100%',
                             height: '100%'
                         } },
@@ -182,7 +182,7 @@ var TableBody = function (_Component) {
                 ) : null,
                 this.props.hasScrollbar && (props.containerHeight || state.bodyHeight) ? _react2.default.createElement(
                     _reactCustomScrollbars.Scrollbars,
-                    { ref: 'scrollBar',
+                    { ref: this.scrollBarRef,
                         renderTrackHorizontal: function renderTrackHorizontal(_ref) {
                             var style = _ref.style,
                                 props = (0, _objectWithoutProperties3.default)(_ref, ['style']);
@@ -299,8 +299,8 @@ var _initialiseProps = function _initialiseProps() {
     };
 
     this.handleScroll = function (event) {
-        var scrollTop = _this2.refs.scrollBar ? _this2.refs.scrollBar.getScrollTop() : 0;
-        var scrollLeft = _this2.refs.scrollBar ? _this2.refs.scrollBar.getScrollLeft() : 0;
+        var scrollTop = _this2.scrollBar ? _this2.scrollBar.getScrollTop() : (0, _jquery2.default)(_this2.refs.container).scrollTop();
+        var scrollLeft = _this2.scrollBar ? _this2.scrollBar.getScrollLeft() : (0, _jquery2.default)(_this2.refs.container).scrollLeft();
         _this2.refs.tbody.showData(scrollTop);
         _this2.context.handleStateChange({
             scrollTop: scrollTop,
@@ -319,6 +319,12 @@ var _initialiseProps = function _initialiseProps() {
     this.hideMasker = function () {
         _this2.hasMasker = false;
         (0, _jquery2.default)(_this2.refs.masker).fadeOut();
+    };
+
+    this.scrollBarRef = function (ref) {
+        if (ref) {
+            _this2.scrollBar = ref;
+        }
     };
 };
 

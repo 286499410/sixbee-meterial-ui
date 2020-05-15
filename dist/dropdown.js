@@ -74,11 +74,11 @@ var Dropdown = function (_Component) {
                 _this.setState({
                     open: false
                 });
-                if (item.onClick) {
-                    item.onClick(item, _this.props.context);
-                }
                 if (_this.props.onClick) {
                     _this.props.onClick(item);
+                }
+                if (item.onClick) {
+                    item.onClick(item, _this.props.context);
                 }
             };
         };

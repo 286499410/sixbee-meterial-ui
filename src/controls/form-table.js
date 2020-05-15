@@ -328,11 +328,11 @@ export default class FormTable extends Component {
      */
     handleChange = (row, column) => (value, control) => {
         _.set(this.state.value[row], column.formKey || column.key, value);
-        if (column.onChange) {
-            column.onChange(value, control, this, row);
-        }
         if (this.props.onChange) {
             this.props.onChange(this.state.value, this);
+        }
+        if (column.onChange) {
+            column.onChange(value, control, this, row);
         }
     };
 

@@ -142,11 +142,11 @@ var FormTable = function (_Component) {
         _this.handleChange = function (row, column) {
             return function (value, control) {
                 _lodash2.default.set(_this.state.value[row], column.formKey || column.key, value);
-                if (column.onChange) {
-                    column.onChange(value, control, _this, row);
-                }
                 if (_this.props.onChange) {
                     _this.props.onChange(_this.state.value, _this);
+                }
+                if (column.onChange) {
+                    column.onChange(value, control, _this, row);
                 }
             };
         };

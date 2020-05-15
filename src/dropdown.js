@@ -36,11 +36,11 @@ export default class Dropdown extends Component {
         this.setState({
             open: false
         });
-        if (item.onClick) {
-            item.onClick(item, this.props.context);
-        }
         if (this.props.onClick) {
             this.props.onClick(item);
+        }
+        if (item.onClick) {
+            item.onClick(item, this.props.context);
         }
     };
 

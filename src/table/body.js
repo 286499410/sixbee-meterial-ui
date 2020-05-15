@@ -35,12 +35,12 @@ export default class TableBody extends Component {
     }
 
     componentDidMount() {
-        if (this.refs.scrollBar) {
+        if (this.scrollBar) {
             if (this.context.props.scrollTop) {
-                this.refs.scrollBar.scrollTop(this.context.props.scrollTop);
+                this.scrollBar.scrollTop(this.context.props.scrollTop);
             }
             if (this.context.props.scrollLeft) {
-                this.refs.scrollBar.scrollLeft(this.context.props.scrollLeft);
+                this.scrollBar.scrollLeft(this.context.props.scrollLeft);
             }
         }
     }
@@ -72,8 +72,8 @@ export default class TableBody extends Component {
     };
 
     handleScroll = (event) => {
-        let scrollTop = this.refs.scrollBar ? this.refs.scrollBar.getScrollTop() : 0;
-        let scrollLeft = this.refs.scrollBar ? this.refs.scrollBar.getScrollLeft() : 0;
+        let scrollTop = this.scrollBar ? this.scrollBar.getScrollTop() : $(this.refs.container).scrollTop();
+        let scrollLeft = this.scrollBar ? this.scrollBar.getScrollLeft() :$(this.refs.container).scrollLeft();
         this.refs.tbody.showData(scrollTop);
         this.context.handleStateChange({
             scrollTop: scrollTop,
@@ -92,6 +92,12 @@ export default class TableBody extends Component {
     hideMasker = () => {
         this.hasMasker = false;
         $(this.refs.masker).fadeOut();
+    };
+
+    scrollBarRef = (ref) => {
+        if(ref) {
+            this.scrollBar = ref;
+        }
     };
 
     render() {
@@ -123,6 +129,7 @@ export default class TableBody extends Component {
         </table>;
         return <div ref="container"
                     className="table-body"
+                    onScroll={this.handleScroll}
                     style={{
                         overflow: 'hidden',
                         position: 'relative',
@@ -130,8 +137,7 @@ export default class TableBody extends Component {
                         height: state.bodyHeight,
                         marginTop: -1,
                         ...props.bodyStyle
-                    }}
-                    onScroll={this.handleScroll}>
+                    }}>
             {
                 props.loading ? <div ref="masker" className="masker" style={{zIndex: 1}}>
                     {
@@ -150,7 +156,7 @@ export default class TableBody extends Component {
             }
             {
                 state.dataSource.length == 0 && !props.loading && this.props.hasEmptyTip !== false ?
-                    <Scrollbars ref="scrollBar" style={{
+                    <Scrollbars ref={this.scrollBarRef} style={{
                         width: '100%',
                         height: '100%'
                     }}>
@@ -166,7 +172,7 @@ export default class TableBody extends Component {
             }
             {
                 this.props.hasScrollbar && (props.containerHeight || state.bodyHeight) ?
-                    <Scrollbars ref="scrollBar"
+                    <Scrollbars ref={this.scrollBarRef}
                                 renderTrackHorizontal={({style, ...props}) =>
                                     <div {...props} style={{
                                         ...style,
