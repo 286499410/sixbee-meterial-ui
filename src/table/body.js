@@ -378,8 +378,22 @@ class TableBodyContent extends Component {
     handleCollapsedData() {
         let data = [];
         let state = this.context.state;
+        let parents = {};
+        state.dataRows.map(row => {
+            parents[row.id] = row._parent;
+        });
+        let isParentCollapsed = (data) => {
+            if(parents[data.id]) {
+                if(this.isCollapsed(parents[data.id])) {
+                    return true;
+                } else if(parents[data.parent_id]) {
+                    return isParentCollapsed(parents[data.id]);
+                }
+            }
+            return false;
+        };
         state.dataRows.map((row) => {
-            if (row._parent === null || !this.isCollapsed(row._parent)) {
+            if (row._parent === null || !isParentCollapsed(row)) {
                 data.push(row);
             }
         });

@@ -74,6 +74,7 @@ export default class FormTable extends Component {
         controlSize: 'default',                 //控件大小
         onStateChange: undefined,               //状态改变后触发：table，pager，currentRow
         editableStyle: {background: '#fffdf5'}, //可编辑控件的样式
+        filtered: false                         //是否只取有数据的值
     };
 
     state = {
@@ -149,7 +150,7 @@ export default class FormTable extends Component {
         this.state.value = value;
         this.forceUpdate();
         if (this.props.onChange) {
-            this.props.onChange(value, this);
+            this.props.onChange(this.props.filtered ? this.getFilteredValue() : value, this);
         }
     }
 
@@ -159,6 +160,28 @@ export default class FormTable extends Component {
      */
     getValue() {
         return (this.state.value === undefined ? this.props.defaultValue : this.state.value) || [];
+    }
+
+    /**
+     * 获取有数据的值
+     */
+    getFilteredValue() {
+        let value = this.getValue();
+        let filteredValue = [];
+        value.map(row => {
+            let flag = false;
+            Object.entries(row).map(([key, val]) => {
+                if(key !== '_key') {
+                    if(val !== '' && val !== undefined && val !== null && (!_.isArray(val) || val.length > 0)) {
+                        flag = true;
+                    }
+                }
+            });
+            if(flag) {
+                filteredValue.push(row);
+            }
+        });
+        return filteredValue;
     }
 
     /**
@@ -329,7 +352,7 @@ export default class FormTable extends Component {
     handleChange = (row, column) => (value, control) => {
         _.set(this.state.value[row], column.formKey || column.key, value);
         if (this.props.onChange) {
-            this.props.onChange(this.state.value, this);
+            this.props.onChange(this.props.filtered ? this.getFilteredValue() : this.state.value, this);
         }
         if (column.onChange) {
             column.onChange(value, control, this, row);

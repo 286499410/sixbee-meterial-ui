@@ -431,8 +431,22 @@ var TableBodyContent = function (_Component2) {
 
             var data = [];
             var state = this.context.state;
+            var parents = {};
             state.dataRows.map(function (row) {
-                if (row._parent === null || !_this6.isCollapsed(row._parent)) {
+                parents[row.id] = row._parent;
+            });
+            var isParentCollapsed = function isParentCollapsed(data) {
+                if (parents[data.id]) {
+                    if (_this6.isCollapsed(parents[data.id])) {
+                        return true;
+                    } else if (parents[data.parent_id]) {
+                        return isParentCollapsed(parents[data.id]);
+                    }
+                }
+                return false;
+            };
+            state.dataRows.map(function (row) {
+                if (row._parent === null || !isParentCollapsed(row)) {
                     data.push(row);
                 }
             });

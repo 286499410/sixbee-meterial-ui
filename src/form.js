@@ -169,6 +169,10 @@ export default class Form extends Component {
         })
     }
 
+    merge(...params) {
+
+    }
+
     /**
      * 获取提交数据
      * @param dataScope
@@ -182,26 +186,34 @@ export default class Form extends Component {
                 delete defaultData[key];
             }
         }
+        let customizer = (obj, src) => {
+            if(_.isArray(obj)) {
+                return src;
+            }
+        }
         switch (dataScope) {
             case 'all': //所有控件的值
-                return _.merge(
+                return _.mergeWith(
                     {},
                     defaultData,
                     this.state.feildOriginData,
-                    this.state.changedData
+                    this.state.changedData,
+                    customizer
                 );
             case 'changed': //修改控件的值
-                return _.merge(
+                return _.mergeWith(
                     {},
                     defaultData,
-                    this.state.changedData
+                    this.state.changedData,
+                    customizer
                 );
             case 'all-extra': //所有值
-                return _.merge(
+                return _.mergeWith(
                     {},
                     defaultData,
                     this.state.originData,
-                    this.state.changedData
+                    this.state.changedData,
+                    customizer
                 );
         }
     };

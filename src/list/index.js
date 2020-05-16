@@ -42,6 +42,8 @@ export default class List extends Component {
         dataSourceConfig: {text: 'text', value: 'value'},
         onFilter: undefined,            //过滤函数
         onSelect: undefined,            //选中触发事件
+        multiple: false,                //是否多选
+
     };
 
     state = {

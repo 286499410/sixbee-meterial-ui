@@ -50,6 +50,14 @@ var _item = require('./item');
 
 var _item2 = _interopRequireDefault(_item);
 
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _control = require('../control');
+
+var _control2 = _interopRequireDefault(_control);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Body = function (_Component) {
@@ -61,12 +69,43 @@ var Body = function (_Component) {
         var _this = (0, _possibleConstructorReturn3.default)(this, (Body.__proto__ || (0, _getPrototypeOf2.default)(Body)).call(this, props));
 
         _this.parent = {};
+        _this.children = {};
 
         _this.handleClick = function (data) {
             return function (event) {
                 _this.context.setListState({ selected: data });
                 if (_this.context.props.onSelect) {
                     _this.context.props.onSelect(_this.getValue(data), data);
+                }
+            };
+        };
+
+        _this.handleCheck = function (data) {
+            return function (isCheck) {
+                var selected = _this.context.state.selected;
+                var key = _this.getValue(data);
+                var childKeys = _this.getChildKeys(data);
+                var parentKeys = _this.getParentKeys(key);
+
+                isCheck ? selected[key] = true : delete selected[key];
+
+                childKeys.map(function (key) {
+                    isCheck ? selected[key] = true : delete selected[key];
+                });
+
+                parentKeys.map(function (key) {
+                    var childkeys = _this.getChildKeys(key);
+                    console.log(key, childkeys);
+                    if (_this.isCheckAll(childkeys, selected)) {
+                        selected[key] = true;
+                    } else {
+                        delete selected[key];
+                    }
+                });
+
+                _this.context.setListState({ selected: selected });
+                if (_this.context.props.onSelect) {
+                    _this.context.props.onSelect(data);
                 }
             };
         };
@@ -83,6 +122,9 @@ var Body = function (_Component) {
                 var parent2 = (0, _assign2.default)({ indent: indent }, data);
                 var children = [];
                 if (data.children && data.children.length > 0) {
+                    _this.children[value] = data.children.map(function (row) {
+                        return _this.getData(row);
+                    });
                     children = _this.filterData(data.children, indent + 16, data);
                 }
                 if (_this.checkData(parent2) || children.length > 0) {
@@ -124,8 +166,8 @@ var Body = function (_Component) {
         };
 
         _this.handleScroll = function (event) {
-            var scrollLeft = $(event.target).scrollLeft();
-            var scrollTop = $(event.target).scrollTop();
+            var scrollLeft = (0, _jquery2.default)(event.target).scrollLeft();
+            var scrollTop = (0, _jquery2.default)(event.target).scrollTop();
             _this.context.setListState({
                 scrollLeft: scrollLeft,
                 scrollTop: scrollTop
@@ -165,9 +207,52 @@ var Body = function (_Component) {
             return index >= 0 ? this.context.props.dataSource[index] : undefined;
         }
     }, {
+        key: 'isCheck',
+        value: function isCheck(data) {
+            var selected = this.context.state.selected;
+            return selected[data.id] ? true : false;
+        }
+    }, {
+        key: 'getParentKeys',
+        value: function getParentKeys(childKey) {
+            var keys = [];
+            if (this.parent[childKey]) {
+                keys.push(this.parent[childKey]);
+                keys = keys.concat(this.getParentKeys(this.parent[childKey]));
+            }
+            return keys;
+        }
+    }, {
+        key: 'getChildKeys',
+        value: function getChildKeys(parentKey) {
+            var _this3 = this;
+
+            var keys = [];
+            (_.get(data, 'children') || []).map(function (row) {
+                keys.push(row[_this3.context.props.dataSourceConfig.value]);
+                if (row.children && row.children.length > 0) {
+                    keys = keys.concat(_this3.getChildKeys(row));
+                }
+            });
+            return keys;
+        }
+    }, {
+        key: 'isCheckAll',
+        value: function isCheckAll(keys) {
+            var selected = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.context.state.selected;
+
+            for (var i = 0; i < keys.length; i++) {
+                if (!selected[keys[i]]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }, {
         key: 'handleData',
         value: function handleData() {
             this.parent = {};
+            this.children = {};
             return this.filterData(this.context.props.dataSource);
         }
     }, {
@@ -187,7 +272,7 @@ var Body = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            var _this3 = this;
+            var _this4 = this;
 
             var dataSource = this.handleData();
             var selectedValue = this.getValue(this.context.state.selected);
@@ -199,29 +284,39 @@ var Body = function (_Component) {
                     _reactCustomScrollbars.Scrollbars,
                     { ref: 'scrollBar', style: { height: '100%' }, onScroll: this.handleScroll },
                     dataSource.map(function (data, index) {
-                        var value = _this3.getValue(data);
-                        var isCollapsed = _this3.isCollapsed(value);
+                        var value = _this4.getValue(data);
+                        var isCollapsed = _this4.isCollapsed(value);
+                        var content = _.isFunction(props.dataSourceConfig.text) ? props.dataSourceConfig.text(data) : _react2.default.createElement(
+                            'div',
+                            null,
+                            _utils2.default.replaceText(props.dataSourceConfig.text, data)
+                        );
                         return _react2.default.createElement(
                             _item2.default,
                             { key: value,
                                 data: data,
                                 selected: value == selectedValue,
-                                onClick: _this3.handleClick(data),
-                                hide: _this3.isHide(value) },
+                                onClick: props.multiple ? undefined : _this4.handleClick(data),
+                                hide: _this4.isHide(value) },
                             _react2.default.createElement(
                                 'div',
                                 { className: "flex middle",
-                                    style: { paddingLeft: data.indent, height: _this3.context.props.rowHeight } },
+                                    style: { paddingLeft: data.indent, height: _this4.context.props.rowHeight } },
                                 props.hasCollapsed ? _react2.default.createElement(_icon2.default, { type: 'button',
                                     name: isCollapsed ? "plus-square" : "minus-square",
                                     size: 14,
                                     buttonStyle: { opacity: data.children && data.children.length > 0 ? 1 : 0 },
-                                    onClick: _this3.handleCollapse(data, !isCollapsed) }) : null,
-                                _.isFunction(props.dataSourceConfig.text) ? props.dataSourceConfig.text(data) : _react2.default.createElement(
+                                    onClick: _this4.handleCollapse(data, !isCollapsed) }) : null,
+                                props.multiple ? _react2.default.createElement(
                                     'div',
-                                    null,
-                                    _utils2.default.replaceText(props.dataSourceConfig.text, data)
-                                )
+                                    { className: 'flex middle' },
+                                    _react2.default.createElement(_control2.default, { type: 'checkbox', size: 'small', styleProps: { style: { marginTop: 0 } }, onChange: _this4.handleCheck(data), value: _this4.isCheck(data) }),
+                                    _react2.default.createElement(
+                                        'div',
+                                        null,
+                                        content
+                                    )
+                                ) : content
                             )
                         );
                     })

@@ -4,6 +4,8 @@ import {Scrollbars} from "react-custom-scrollbars";
 import Icon from "../icon";
 import utils from '../utils';
 import Item from './item';
+import $ from 'jquery';
+import Control from '../control';
 
 export default class Body extends Component {
 
@@ -14,6 +16,8 @@ export default class Body extends Component {
     };
 
     parent = {};
+
+    children = {};
 
     constructor(props) {
         super(props);
@@ -64,6 +68,93 @@ export default class Body extends Component {
     };
 
     /**
+     * 是否勾选
+     * @param data
+     * @returns {boolean}
+     */
+    isCheck(data) {
+        let selected = this.context.state.selected;
+        return selected[data.id] ? true : false;
+    }
+
+    /**
+     * 获取所有上级
+     * @param childKey
+     * @returns {Array}
+     */
+    getParentKeys(childKey) {
+        let keys = [];
+        if(this.parent[childKey]) {
+            keys.push(this.parent[childKey]);
+            keys = keys.concat(this.getParentKeys(this.parent[childKey]))
+        }
+        return keys;
+    }
+
+    /**
+     * 获取所有下级
+     * @param parentKey
+     * @returns {Array}
+     */
+    getChildKeys(parentKey) {
+        let keys = [];
+        (_.get(data, 'children') || []).map(row => {
+            keys.push(row[this.context.props.dataSourceConfig.value]);
+            if(row.children && row.children.length > 0) {
+                keys = keys.concat(this.getChildKeys(row));
+            }
+        });
+        return keys;
+    }
+
+    /**
+     * 是否已选取选中
+     * @param keys
+     * @param selected
+     */
+    isCheckAll(keys, selected = this.context.state.selected) {
+        for(let i = 0; i < keys.length; i++) {
+            if(!selected[keys[i]]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 勾选事件
+     * @param data
+     * @returns {Function}
+     */
+    handleCheck = (data) => (isCheck) => {
+        let selected = this.context.state.selected;
+        let key = this.getValue(data);
+        let childKeys = this.getChildKeys(data);
+        let parentKeys = this.getParentKeys(key);
+        //处理自己
+        isCheck ? selected[key] = true : delete selected[key];
+        //处理下级
+        childKeys.map(key => {
+            isCheck ? selected[key] = true : delete selected[key];
+        });
+        //处理上级
+        parentKeys.map(key => {
+            let childkeys = this.getChildKeys(key);
+            console.log(key, childkeys);
+            if(this.isCheckAll(childkeys, selected)) {
+                selected[key] = true;
+            } else {
+                delete selected[key];
+            }
+        });
+
+        this.context.setListState({selected: selected});
+        if (this.context.props.onSelect) {
+            this.context.props.onSelect(data);
+        }
+    };
+
+    /**
      * 过滤处理
      * @param dataSource
      * @param indent
@@ -79,6 +170,7 @@ export default class Body extends Component {
             let parent2 = Object.assign({indent: indent}, data);
             let children = [];
             if (data.children && data.children.length > 0) {
+                this.children[value] = data.children.map((row) => (this.getData(row)));
                 children = this.filterData(data.children, indent + 16, data);
             }
             if (this.checkData(parent2) || children.length > 0) {
@@ -91,6 +183,7 @@ export default class Body extends Component {
 
     handleData() {
         this.parent = {};
+        this.children = {};
         return this.filterData(this.context.props.dataSource);
     }
 
@@ -169,11 +262,13 @@ export default class Body extends Component {
                     dataSource.map((data, index) => {
                         let value = this.getValue(data);
                         let isCollapsed = this.isCollapsed(value);
+                        let content = _.isFunction(props.dataSourceConfig.text) ? props.dataSourceConfig.text(data) :
+                            <div>{utils.replaceText(props.dataSourceConfig.text, data)}</div>;
                         return (
                             <Item key={value}
                                   data={data}
                                   selected={value == selectedValue}
-                                  onClick={this.handleClick(data)}
+                                  onClick={props.multiple ? undefined : this.handleClick(data)}
                                   hide={this.isHide(value)}>
                                 <div className={"flex middle"}
                                      style={{paddingLeft: data.indent, height: this.context.props.rowHeight}}>
@@ -184,8 +279,12 @@ export default class Body extends Component {
                                                                    buttonStyle={{opacity: data.children && data.children.length > 0 ? 1 : 0}}
                                                                    onClick={this.handleCollapse(data, !isCollapsed)}/> : null
                                     }
-                                    {_.isFunction(props.dataSourceConfig.text) ? props.dataSourceConfig.text(data) :
-                                        <div>{utils.replaceText(props.dataSourceConfig.text, data)}</div>}
+                                    {
+                                        props.multiple ? <div className="flex middle">
+                                            <Control type="checkbox" size="small" styleProps={{style: {marginTop: 0}}} onChange={this.handleCheck(data)} value={this.isCheck(data)}/>
+                                            <div>{content}</div>
+                                        </div> : content
+                                    }
                                 </div>
                             </Item>
                         )

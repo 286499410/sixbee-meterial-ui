@@ -169,6 +169,9 @@ var Form = function (_Component) {
             });
         }
     }, {
+        key: 'merge',
+        value: function merge() {}
+    }, {
         key: 'getData',
         value: function getData() {
             var dataScope = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props.dataScope;
@@ -201,13 +204,18 @@ var Form = function (_Component) {
                 }
             }
 
+            var customizer = function customizer(obj, src) {
+                if (_lodash2.default.isArray(obj)) {
+                    return src;
+                }
+            };
             switch (dataScope) {
                 case 'all':
-                    return _lodash2.default.merge({}, defaultData, this.state.feildOriginData, this.state.changedData);
+                    return _lodash2.default.mergeWith({}, defaultData, this.state.feildOriginData, this.state.changedData, customizer);
                 case 'changed':
-                    return _lodash2.default.merge({}, defaultData, this.state.changedData);
+                    return _lodash2.default.mergeWith({}, defaultData, this.state.changedData, customizer);
                 case 'all-extra':
-                    return _lodash2.default.merge({}, defaultData, this.state.originData, this.state.changedData);
+                    return _lodash2.default.mergeWith({}, defaultData, this.state.originData, this.state.changedData, customizer);
             }
         }
     }, {

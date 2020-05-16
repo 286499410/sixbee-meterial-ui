@@ -12,6 +12,14 @@ var _extends2 = require('babel-runtime/helpers/extends');
 
 var _extends3 = _interopRequireDefault(_extends2);
 
+var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
+
+var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
+
+var _entries = require('babel-runtime/core-js/object/entries');
+
+var _entries2 = _interopRequireDefault(_entries);
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -143,7 +151,7 @@ var FormTable = function (_Component) {
             return function (value, control) {
                 _lodash2.default.set(_this.state.value[row], column.formKey || column.key, value);
                 if (_this.props.onChange) {
-                    _this.props.onChange(_this.state.value, _this);
+                    _this.props.onChange(_this.props.filtered ? _this.getFilteredValue() : _this.state.value, _this);
                 }
                 if (column.onChange) {
                     column.onChange(value, control, _this, row);
@@ -264,13 +272,37 @@ var FormTable = function (_Component) {
             this.state.value = value;
             this.forceUpdate();
             if (this.props.onChange) {
-                this.props.onChange(value, this);
+                this.props.onChange(this.props.filtered ? this.getFilteredValue() : value, this);
             }
         }
     }, {
         key: 'getValue',
         value: function getValue() {
             return (this.state.value === undefined ? this.props.defaultValue : this.state.value) || [];
+        }
+    }, {
+        key: 'getFilteredValue',
+        value: function getFilteredValue() {
+            var value = this.getValue();
+            var filteredValue = [];
+            value.map(function (row) {
+                var flag = false;
+                (0, _entries2.default)(row).map(function (_ref) {
+                    var _ref2 = (0, _slicedToArray3.default)(_ref, 2),
+                        key = _ref2[0],
+                        val = _ref2[1];
+
+                    if (key !== '_key') {
+                        if (val !== '' && val !== undefined && val !== null && (!_lodash2.default.isArray(val) || val.length > 0)) {
+                            flag = true;
+                        }
+                    }
+                });
+                if (flag) {
+                    filteredValue.push(row);
+                }
+            });
+            return filteredValue;
         }
     }, {
         key: 'getControl',
@@ -711,5 +743,6 @@ FormTable.defaultProps = {
     bodyRowHeight: undefined,
     controlSize: 'default',
     onStateChange: undefined,
-    editableStyle: { background: '#fffdf5' } };
+    editableStyle: { background: '#fffdf5' },
+    filtered: false };
 exports.default = FormTable;

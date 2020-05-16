@@ -198,5 +198,6 @@ List.defaultProps = {
     dataSource: [],
     dataSourceConfig: { text: 'text', value: 'value' },
     onFilter: undefined,
-    onSelect: undefined };
+    onSelect: undefined,
+    multiple: false };
 exports.default = List;
