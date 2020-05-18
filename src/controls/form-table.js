@@ -150,7 +150,7 @@ export default class FormTable extends Component {
         this.state.value = value;
         this.forceUpdate();
         if (this.props.onChange) {
-            this.props.onChange(this.props.filtered ? this.getFilteredValue() : value, this);
+            this.props.onChange(value, this);
         }
     }
 
@@ -352,7 +352,7 @@ export default class FormTable extends Component {
     handleChange = (row, column) => (value, control) => {
         _.set(this.state.value[row], column.formKey || column.key, value);
         if (this.props.onChange) {
-            this.props.onChange(this.props.filtered ? this.getFilteredValue() : this.state.value, this);
+            this.props.onChange(this.state.value, this);
         }
         if (column.onChange) {
             column.onChange(value, control, this, row);

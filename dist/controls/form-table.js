@@ -151,7 +151,7 @@ var FormTable = function (_Component) {
             return function (value, control) {
                 _lodash2.default.set(_this.state.value[row], column.formKey || column.key, value);
                 if (_this.props.onChange) {
-                    _this.props.onChange(_this.props.filtered ? _this.getFilteredValue() : _this.state.value, _this);
+                    _this.props.onChange(_this.state.value, _this);
                 }
                 if (column.onChange) {
                     column.onChange(value, control, _this, row);
@@ -272,7 +272,7 @@ var FormTable = function (_Component) {
             this.state.value = value;
             this.forceUpdate();
             if (this.props.onChange) {
-                this.props.onChange(this.props.filtered ? this.getFilteredValue() : value, this);
+                this.props.onChange(value, this);
             }
         }
     }, {

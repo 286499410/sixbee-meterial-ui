@@ -61,9 +61,11 @@ export default class Body extends Component {
      * @returns {Function}
      */
     handleClick = (data) => (event) => {
-        this.context.setListState({selected: data});
-        if (this.context.props.onSelect) {
-            this.context.props.onSelect(this.getValue(data), data);
+        if(!this.props.multiple) {
+            this.context.setListState({selected: data});
+            if (this.context.props.onSelect) {
+                this.context.props.onSelect(this.getValue(data), data);
+            }
         }
     };
 
@@ -98,11 +100,9 @@ export default class Body extends Component {
      */
     getChildKeys(parentKey) {
         let keys = [];
-        (_.get(data, 'children') || []).map(row => {
-            keys.push(row[this.context.props.dataSourceConfig.value]);
-            if(row.children && row.children.length > 0) {
-                keys = keys.concat(this.getChildKeys(row));
-            }
+        keys = keys.concat(this.children[parentKey] || []);
+        (this.children[parentKey] || []).map((childKey) => {
+            keys = keys.concat(this.getChildKeys(childKey));
         });
         return keys;
     }
@@ -129,7 +129,7 @@ export default class Body extends Component {
     handleCheck = (data) => (isCheck) => {
         let selected = this.context.state.selected;
         let key = this.getValue(data);
-        let childKeys = this.getChildKeys(data);
+        let childKeys = this.getChildKeys(key);
         let parentKeys = this.getParentKeys(key);
         //处理自己
         isCheck ? selected[key] = true : delete selected[key];
@@ -140,17 +140,15 @@ export default class Body extends Component {
         //处理上级
         parentKeys.map(key => {
             let childkeys = this.getChildKeys(key);
-            console.log(key, childkeys);
             if(this.isCheckAll(childkeys, selected)) {
                 selected[key] = true;
             } else {
                 delete selected[key];
             }
         });
-
         this.context.setListState({selected: selected});
         if (this.context.props.onSelect) {
-            this.context.props.onSelect(data);
+            this.context.props.onSelect(selected)
         }
     };
 
@@ -170,7 +168,7 @@ export default class Body extends Component {
             let parent2 = Object.assign({indent: indent}, data);
             let children = [];
             if (data.children && data.children.length > 0) {
-                this.children[value] = data.children.map((row) => (this.getData(row)));
+                this.children[value] = data.children.map((row) => (this.getValue(row)));
                 children = this.filterData(data.children, indent + 16, data);
             }
             if (this.checkData(parent2) || children.length > 0) {

@@ -73,9 +73,11 @@ var Body = function (_Component) {
 
         _this.handleClick = function (data) {
             return function (event) {
-                _this.context.setListState({ selected: data });
-                if (_this.context.props.onSelect) {
-                    _this.context.props.onSelect(_this.getValue(data), data);
+                if (!_this.props.multiple) {
+                    _this.context.setListState({ selected: data });
+                    if (_this.context.props.onSelect) {
+                        _this.context.props.onSelect(_this.getValue(data), data);
+                    }
                 }
             };
         };
@@ -84,7 +86,7 @@ var Body = function (_Component) {
             return function (isCheck) {
                 var selected = _this.context.state.selected;
                 var key = _this.getValue(data);
-                var childKeys = _this.getChildKeys(data);
+                var childKeys = _this.getChildKeys(key);
                 var parentKeys = _this.getParentKeys(key);
 
                 isCheck ? selected[key] = true : delete selected[key];
@@ -95,17 +97,15 @@ var Body = function (_Component) {
 
                 parentKeys.map(function (key) {
                     var childkeys = _this.getChildKeys(key);
-                    console.log(key, childkeys);
                     if (_this.isCheckAll(childkeys, selected)) {
                         selected[key] = true;
                     } else {
                         delete selected[key];
                     }
                 });
-
                 _this.context.setListState({ selected: selected });
                 if (_this.context.props.onSelect) {
-                    _this.context.props.onSelect(data);
+                    _this.context.props.onSelect(selected);
                 }
             };
         };
@@ -123,7 +123,7 @@ var Body = function (_Component) {
                 var children = [];
                 if (data.children && data.children.length > 0) {
                     _this.children[value] = data.children.map(function (row) {
-                        return _this.getData(row);
+                        return _this.getValue(row);
                     });
                     children = _this.filterData(data.children, indent + 16, data);
                 }
@@ -228,11 +228,9 @@ var Body = function (_Component) {
             var _this3 = this;
 
             var keys = [];
-            (_.get(data, 'children') || []).map(function (row) {
-                keys.push(row[_this3.context.props.dataSourceConfig.value]);
-                if (row.children && row.children.length > 0) {
-                    keys = keys.concat(_this3.getChildKeys(row));
-                }
+            keys = keys.concat(this.children[parentKey] || []);
+            (this.children[parentKey] || []).map(function (childKey) {
+                keys = keys.concat(_this3.getChildKeys(childKey));
             });
             return keys;
         }

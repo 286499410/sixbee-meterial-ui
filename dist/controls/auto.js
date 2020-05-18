@@ -281,7 +281,7 @@ var _initialiseProps = function _initialiseProps() {
             value: value,
             searchText: searchText,
             disabled: _this4.props.disabled,
-            hintText: _this4.props.hintText,
+            hintText: _lodash2.default.isFunction(_this4.props.hintText) ? _this4.props.hintText(_this4.props) : _this4.props.hintText,
             errorText: borderStyle === 'underline' ? _this4.props.errorText : undefined,
             floatingLabelFixed: _this4.props.labelFixed,
             underlineShow: borderStyle === 'underline' && _this4.props.borderShow,

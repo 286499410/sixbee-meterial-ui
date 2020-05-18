@@ -272,7 +272,7 @@ export default class Auto extends Component {
             value={value}
             searchText={searchText}
             disabled={this.props.disabled}
-            hintText={this.props.hintText}
+            hintText={_.isFunction(this.props.hintText) ? this.props.hintText(this.props) : this.props.hintText}
             errorText={borderStyle === 'underline' ? this.props.errorText : undefined}
             floatingLabelFixed={this.props.labelFixed}
             underlineShow={borderStyle === 'underline' && this.props.borderShow}
