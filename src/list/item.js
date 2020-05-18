@@ -38,7 +38,8 @@ export default class Item extends Component {
                 <div className="flex middle">
                     {this.context.props.iconEvents.map((event, key) => {
                         let disabled = _.isFunction(event.disabled) ? event.disabled(this.props.data) : event.disabled;
-                        return <Icon key={key}
+                        const isHidden = _.isFunction(event.isHidden) ? event.isHidden(this.props.data) : event.isHidden;
+                        return isHidden ? null : <Icon key={key}
                                      type="button"
                                      size={16}
                                      name={event.icon}
