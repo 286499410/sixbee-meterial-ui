@@ -86,7 +86,8 @@ var Item = function (_Component) {
                         { className: 'flex middle' },
                         this.context.props.iconEvents.map(function (event, key) {
                             var disabled = _.isFunction(event.disabled) ? event.disabled(_this2.props.data) : event.disabled;
-                            return _react2.default.createElement(_icon2.default, { key: key,
+                            var isHidden = _.isFunction(event.isHidden) ? event.isHidden(_this2.props.data) : event.isHidden;
+                            return isHidden ? null : _react2.default.createElement(_icon2.default, { key: key,
                                 type: 'button',
                                 size: 16,
                                 name: event.icon,

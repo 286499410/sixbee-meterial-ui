@@ -32,8 +32,10 @@
     "date-fns": "^2.9.0",
     "get-user-locale": "^1.1.1",
     "intl-locales-supported": "^1.0.0",
+    "jquery": "^3.5.1",
     "material-ui": "^0.20.2",
     "material-ui-persian-date-picker-utils": "^0.1.2",
+    "node-uuid": "^1.4.8",
     "react-calendar": "^2.19.2",
     "react-custom-scrollbars": "^4.2.1",
     "react-date-range": "^1.0.3",
@@ -42,8 +44,8 @@
     "sortablejs": "^1.6.1"
   },
   "peerDependencies": {
+    "lodash": ">=4.17.0",
     "react": ">=15",
-    "react-dom": ">=15",
-    "lodash": ">=4.17.0"
+    "react-dom": ">=15"
   }
 }
