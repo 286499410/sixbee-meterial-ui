@@ -693,9 +693,9 @@ export default class FormTable extends Component {
             }
         }
         let footerData = this.props.footerData ? this.props.footerData(this) : null;
-        return <div style={{marginBottom: 16, ...this.props.style, ...this.props.rootStyle}}>
+        return <div style={{marginBottom: 20, ...this.props.style, ...this.props.rootStyle}}>
             {
-                this.props.label === false ? null : <div style={this.props.labelStyle}>
+                this.props.label === false || this.props.label === undefined ? null : <div style={this.props.labelStyle}>
                     <span style={style.label}>{this.props.label}</span>
                 </div>
             }

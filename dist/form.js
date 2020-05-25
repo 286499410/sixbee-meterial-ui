@@ -52,6 +52,10 @@ var _propTypes = require('prop-types');
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
+var _pubsubJs = require('pubsub-js');
+
+var _pubsubJs2 = _interopRequireDefault(_pubsubJs);
+
 var _reactCustomScrollbars = require('react-custom-scrollbars');
 
 var _lodash = require('lodash');
@@ -101,11 +105,49 @@ var Form = function (_Component) {
 
         _initialiseProps.call(_this);
 
+        _this._observerKey = {};
+        _this._observers = [];
         _this.initData(props);
         return _this;
     }
 
     (0, _createClass3.default)(Form, [{
+        key: 'subscribe',
+        value: function subscribe(type, fn) {
+            var _this2 = this;
+
+            if (!this._observerKey[type]) {
+                this._observerKey[type] = 'form_' + new Date().getTime();
+            }
+            var token = _pubsubJs2.default.subscribe(this._observerKey[type], fn);
+            this._observers.push(token);
+            return function () {
+                _this2.unsubscribe(token);
+            };
+        }
+    }, {
+        key: 'publish',
+        value: function publish(type) {
+            var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            if (this._observerKey[type]) {
+                _pubsubJs2.default.publish(this._observerKey[type], data);
+            }
+        }
+    }, {
+        key: 'unsubscribe',
+        value: function unsubscribe() {
+            var token = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+            if (token) {
+                _pubsubJs2.default.unsubscribe(token);
+            } else {
+                this._observers.map(function (token) {
+                    _pubsubJs2.default.unsubscribe(token);
+                });
+            }
+        }
+    }, {
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(nextProps) {
             this.initData(nextProps);
@@ -138,33 +180,33 @@ var Form = function (_Component) {
     }, {
         key: 'setFieldDefaultData',
         value: function setFieldDefaultData(fields) {
-            var _this2 = this;
+            var _this3 = this;
 
             fields.map(function (field) {
                 if (field.defaultValue !== undefined) {
                     var defaultValue = field.defaultValue;
                     if (_lodash2.default.isFunction(defaultValue)) {
-                        defaultValue = defaultValue(_this2);
+                        defaultValue = defaultValue(_this3);
                     }
-                    _lodash2.default.set(_this2.state.fieldDefaultData, field.formKey || field.key, defaultValue);
+                    _lodash2.default.set(_this3.state.fieldDefaultData, field.formKey || field.key, defaultValue);
                 }
                 if (field.fields) {
-                    _this2.setFieldDefaultData(field.fields);
+                    _this3.setFieldDefaultData(field.fields);
                 }
             });
         }
     }, {
         key: 'setFieldOriginData',
         value: function setFieldOriginData(fields) {
-            var _this3 = this;
+            var _this4 = this;
 
             fields.map(function (field) {
-                var value = _lodash2.default.get(_this3.state.originData, field.formKey || field.key);
+                var value = _lodash2.default.get(_this4.state.originData, field.formKey || field.key);
                 if (value !== undefined) {
-                    _lodash2.default.set(_this3.state.feildOriginData, field.formKey || field.key, value);
+                    _lodash2.default.set(_this4.state.feildOriginData, field.formKey || field.key, value);
                 }
                 if (field.fields) {
-                    _this3.setFieldOriginData(field.fields);
+                    _this4.setFieldOriginData(field.fields);
                 }
             });
         }
@@ -261,7 +303,7 @@ var Form = function (_Component) {
     }, {
         key: 'submit',
         value: function submit() {
-            var _this4 = this;
+            var _this5 = this;
 
             var allData = this.getData('all');
             var submitData = this.getData();
@@ -278,22 +320,22 @@ var Form = function (_Component) {
                 var promise = this.props.onSubmit(submitData);
                 if (promise instanceof _promise2.default) {
                     promise.then(function () {
-                        _this4.setFormStatus(STATUS_SUBMITTED);
+                        _this5.setFormStatus(STATUS_SUBMITTED);
                     }, function (res) {
                         if (res instanceof Response) {
                             res.json().then(function (json) {
                                 if (json.errCode == 10002 && json.validator) {
-                                    _this4.setFormStatus(STATUS_CHECKERROR);
-                                    _this4.setState({ errorText: json.validator });
+                                    _this5.setFormStatus(STATUS_CHECKERROR);
+                                    _this5.setState({ errorText: json.validator });
                                 } else {
-                                    _this4.setFormStatus(STATUS_ERROR);
+                                    _this5.setFormStatus(STATUS_ERROR);
                                 }
-                                if (_this4.props.afterSubmit) {
-                                    _this4.props.afterSubmit(json);
+                                if (_this5.props.afterSubmit) {
+                                    _this5.props.afterSubmit(json);
                                 }
                             });
                         } else {
-                            _this4.setFormStatus(STATUS_ERROR);
+                            _this5.setFormStatus(STATUS_ERROR);
                         }
                     });
                 } else {
@@ -361,21 +403,21 @@ var Form = function (_Component) {
     }, {
         key: 'getTabDataSource',
         value: function getTabDataSource() {
-            var _this5 = this;
+            var _this6 = this;
 
             return this.props.tabs.map(function (tab) {
                 return {
                     label: tab.label,
                     content: _react2.default.createElement(
                         _reactCustomScrollbars.Scrollbars,
-                        { style: { width: _this5.props.width, height: '100%' } },
+                        { style: { width: _this6.props.width, height: '100%' } },
                         _react2.default.createElement(
                             'div',
-                            { className: 'space', style: (0, _extends3.default)({ width: '100%', overflowX: 'hidden' }, _this5.props.style) },
+                            { className: 'space', style: (0, _extends3.default)({ width: '100%', overflowX: 'hidden' }, _this6.props.style) },
                             _react2.default.createElement(
                                 'div',
-                                { className: 'form row-space', cols: _this5.props.cols },
-                                _this5.renderControls(_this5.getFields(tab.fields))
+                                { className: 'form row-space', cols: _this6.props.cols },
+                                _this6.renderControls(_this6.getFields(tab.fields))
                             )
                         )
                     )
@@ -484,7 +526,7 @@ Form.contextTypes = {
 };
 
 var _initialiseProps = function _initialiseProps() {
-    var _this6 = this;
+    var _this7 = this;
 
     this.state = {
         formStatus: STATUS_INIT,
@@ -498,58 +540,59 @@ var _initialiseProps = function _initialiseProps() {
 
     this.initData = function (props) {
         if (_lodash2.default.isFunction(props.originData)) {
-            _this6.state.originData = props.originData();
+            _this7.state.originData = props.originData();
         } else if (props.originData !== undefined) {
-            _this6.state.originData = props.originData;
+            _this7.state.originData = props.originData;
         }
         if (props.changedData !== undefined) {
-            _this6.state.changedData = props.changedData;
+            _this7.state.changedData = props.changedData;
         }
         if (props.tabIndex !== undefined) {
-            _this6.state.tabIndex = props.tabIndex;
+            _this7.state.tabIndex = props.tabIndex;
         }
 
-        _this6.state.fieldDefaultData = {};
-        _this6.setFieldDefaultData(_this6.props.fields);
+        _this7.state.fieldDefaultData = {};
+        _this7.setFieldDefaultData(_this7.props.fields);
 
-        _this6.state.feildOriginData = {};
-        _this6.setFieldOriginData(_this6.props.fields);
+        _this7.state.feildOriginData = {};
+        _this7.setFieldOriginData(_this7.props.fields);
     };
 
     this.handleChange = function (field) {
         return function (value, control) {
-            _this6.setFormStatus(STATUS_EDITING);
-            _lodash2.default.set(_this6.state.changedData, field.formKey || field.key, value);
-            var data = _this6.getData('all');
+            _this7.setFormStatus(STATUS_EDITING);
+            _lodash2.default.set(_this7.state.changedData, field.formKey || field.key, value);
+            var data = _this7.getData('all');
             if (field.onChange) {
                 var _value = _lodash2.default.get(data, field.formKey || field.key);
-                field.onChange(_value, control, _this6);
+                field.onChange(_value, control, _this7);
             }
-            if (_this6.props.onChange) {
-                _this6.props.onChange(data, field, control, _this6);
+            if (_this7.props.onChange) {
+                _this7.props.onChange(data, field, control, _this7);
             }
-            if ((0, _keys2.default)(_this6.state.errorText).length > 0) {
-                var allData = _this6.getData('all');
-                _this6.check(allData, false);
+            if ((0, _keys2.default)(_this7.state.errorText).length > 0) {
+                var allData = _this7.getData('all');
+                _this7.check(allData, false);
             }
-            _this6.forceUpdate();
+            _this7.publish('change', { field: field, value: value, control: control });
+            _this7.forceUpdate();
         };
     };
 
     this.renderControls = function (fields) {
-        var data = _this6.getData('all');
-        var allExtraData = _this6.getData('all-extra');
-        var cols = _this6.props.cols || 1;
+        var data = _this7.getData('all');
+        var allExtraData = _this7.getData('all-extra');
+        var cols = _this7.props.cols || 1;
         return fields.map(function (field, index) {
             var value = _lodash2.default.get(data, field.formKey || field.key);
-            var isShow = _this6.isShow(field, allExtraData);
+            var isShow = _this7.isShow(field, allExtraData);
             if (!isShow) {
                 return null;
             }
 
             if (field.convert) value = field.convert(allExtraData);
             var fieldCols = field.cols || 1;
-            var controlProps = _lodash2.default.get(_this6.props.controlProps, field.formKey || field.key, {});
+            var controlProps = _lodash2.default.get(_this7.props.controlProps, field.formKey || field.key, {});
             switch (field.type) {
                 case 'group':
                     return _react2.default.createElement(
@@ -558,7 +601,7 @@ var _initialiseProps = function _initialiseProps() {
                         _react2.default.createElement(
                             'div',
                             { style: {
-                                    width: field.width || _this6.props.controlWidth
+                                    width: field.width || _this7.props.controlWidth
                                 } },
                             _react2.default.createElement(
                                 'div',
@@ -567,12 +610,11 @@ var _initialiseProps = function _initialiseProps() {
                                     'div',
                                     { className: 'col col-full form-group-title',
                                         style: {
-                                            marginTop: 16,
-                                            marginBottom: _this6.props.inline ? 16 : 0
+                                            marginBottom: _this7.props.inline ? 20 : 0
                                         } },
                                     field.label
                                 ) : null,
-                                _this6.renderControls(field.fields)
+                                _this7.renderControls(field.fields)
                             )
                         )
                     );
@@ -585,10 +627,10 @@ var _initialiseProps = function _initialiseProps() {
                         }, field, {
                             columns: field.fields,
                             value: value,
-                            controlSize: _this6.props.controlSize,
+                            controlSize: _this7.props.controlSize,
                             data: allExtraData,
-                            context: _this6,
-                            onChange: _this6.handleChange(field) }))
+                            context: _this7,
+                            onChange: _this7.handleChange(field) }))
                     );
                 case 'multi':
                     return _react2.default.createElement(
@@ -597,12 +639,12 @@ var _initialiseProps = function _initialiseProps() {
                         _react2.default.createElement(
                             'div',
                             { className: 'flex middle' },
-                            field.label ? _this6.props.inline ? _react2.default.createElement(
+                            field.label ? _this7.props.inline ? _react2.default.createElement(
                                 'div',
                                 {
                                     style: {
-                                        width: _this6.props.labelWidth,
-                                        minWidth: _this6.props.labelWidth
+                                        width: _this7.props.labelWidth,
+                                        minWidth: _this7.props.labelWidth
                                     } },
                                 field.label,
                                 field.required ? _react2.default.createElement(
@@ -622,7 +664,7 @@ var _initialiseProps = function _initialiseProps() {
                                 _react2.default.createElement(
                                     'div',
                                     { className: 'row-space large', cols: field.cols || field.fields.length },
-                                    _this6.renderControls(field.fields, false)
+                                    _this7.renderControls(field.fields, false)
                                 ),
                                 _react2.default.createElement(
                                     'div',
@@ -646,49 +688,49 @@ var _initialiseProps = function _initialiseProps() {
                         _react2.default.createElement(
                             'div',
                             { style: {
-                                    width: field.width || _this6.props.controlWidth,
-                                    paddingRight: field.paddingRight || _this6.props.controlPaddingRight,
-                                    marginBottom: _this6.props.controlBetweenSpace
+                                    width: field.width || _this7.props.controlWidth,
+                                    paddingRight: field.paddingRight || _this7.props.controlPaddingRight,
+                                    marginBottom: _this7.props.controlBetweenSpace
                                 } },
-                            field.render(data, _this6)
+                            field.render(data, _this7)
                         )
                     );
                 default:
                     var control = _react2.default.createElement(_control2.default, (0, _extends3.default)({ ref: field.key,
                         value: value,
-                        size: _this6.props.controlSize
+                        size: _this7.props.controlSize
                     }, (0, _extends3.default)({}, field, {
-                        label: _this6.props.inline && field.type !== 'checkbox' ? false : field.label
+                        label: _this7.props.inline && field.type !== 'checkbox' ? false : field.label
                     }), {
-                        labelFixed: _this6.props.labelFixed,
-                        errorText: _lodash2.default.get(_this6.state.errorText, field.key),
-                        validate: _this6.props.validate ? _this6.state.validate : false,
-                        onChange: _this6.handleChange(field),
+                        labelFixed: _this7.props.labelFixed,
+                        errorText: _lodash2.default.get(_this7.state.errorText, field.key),
+                        validate: _this7.props.validate ? _this7.state.validate : false,
+                        onChange: _this7.handleChange(field),
                         data: allExtraData,
-                        context: _this6
+                        context: _this7
                     }, controlProps));
-                    if (_this6.props.inline) {
+                    if (_this7.props.inline) {
                         return _react2.default.createElement(
                             'div',
                             { className: 'col col-' + fieldCols + ' ' + (!isShow ? 'hidden' : ''),
                                 style: {
-                                    marginBottom: _this6.props.inlineFlex ? 8 : _this6.props.controlBetweenSpace,
-                                    marginRight: _this6.props.inlineFlex ? _this6.props.controlBetweenSpace : 0,
-                                    paddingRight: field.paddingRight || _this6.props.controlPaddingRight
+                                    marginBottom: _this7.props.inlineFlex ? 8 : _this7.props.controlBetweenSpace,
+                                    marginRight: _this7.props.inlineFlex ? _this7.props.controlBetweenSpace : 0,
+                                    paddingRight: field.paddingRight || _this7.props.controlPaddingRight
                                 },
                                 key: index },
                             _react2.default.createElement(
                                 'div',
                                 { className: 'flex middle ' + (!isShow ? 'hidden' : ''),
-                                    style: { width: field.width || _this6.props.controlWidth } },
+                                    style: { width: field.width || _this7.props.controlWidth } },
                                 field.type !== 'checkbox' && field.label ? _react2.default.createElement(
                                     'div',
                                     {
                                         style: {
-                                            width: field.labelWidth || _this6.props.labelWidth,
-                                            minWidth: field.labelWidth || _this6.props.labelWidth,
+                                            width: field.labelWidth || _this7.props.labelWidth,
+                                            minWidth: field.labelWidth || _this7.props.labelWidth,
                                             paddingRight: 8,
-                                            paddingBottom: _lodash2.default.get(_this6.state.errorText, field.key) ? 16 : undefined
+                                            paddingBottom: _lodash2.default.get(_this7.state.errorText, field.key) ? 16 : undefined
                                         } },
                                     field.required ? _react2.default.createElement(
                                         'span',
@@ -712,17 +754,17 @@ var _initialiseProps = function _initialiseProps() {
                                 'div',
                                 {
                                     className: 'helper-text' },
-                                _lodash2.default.isFunction(field.helperText) ? field.helperText(value, _this6) : field.helperText
+                                _lodash2.default.isFunction(field.helperText) ? field.helperText(value, _this7) : field.helperText
                             ) : null
                         );
                     } else {
                         return _react2.default.createElement(
                             'div',
                             { className: 'col col-' + fieldCols + ' ' + (!isShow ? 'hidden' : ''), key: index,
-                                style: { marginBottom: _this6.props.controlBetweenSpace } },
+                                style: { marginBottom: _this7.props.controlBetweenSpace } },
                             _react2.default.createElement(
                                 'div',
-                                { style: { width: field.width || _this6.props.controlWidth } },
+                                { style: { width: field.width || _this7.props.controlWidth } },
                                 control
                             ),
                             field.helperText ? _react2.default.createElement(
@@ -737,9 +779,9 @@ var _initialiseProps = function _initialiseProps() {
     };
 
     this.handleTabChange = function (index) {
-        _this6.setState({ tabIndex: index });
-        if (_this6.props.onTabChange) {
-            _this6.props.onTabChange(index);
+        _this7.setState({ tabIndex: index });
+        if (_this7.props.onTabChange) {
+            _this7.props.onTabChange(index);
         }
     };
 };
@@ -752,7 +794,7 @@ var FormActions = function (_Component2) {
     function FormActions() {
         var _ref;
 
-        var _temp, _this7, _ret;
+        var _temp, _this8, _ret;
 
         (0, _classCallCheck3.default)(this, FormActions);
 
@@ -760,27 +802,27 @@ var FormActions = function (_Component2) {
             args[_key] = arguments[_key];
         }
 
-        return _ret = (_temp = (_this7 = (0, _possibleConstructorReturn3.default)(this, (_ref = FormActions.__proto__ || (0, _getPrototypeOf2.default)(FormActions)).call.apply(_ref, [this].concat(args))), _this7), _this7.handleClick = function (key) {
+        return _ret = (_temp = (_this8 = (0, _possibleConstructorReturn3.default)(this, (_ref = FormActions.__proto__ || (0, _getPrototypeOf2.default)(FormActions)).call.apply(_ref, [this].concat(args))), _this8), _this8.handleClick = function (key) {
             return function (event) {
                 switch (key) {
                     case 'reset':
-                        _this7.context.Form.reset.bind(_this7.context.Form)();
+                        _this8.context.Form.reset.bind(_this8.context.Form)();
                         break;
                     case 'submit':
-                        _this7.context.Form.submit.bind(_this7.context.Form)();
+                        _this8.context.Form.submit.bind(_this8.context.Form)();
                         break;
                     case 'cancel':
-                        _this7.context.Form.cancel.bind(_this7.context.Form)();
+                        _this8.context.Form.cancel.bind(_this8.context.Form)();
                         break;
                 }
             };
-        }, _temp), (0, _possibleConstructorReturn3.default)(_this7, _ret);
+        }, _temp), (0, _possibleConstructorReturn3.default)(_this8, _ret);
     }
 
     (0, _createClass3.default)(FormActions, [{
         key: 'getActions',
         value: function getActions() {
-            var _this8 = this;
+            var _this9 = this;
 
             var actions = [];
             var label = {
@@ -807,7 +849,7 @@ var FormActions = function (_Component2) {
                 if (_lodash2.default.isString(action)) {
                     actions.push((0, _extends3.default)({}, label[action]));
                 } else if (label[action.key]) {
-                    var disabled = _lodash2.default.isFunction(action.disabled) ? action.disabled(_this8.context.Form) : action.disabled;
+                    var disabled = _lodash2.default.isFunction(action.disabled) ? action.disabled(_this9.context.Form) : action.disabled;
                     actions.push((0, _extends3.default)({}, label[action.key], action, {
                         disabled: disabled
                     }));

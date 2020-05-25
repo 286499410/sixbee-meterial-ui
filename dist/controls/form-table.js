@@ -655,8 +655,8 @@ var FormTable = function (_Component) {
             var footerData = this.props.footerData ? this.props.footerData(this) : null;
             return _react2.default.createElement(
                 'div',
-                { style: (0, _extends3.default)({ marginBottom: 16 }, this.props.style, this.props.rootStyle) },
-                this.props.label === false ? null : _react2.default.createElement(
+                { style: (0, _extends3.default)({ marginBottom: 20 }, this.props.style, this.props.rootStyle) },
+                this.props.label === false || this.props.label === undefined ? null : _react2.default.createElement(
                     'div',
                     { style: this.props.labelStyle },
                     _react2.default.createElement(

@@ -286,7 +286,7 @@ export default class Select extends Component {
                 if (value.indexOf(data.value) >= 0) {
                     selectedText.push(data.selectText || data.text);
                 }
-            } else if (value == data.value) {
+            } else if (value === data.value) {
                 selectedText.push(data.selectText || data.text);
             }
         });

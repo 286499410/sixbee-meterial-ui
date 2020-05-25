@@ -4,6 +4,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import PubSub from 'pubsub-js';
 import {Scrollbars} from 'react-custom-scrollbars';
 import _ from 'lodash';
 import Control from './control';
@@ -74,7 +75,49 @@ export default class Form extends Component {
 
     constructor(props) {
         super(props);
+        this._observerKey = {};
+        this._observers = [];
         this.initData(props);
+    }
+
+    /**
+     * 订阅事件
+     * @param fn
+     * @returns {Function}
+     */
+    subscribe(type, fn) {
+        if(!this._observerKey[type]) {
+            this._observerKey[type] = 'form_' + new Date().getTime();
+        }
+        let token = PubSub.subscribe(this._observerKey[type], fn);
+        this._observers.push(token);
+        return () => {
+            this.unsubscribe(token);
+        };
+    }
+
+    /**
+     * 触发订阅事件
+     * @param data
+     */
+    publish(type, data = {}) {
+        if (this._observerKey[type]) {
+            PubSub.publish(this._observerKey[type], data);
+        }
+    }
+
+    /**
+     * 取消订阅
+     * @param token
+     */
+    unsubscribe(token = null) {
+        if (token) {
+            PubSub.unsubscribe(token);
+        } else {
+            this._observers.map((token) => {
+                PubSub.unsubscribe(token);
+            });
+        }
     }
 
     static contextTypes = {
@@ -190,7 +233,7 @@ export default class Form extends Component {
             if(_.isArray(obj)) {
                 return src;
             }
-        }
+        };
         switch (dataScope) {
             case 'all': //所有控件的值
                 return _.mergeWith(
@@ -249,6 +292,7 @@ export default class Form extends Component {
             let allData = this.getData('all');
             this.check(allData, false);
         }
+        this.publish('change', {field, value, control});
         this.forceUpdate();
     };
 
@@ -431,8 +475,7 @@ export default class Form extends Component {
                                 {
                                     field.label ? <div className="col col-full form-group-title"
                                                        style={{
-                                                           marginTop: 16,
-                                                           marginBottom: this.props.inline ? 16 : 0
+                                                           marginBottom: this.props.inline ? 20 : 0
                                                        }}>{field.label}</div> : null
                                 }
                                 {this.renderControls(field.fields)}
