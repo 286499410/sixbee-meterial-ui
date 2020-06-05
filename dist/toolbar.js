@@ -244,7 +244,10 @@ var Toolbar = function (_Component) {
                             }
                             return _react2.default.createElement(
                                 'div',
-                                { className: 'toolbar-item', key: j, onClick: _this2.handleClick(event), 'auth-key': event.authKey },
+                                { className: 'toolbar-item',
+                                    key: j,
+                                    onClick: _this2.handleClick(event),
+                                    'auth-key': _lodash2.default.isFunction(event.authKey) ? event.authKey() : event.authKey },
                                 _this2.renderEvent(event)
                             );
                         })

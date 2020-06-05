@@ -38,6 +38,10 @@ var _propTypes2 = _interopRequireDefault(_propTypes);
 
 var _body = require('./body');
 
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Footer = function (_Component) {
@@ -71,7 +75,11 @@ var Footer = function (_Component) {
                                 'tr',
                                 { key: i },
                                 row.map(function (col, j) {
-                                    return _react2.default.createElement(
+                                    return _lodash2.default.isString(col) || col === null ? _react2.default.createElement(
+                                        'td',
+                                        { key: j },
+                                        col
+                                    ) : _react2.default.createElement(
                                         'td',
                                         { key: j, colSpan: col.colSpan || 1, rowSpan: col.rowSpan || 1,
                                             style: (0, _extends3.default)({ textAlign: col.textAlign || 'left' }, col.style) },

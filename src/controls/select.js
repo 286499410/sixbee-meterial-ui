@@ -126,8 +126,12 @@ export default class Select extends Component {
      * @param dataSource
      */
     setDataSource = (dataSource = this.props.dataSource) => {
-        utils.getDataSource(undefined, dataSource, this.props.dataSourceConfig, this).then((dataSource) => {
-            this.setState({dataSource: dataSource});
+        return new Promise(resolve => {
+            utils.getDataSource(undefined, dataSource, this.props.dataSourceConfig, this).then((dataSource) => {
+                this.state.dataSource = dataSource;
+                this.forceUpdate();
+                resolve(dataSource);
+            });
         });
     };
 

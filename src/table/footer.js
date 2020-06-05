@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types'
 import {TableBodyColGroup} from './body';
+import _ from 'lodash';
 
 export default class Footer extends Component {
 
@@ -24,7 +25,7 @@ export default class Footer extends Component {
                     props.footerData.map((row, i) => {
                         return <tr key={i}>
                             {row.map((col, j) => {
-                                return <td key={j} colSpan={col.colSpan || 1} rowSpan={col.rowSpan || 1}
+                                return _.isString(col) || col === null ? <td key={j}>{col}</td> : <td key={j} colSpan={col.colSpan || 1} rowSpan={col.rowSpan || 1}
                                            style={{textAlign: col.textAlign || 'left', ...col.style}}>{col.content}</td>
                             })}
                         </tr>

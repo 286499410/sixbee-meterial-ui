@@ -12,6 +12,10 @@ var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
 
+var _promise = require('babel-runtime/core-js/promise');
+
+var _promise2 = _interopRequireDefault(_promise);
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -146,8 +150,12 @@ var Select = function (_Component) {
         _this.setDataSource = function () {
             var dataSource = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _this.props.dataSource;
 
-            _utils2.default.getDataSource(undefined, dataSource, _this.props.dataSourceConfig, _this).then(function (dataSource) {
-                _this.setState({ dataSource: dataSource });
+            return new _promise2.default(function (resolve) {
+                _utils2.default.getDataSource(undefined, dataSource, _this.props.dataSourceConfig, _this).then(function (dataSource) {
+                    _this.state.dataSource = dataSource;
+                    _this.forceUpdate();
+                    resolve(dataSource);
+                });
             });
         };
 

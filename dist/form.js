@@ -862,6 +862,8 @@ var FormActions = function (_Component2) {
     }, {
         key: 'render',
         value: function render() {
+            var _this10 = this;
+
             var actions = this.getActions();
             if (this.props.inlineFlex) {
                 return _react2.default.createElement(
@@ -890,24 +892,35 @@ var FormActions = function (_Component2) {
                             boxShadow: '0 -1px 5px #ddd',
                             zIndex: 2
                         }, this.props.style) },
-                    actions.map(function (action, index) {
-                        if (action.type == 'text') {
-                            return _react2.default.createElement(
-                                'span',
-                                { key: index, style: (0, _extends3.default)({ marginLeft: 12 }, action.style) },
-                                action.label
-                            );
-                        } else {
-                            return _react2.default.createElement(_button2.default, {
-                                key: index,
-                                label: action.label,
-                                type: action.buttonType || 'default',
-                                onClick: action.onClick,
-                                disabled: action.disabled,
-                                style: { marginLeft: 12 }
-                            });
-                        }
-                    })
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'flex middle inline' },
+                        actions.map(function (action, index) {
+                            switch (action.type) {
+                                case 'text':
+                                    return _react2.default.createElement(
+                                        'div',
+                                        { key: index, style: (0, _extends3.default)({ marginLeft: 12 }, action.style) },
+                                        action.label
+                                    );
+                                case 'render':
+                                    return _react2.default.createElement(
+                                        'div',
+                                        { key: index },
+                                        action.render(_this10.context.Form)
+                                    );
+                                default:
+                                    return _react2.default.createElement(_button2.default, {
+                                        key: index,
+                                        label: action.label,
+                                        type: action.buttonType || 'default',
+                                        onClick: action.onClick,
+                                        disabled: action.disabled,
+                                        style: { marginLeft: 12 }
+                                    });
+                            }
+                        })
+                    )
                 );
             }
         }

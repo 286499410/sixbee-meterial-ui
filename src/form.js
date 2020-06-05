@@ -86,7 +86,7 @@ export default class Form extends Component {
      * @returns {Function}
      */
     subscribe(type, fn) {
-        if(!this._observerKey[type]) {
+        if (!this._observerKey[type]) {
             this._observerKey[type] = 'form_' + new Date().getTime();
         }
         let token = PubSub.subscribe(this._observerKey[type], fn);
@@ -230,7 +230,7 @@ export default class Form extends Component {
             }
         }
         let customizer = (obj, src) => {
-            if(_.isArray(obj)) {
+            if (_.isArray(obj)) {
                 return src;
             }
         };
@@ -766,22 +766,27 @@ class FormActions extends Component {
                             zIndex: 2,
                             ...this.props.style
                         }}>
-                {
-                    actions.map((action, index) => {
-                        if (action.type == 'text') {
-                            return <span key={index} style={{marginLeft: 12, ...action.style}}>{action.label}</span>
-                        } else {
-                            return <Button
-                                key={index}
-                                label={action.label}
-                                type={action.buttonType || 'default'}
-                                onClick={action.onClick}
-                                disabled={action.disabled}
-                                style={{marginLeft: 12}}
-                            />
-                        }
-                    })
-                }
+                <div className="flex middle inline">
+                    {
+                        actions.map((action, index) => {
+                            switch (action.type) {
+                                case 'text':
+                                    return <div key={index} style={{marginLeft: 12, ...action.style}}>{action.label}</div>;
+                                case 'render':
+                                    return <div key={index}>{action.render(this.context.Form)}</div>;
+                                default:
+                                    return <Button
+                                        key={index}
+                                        label={action.label}
+                                        type={action.buttonType || 'default'}
+                                        onClick={action.onClick}
+                                        disabled={action.disabled}
+                                        style={{marginLeft: 12}}
+                                    />
+                            }
+                        })
+                    }
+                </div>
             </div>
         }
     }

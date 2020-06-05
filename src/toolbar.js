@@ -167,13 +167,16 @@ export default class Toolbar extends Component {
                             } else if (_.isObject(event) && this.props.events && this.props.events[event.key]) {
                                 event = {...this.props.events[event.key], ...event}
                             }
-                            if(event.isShow) {
+                            if (event.isShow) {
                                 let isShow = _.isFunction(event.isShow) ? event.isShow() : event.isShow;
-                                if(!isShow) {
+                                if (!isShow) {
                                     return null;
                                 }
                             }
-                            return <div className="toolbar-item" key={j} onClick={this.handleClick(event)} auth-key={event.authKey}>
+                            return <div className="toolbar-item"
+                                        key={j}
+                                        onClick={this.handleClick(event)}
+                                        auth-key={_.isFunction(event.authKey) ? event.authKey() : event.authKey}>
                                 {this.renderEvent(event)}
                             </div>
                         })}
