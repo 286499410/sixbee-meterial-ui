@@ -84,7 +84,7 @@ export default class DateRange extends Component {
         this.state.endDate = endDate;
         if (this.props.onChange) {
             if (this.isEmpty(startDate) && this.isEmpty(endDate)) {
-                this.props.onChange(undefined, this);
+                this.props.onChange(null, this);
             } else if (this.props.timestamp) {
                 this.props.onChange([
                     !this.isEmpty(startDate) ? utils.strToTime(startDate) : undefined,

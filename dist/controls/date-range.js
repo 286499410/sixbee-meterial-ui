@@ -173,7 +173,7 @@ var DateRange = function (_Component) {
             this.state.endDate = endDate;
             if (this.props.onChange) {
                 if (this.isEmpty(startDate) && this.isEmpty(endDate)) {
-                    this.props.onChange(undefined, this);
+                    this.props.onChange(null, this);
                 } else if (this.props.timestamp) {
                     this.props.onChange([!this.isEmpty(startDate) ? _utils2.default.strToTime(startDate) : undefined, !this.isEmpty(endDate) ? _utils2.default.strToTime(endDate) + 86400 - 1 : undefined], this);
                 } else {
