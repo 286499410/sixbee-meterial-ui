@@ -129,7 +129,9 @@ export default class Windows extends Component {
         }
         if (handleChange)
             this.handleChange();
-        this.refs.tabs.forceUpdate();
+        if(this.refs.tabs) {
+            this.refs.tabs.forceUpdate();
+        }
         return true;
     };
 

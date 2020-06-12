@@ -201,7 +201,7 @@ var Form = function (_Component) {
             var _this4 = this;
 
             fields.map(function (field) {
-                var value = _lodash2.default.get(_this4.state.originData, field.formKey || field.key);
+                var value = _lodash2.default.get(_this4.state.originData, field.originKey || field.formKey || field.key);
                 if (value !== undefined) {
                     _lodash2.default.set(_this4.state.feildOriginData, field.formKey || field.key, value);
                 }
@@ -210,9 +210,6 @@ var Form = function (_Component) {
                 }
             });
         }
-    }, {
-        key: 'merge',
-        value: function merge() {}
     }, {
         key: 'getData',
         value: function getData() {

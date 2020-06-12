@@ -335,6 +335,10 @@ var utils = {
             default:
                 return value;
         }
+    },
+
+    isEmpty: function isEmpty(value) {
+        return value === undefined || value === null || value === '';
     }
 };
 

@@ -76,10 +76,14 @@ export default class Auto extends Component {
     initData = (props) => {
         if (props.hasOwnProperty('value')) {
             this.state.value = props.value;
-            if (props.value && this.state.dataSource.length > 0) {
-                let data = this.getData(props.value);
-                if (data) {
-                    this.state.searchText = _.get(data, this.props.dataSourceConfig.text, '');
+            if (utils.isEmpty(props.value)) {
+                this.state.searchText = '';
+            } else {
+                if (this.state.dataSource.length > 0) {
+                    let data = this.getData(props.value);
+                    if (data) {
+                        this.state.searchText = _.get(data, this.props.dataSourceConfig.text, '');
+                    }
                 }
             }
         }

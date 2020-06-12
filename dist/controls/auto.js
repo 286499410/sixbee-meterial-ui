@@ -184,10 +184,14 @@ var _initialiseProps = function _initialiseProps() {
     this.initData = function (props) {
         if (props.hasOwnProperty('value')) {
             _this4.state.value = props.value;
-            if (props.value && _this4.state.dataSource.length > 0) {
-                var data = _this4.getData(props.value);
-                if (data) {
-                    _this4.state.searchText = _lodash2.default.get(data, _this4.props.dataSourceConfig.text, '');
+            if (_utils2.default.isEmpty(props.value)) {
+                _this4.state.searchText = '';
+            } else {
+                if (_this4.state.dataSource.length > 0) {
+                    var data = _this4.getData(props.value);
+                    if (data) {
+                        _this4.state.searchText = _lodash2.default.get(data, _this4.props.dataSourceConfig.text, '');
+                    }
                 }
             }
         }

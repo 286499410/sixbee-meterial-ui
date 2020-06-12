@@ -87,7 +87,9 @@ var Windows = function (_Component) {
                 _this.props.onRequestClose(page);
             }
             if (handleChange) _this.handleChange();
-            _this.refs.tabs.forceUpdate();
+            if (_this.refs.tabs) {
+                _this.refs.tabs.forceUpdate();
+            }
             return true;
         };
 

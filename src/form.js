@@ -202,7 +202,7 @@ export default class Form extends Component {
      */
     setFieldOriginData(fields) {
         fields.map((field) => {
-            let value = _.get(this.state.originData, field.formKey || field.key);
+            let value = _.get(this.state.originData, field.originKey || field.formKey || field.key);
             if (value !== undefined) {
                 _.set(this.state.feildOriginData, field.formKey || field.key, value);
             }
@@ -210,10 +210,6 @@ export default class Form extends Component {
                 this.setFieldOriginData(field.fields);
             }
         })
-    }
-
-    merge(...params) {
-
     }
 
     /**
