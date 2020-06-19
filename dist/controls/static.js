@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -82,12 +86,10 @@ var Static = function (_Component) {
             var data = {};
             var key = this.props.formKey || this.props.dataKey;
             _.set(data, key, this.props.value);
-            return _utils2.default.render(data, {
+            return _utils2.default.render(data, (0, _extends3.default)({}, this.props, {
                 key: key,
-                type: this.props.staticType || 'text',
-                dataSource: this.props.dataSource,
-                dataSourceConfig: this.props.dataSourceConfig
-            }) || null;
+                type: this.props.staticType || 'text'
+            })) || null;
         }
     }]);
     return Static;
