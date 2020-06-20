@@ -36,10 +36,11 @@ export default class Static extends Component {
 
     render() {
         let data = {};
-        _.set(data, key, this.props.value);
+        let dataKey = this.props.formKey || this.props.dataKey || this.props.key;
+        _.set(data, dataKey, this.props.value);
         return utils.render(data, {
             ...this.props,
-            dataKey: this.props.formKey || this.props.dataKey || this.props.key,
+            dataKey: dataKey,
             type: this.props.staticType || 'text',
         }) || null;
     }
