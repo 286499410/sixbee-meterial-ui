@@ -84,10 +84,9 @@ var Static = function (_Component) {
         key: 'render',
         value: function render() {
             var data = {};
-            var key = this.props.formKey || this.props.dataKey;
             _.set(data, key, this.props.value);
             return _utils2.default.render(data, (0, _extends3.default)({}, this.props, {
-                key: key,
+                dataKey: this.props.formKey || this.props.dataKey || this.props.key,
                 type: this.props.staticType || 'text'
             })) || null;
         }
