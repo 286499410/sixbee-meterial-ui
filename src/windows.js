@@ -100,7 +100,7 @@ export default class Windows extends Component {
      * @param page
      */
     handleClick = (page) => (event) => {
-        if (this.getCurrentUrl() !== page.url) {
+        if (page && this.getCurrentUrl() !== page.url) {
             this.addTrack(page.url);
             this.props.history.replace(page.url);
         }

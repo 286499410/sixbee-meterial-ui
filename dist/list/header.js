@@ -67,6 +67,9 @@ var Header = function (_Component) {
         value: function render() {
             var _this2 = this;
 
+            if (!this.context.props.title && !this.context.props.filter && (!this.context.props.headerIconEvents || this.context.props.headerIconEvents.length == 0)) {
+                return null;
+            }
             return _react2.default.createElement(
                 'div',
                 { className: 'list-header' },

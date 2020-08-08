@@ -60,7 +60,7 @@ var Windows = function (_Component) {
 
         _this.handleClick = function (page) {
             return function (event) {
-                if (_this.getCurrentUrl() !== page.url) {
+                if (page && _this.getCurrentUrl() !== page.url) {
                     _this.addTrack(page.url);
                     _this.props.history.replace(page.url);
                 }

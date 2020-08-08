@@ -733,7 +733,7 @@ FormTable.defaultProps = {
     value: undefined,
     defaultValue: undefined,
     defaultRowData: {},
-    tableClassName: "text-small control",
+    tableClassName: "control",
     style: {},
     hasPager: false,
     bodyHeaderData: undefined,

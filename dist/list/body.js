@@ -54,10 +54,6 @@ var _jquery = require('jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _control = require('../control');
-
-var _control2 = _interopRequireDefault(_control);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Body = function (_Component) {
@@ -83,7 +79,8 @@ var Body = function (_Component) {
         };
 
         _this.handleCheck = function (data) {
-            return function (isCheck) {
+            return function (event) {
+                var isCheck = event.target.checked;
                 var selected = _this.context.state.selected;
                 var key = _this.getValue(data);
                 var childKeys = _this.getChildKeys(key);
@@ -308,7 +305,7 @@ var Body = function (_Component) {
                                 props.multiple ? _react2.default.createElement(
                                     'div',
                                     { className: 'flex middle' },
-                                    _react2.default.createElement(_control2.default, { type: 'checkbox', size: 'small', styleProps: { style: { marginTop: 0 } }, onChange: _this4.handleCheck(data), value: _this4.isCheck(data) }),
+                                    _react2.default.createElement('input', { type: 'checkbox', checked: _this4.isCheck(data), onChange: _this4.handleCheck(data), style: { margin: 0, marginRight: 6 } }),
                                     _react2.default.createElement(
                                         'div',
                                         null,

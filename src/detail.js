@@ -31,7 +31,9 @@ export default class Detail extends Component {
                             <div className={"text-normal"} style={{flowGrow: 1}}>{value}</div>
                         </div> : <div>
                             <div className="text-muted text-small" style={{marginBottom: 6}}>{field.label}</div>
-                            <div className={"text-normal"} style={{minHeight: 20}}>{value}</div>
+                            <div className={"text-normal" + (field.onClick ? ' text-primary cursor-pointer' : '')}
+                                 style={{minHeight: 20}}
+                                 onClick={field.onClick ? field.onClick.bind(this, this.props.data) : undefined}>{value}</div>
                         </div>
                     }
                 </div>

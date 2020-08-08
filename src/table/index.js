@@ -64,7 +64,7 @@ export default class Table extends Component {
         rowCheckboxEnabled: undefined,          //逐行检查是否启用/禁用复选框
         bodyCellMultiLine: false,               //表内容单元格是否允许多行显示
         checkboxColumnWidth: 50,                //复选框列的宽度
-        resize: false,                          //列宽度是否可拖动更改
+        resize: true,                           //列宽度是否可拖动更改
         cellRender: undefined,                  //单元格渲染处理函数
         loading: false,                         //是否显示loading
         footerFixed: false,                     //footer是否固定底部
@@ -74,6 +74,7 @@ export default class Table extends Component {
         showSeries: false,                      //是否显示序号
         seriesColumnWidth: 50,                  //序号列宽度
         showEllipsis: true,                     //显示省略内容
+        autoResponse: false,                    //自适应
         checkboxStyle: {
             style: {
                 marginLeft: 15,
@@ -141,10 +142,30 @@ export default class Table extends Component {
         }
     }
 
+    /**
+     * 表格宽度
+     * @returns {*}
+     */
+    getTableWidth(props = this.props) {
+        let hasChildren = {};
+        this.state.dataColumns.map((column) => {
+            if (column.parent) hasChildren[column.parent.key] = true;
+        });
+        const columnWidths = Object.entries(this.state.columnWidths).map(([key, value]) => {
+            if (hasChildren[key]) return 0;
+            return value;
+        });
+        return props.tableWidth ||
+            Math.max(
+                this.getCheckboxColumnWidth() + this.getSeriesColumnWidth() + columnWidths.length > 0 ? columnWidths.reduce((total, num) => total + num) : 0,
+                _.isString(this.state.containerWidth) ? 0 : this.state.containerWidth,
+                props.tableMinWidth || 0
+            );
+    }
+
     initData(props) {
         let nextProps = {
             containerWidth: this.state.containerWidth || props.containerWidth,
-            tableWidth: props.tableWidth,
             columnWidths: {...props.columnWidths},
             dataSource: props.dataSource,
             mode: props.mode,
@@ -164,6 +185,7 @@ export default class Table extends Component {
             }
         }
         Object.assign(this.state, nextProps);
+        this.state.tableWidth = this.getTableWidth(nextProps);
         this.state.dataRows = this.state.dataSource;
     }
 
@@ -200,14 +222,6 @@ export default class Table extends Component {
 
     componentDidMount() {
         this.state.containerWidth = $(this.refs.container).outerWidth() || '100%';
-        if(this.props.tableMinWidth) {
-            this.state.tableWidth = Math.max(
-                (!this.state.tableWidth || this.state.tableWidth == '100%') ? this.state.containerWidth : this.state.tableWidth,
-                this.props.tableMinWidth
-            );
-        } else {
-            this.state.tableWidth = this.state.tableWidth || this.state.containerWidth;
-        }
         this.componentDidUpdate();
     }
 
@@ -231,43 +245,30 @@ export default class Table extends Component {
      * 处理列宽
      */
     handleColumnWidths() {
-        let undefinedColumnWidths = [], widthSum = 0;
+        let undefinedColumnWidths = [];
         for (let [key, width] of Object.entries(this.state.columnWidths)) {
-            if(_.findIndex(this.state.dataColumns, {key: key}) < 0) {
+            if (_.findIndex(this.state.dataColumns, {key: key}) < 0) {
                 delete this.state.columnWidths[key];
             }
         }
         this.state.dataColumns.map((column) => {
             if (this.state.columnWidths[column.key] === undefined) {
                 undefinedColumnWidths.push(column.key);
-            } else {
-                widthSum += this.state.columnWidths[column.key];
             }
-            if(column.parent) {
+            if (column.parent) {
                 this.state.columnWidths[column.parent.key] = 0;
             }
         });
         this.state.dataColumns.map((column) => {
             //上级列宽度等于下级列之和
-            if(column.parent && this.state.columnWidths[column.key]) {
+            if (column.parent && this.state.columnWidths[column.key]) {
                 this.state.columnWidths[column.parent.key] += this.state.columnWidths[column.key];
             }
         });
         undefinedColumnWidths.map((key) => {
+            //未定义宽度列，宽度等于页面宽度
             this.state.columnWidths[key] = $(this.refs.container).find(`.table-header th[data-key=${key}]`).outerWidth();
         });
-        if (undefinedColumnWidths.length == 0 && widthSum != this.state.tableWidth) {
-            //定义的列宽和不等于表宽，需重新分配宽度
-            let remainWidth = this.state.tableWidth - this.getCheckboxColumnWidth() - this.getSeriesColumnWidth();
-            let contentWidth = remainWidth;
-            for (let [key, width] of Object.entries(this.state.columnWidths)) {
-                this.state.columnWidths[key] = Math.round((width / widthSum) * contentWidth);
-                remainWidth -= this.state.columnWidths[key];
-            }
-            if(this.state.columnWidths[this.state.dataColumns[this.state.dataColumns.length - 1].key] + remainWidth > 0) {
-                this.state.columnWidths[this.state.dataColumns[this.state.dataColumns.length - 1].key] += remainWidth;
-            }
-        }
     }
 
     componentDidUpdate() {
@@ -275,6 +276,7 @@ export default class Table extends Component {
         let state = this.state;
         let props = this.props;
         this.handleColumnWidths();
+        this.state.tableWidth = this.getTableWidth();
         if (this.props.containerHeight) {
             let containerHeight = $(this.refs.container).outerHeight();
             this.state.headerHeight = props.headerRowHeight * state.headerColumns.length + state.headerColumns.length || $(this.refs.container).find('.table-header').height() || 0;

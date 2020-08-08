@@ -94,7 +94,9 @@ var Detail = function (_Component) {
                             ),
                             _react2.default.createElement(
                                 'div',
-                                { className: "text-normal", style: { minHeight: 20 } },
+                                { className: "text-normal" + (field.onClick ? ' text-primary cursor-pointer' : ''),
+                                    style: { minHeight: 20 },
+                                    onClick: field.onClick ? field.onClick.bind(_this2, _this2.props.data) : undefined },
                                 value
                             )
                         )

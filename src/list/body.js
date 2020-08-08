@@ -5,7 +5,6 @@ import Icon from "../icon";
 import utils from '../utils';
 import Item from './item';
 import $ from 'jquery';
-import Control from '../control';
 
 export default class Body extends Component {
 
@@ -126,7 +125,8 @@ export default class Body extends Component {
      * @param data
      * @returns {Function}
      */
-    handleCheck = (data) => (isCheck) => {
+    handleCheck = (data) => (event) => {
+        const isCheck = event.target.checked;
         let selected = this.context.state.selected;
         let key = this.getValue(data);
         let childKeys = this.getChildKeys(key);
@@ -279,7 +279,8 @@ export default class Body extends Component {
                                     }
                                     {
                                         props.multiple ? <div className="flex middle">
-                                            <Control type="checkbox" size="small" styleProps={{style: {marginTop: 0}}} onChange={this.handleCheck(data)} value={this.isCheck(data)}/>
+                                            <input type="checkbox" checked={this.isCheck(data)} onChange={(this.handleCheck(data))} style={{margin: 0,marginRight: 6}}/>
+                                            {/*<Control type="checkbox" size="small" styleProps={{style: {marginTop: 0}}} onChange={this.handleCheck(data)} value={this.isCheck(data)}/>*/}
                                             <div>{content}</div>
                                         </div> : content
                                     }

@@ -180,7 +180,7 @@ var TableBody = function (_Component) {
                     ),
                     _react2.default.createElement('div', { style: { width: state.tableWidth, height: 1 } })
                 ) : null,
-                this.props.hasScrollbar && (props.containerHeight || state.bodyHeight) ? _react2.default.createElement(
+                this.props.hasScrollbar ? _react2.default.createElement(
                     _reactCustomScrollbars.Scrollbars,
                     { ref: this.scrollBarRef,
                         renderTrackHorizontal: function renderTrackHorizontal(_ref) {
@@ -250,7 +250,7 @@ var TableBody = function (_Component) {
                             width: '100%',
                             height: '100%'
                         },
-                        autoHeight: false
+                        autoHeight: props.containerHeight || state.bodyHeight ? false : true
                     },
                     table
                 ) : table

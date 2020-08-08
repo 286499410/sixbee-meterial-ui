@@ -5,9 +5,10 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { Scrollbars } from 'react-custom-scrollbars';
+import { Scrollbars} from 'react-custom-scrollbars';
 import Header from './header';
 import Body from './body';
+import Control from '../control';
 
 export default class List extends Component {
 
@@ -15,7 +16,7 @@ export default class List extends Component {
         List: PropTypes.object,
         state: PropTypes.object,
         props: PropTypes.object,
-        setListState: PropTypes.func
+        setListState: PropTypes.func,
     };
 
     getChildContext() {
@@ -43,7 +44,7 @@ export default class List extends Component {
         onFilter: undefined,            //过滤函数
         onSelect: undefined,            //选中触发事件
         multiple: false,                //是否多选
-
+        hasFilterText: false
     };
 
     state = {
@@ -105,6 +106,7 @@ export default class List extends Component {
                     ref="container"
                     style={{width: this.props.width, height: this.props.height}}>
             <Header ref="header"/>
+            {this.props.hasFilterText && <div style={{margin: "0 16px"}}><Control type="text" borderStyle="underline" hintText="输入科目名称查询" onChange={(value) => {this.setState({filterText: value})}}/></div>}
             <Body ref="body"/>
         </div>
     }

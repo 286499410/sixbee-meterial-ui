@@ -63,7 +63,7 @@ export default class FormTable extends Component {
         value: undefined,                       //值
         defaultValue: undefined,                //默认值, 支持函数
         defaultRowData: {},                     //默认行数据
-        tableClassName: "text-small control",   //表样式类
+        tableClassName: "control",              //表样式类
         style: {},                              //样式
         hasPager: false,                        //是否有分页
         bodyHeaderData: undefined,              //

@@ -171,7 +171,7 @@ export default class TableBody extends Component {
                      : null
             }
             {
-                this.props.hasScrollbar && (props.containerHeight || state.bodyHeight) ?
+                this.props.hasScrollbar ?
                     <Scrollbars ref={this.scrollBarRef}
                                 renderTrackHorizontal={({style, ...props}) =>
                                     <div {...props} style={{
@@ -232,7 +232,7 @@ export default class TableBody extends Component {
                                     width: '100%',
                                     height: '100%'
                                 }}
-                                autoHeight={false}
+                                autoHeight={props.containerHeight || state.bodyHeight ? false : true}
                     >
                         {table}
                     </Scrollbars> : table

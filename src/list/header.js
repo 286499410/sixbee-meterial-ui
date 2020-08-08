@@ -23,6 +23,9 @@ export default class Header extends Component {
     };
 
     render() {
+        if(!this.context.props.title && !this.context.props.filter && (!this.context.props.headerIconEvents || this.context.props.headerIconEvents.length == 0)) {
+            return null;
+        }
         return <div className="list-header">
             <div className="relative">
                 {this.context.props.title}

@@ -8,10 +8,6 @@ var _values = require('babel-runtime/core-js/object/values');
 
 var _values2 = _interopRequireDefault(_values);
 
-var _entries = require('babel-runtime/core-js/object/entries');
-
-var _entries2 = _interopRequireDefault(_entries);
-
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
@@ -20,13 +16,17 @@ var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
 
 var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 
-var _extends2 = require('babel-runtime/helpers/extends');
+var _entries = require('babel-runtime/core-js/object/entries');
 
-var _extends3 = _interopRequireDefault(_extends2);
+var _entries2 = _interopRequireDefault(_entries);
 
 var _promise = require('babel-runtime/core-js/promise');
 
@@ -222,11 +222,31 @@ var Table = function (_Component) {
             }
         }
     }, {
+        key: 'getTableWidth',
+        value: function getTableWidth() {
+            var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props;
+
+            var hasChildren = {};
+            this.state.dataColumns.map(function (column) {
+                if (column.parent) hasChildren[column.parent.key] = true;
+            });
+            var columnWidths = (0, _entries2.default)(this.state.columnWidths).map(function (_ref) {
+                var _ref2 = (0, _slicedToArray3.default)(_ref, 2),
+                    key = _ref2[0],
+                    value = _ref2[1];
+
+                if (hasChildren[key]) return 0;
+                return value;
+            });
+            return props.tableWidth || Math.max(this.getCheckboxColumnWidth() + this.getSeriesColumnWidth() + columnWidths.length > 0 ? columnWidths.reduce(function (total, num) {
+                return total + num;
+            }) : 0, _lodash2.default.isString(this.state.containerWidth) ? 0 : this.state.containerWidth, props.tableMinWidth || 0);
+        }
+    }, {
         key: 'initData',
         value: function initData(props) {
             var nextProps = {
                 containerWidth: this.state.containerWidth || props.containerWidth,
-                tableWidth: props.tableWidth,
                 columnWidths: (0, _extends3.default)({}, props.columnWidths),
                 dataSource: props.dataSource,
                 mode: props.mode,
@@ -246,12 +266,12 @@ var Table = function (_Component) {
 
             try {
                 for (var _iterator = (0, _getIterator3.default)((0, _entries2.default)(nextProps)), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var _ref = _step.value;
+                    var _ref3 = _step.value;
 
-                    var _ref2 = (0, _slicedToArray3.default)(_ref, 2);
+                    var _ref4 = (0, _slicedToArray3.default)(_ref3, 2);
 
-                    var key = _ref2[0];
-                    var value = _ref2[1];
+                    var key = _ref4[0];
+                    var value = _ref4[1];
 
                     if (value === undefined) {
                         delete nextProps[key];
@@ -273,6 +293,7 @@ var Table = function (_Component) {
             }
 
             (0, _assign2.default)(this.state, nextProps);
+            this.state.tableWidth = this.getTableWidth(nextProps);
             this.state.dataRows = this.state.dataSource;
         }
     }, {
@@ -313,11 +334,6 @@ var Table = function (_Component) {
         key: 'componentDidMount',
         value: function componentDidMount() {
             this.state.containerWidth = (0, _jquery2.default)(this.refs.container).outerWidth() || '100%';
-            if (this.props.tableMinWidth) {
-                this.state.tableWidth = Math.max(!this.state.tableWidth || this.state.tableWidth == '100%' ? this.state.containerWidth : this.state.tableWidth, this.props.tableMinWidth);
-            } else {
-                this.state.tableWidth = this.state.tableWidth || this.state.containerWidth;
-            }
             this.componentDidUpdate();
         }
     }, {
@@ -335,20 +351,19 @@ var Table = function (_Component) {
         value: function handleColumnWidths() {
             var _this2 = this;
 
-            var undefinedColumnWidths = [],
-                widthSum = 0;
+            var undefinedColumnWidths = [];
             var _iteratorNormalCompletion2 = true;
             var _didIteratorError2 = false;
             var _iteratorError2 = undefined;
 
             try {
                 for (var _iterator2 = (0, _getIterator3.default)((0, _entries2.default)(this.state.columnWidths)), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var _ref3 = _step2.value;
+                    var _ref5 = _step2.value;
 
-                    var _ref4 = (0, _slicedToArray3.default)(_ref3, 2);
+                    var _ref6 = (0, _slicedToArray3.default)(_ref5, 2);
 
-                    var key = _ref4[0];
-                    var width = _ref4[1];
+                    var key = _ref6[0];
+                    var width = _ref6[1];
 
                     if (_lodash2.default.findIndex(this.state.dataColumns, { key: key }) < 0) {
                         delete this.state.columnWidths[key];
@@ -372,8 +387,6 @@ var Table = function (_Component) {
             this.state.dataColumns.map(function (column) {
                 if (_this2.state.columnWidths[column.key] === undefined) {
                     undefinedColumnWidths.push(column.key);
-                } else {
-                    widthSum += _this2.state.columnWidths[column.key];
                 }
                 if (column.parent) {
                     _this2.state.columnWidths[column.parent.key] = 0;
@@ -387,44 +400,6 @@ var Table = function (_Component) {
             undefinedColumnWidths.map(function (key) {
                 _this2.state.columnWidths[key] = (0, _jquery2.default)(_this2.refs.container).find('.table-header th[data-key=' + key + ']').outerWidth();
             });
-            if (undefinedColumnWidths.length == 0 && widthSum != this.state.tableWidth) {
-                var remainWidth = this.state.tableWidth - this.getCheckboxColumnWidth() - this.getSeriesColumnWidth();
-                var contentWidth = remainWidth;
-                var _iteratorNormalCompletion3 = true;
-                var _didIteratorError3 = false;
-                var _iteratorError3 = undefined;
-
-                try {
-                    for (var _iterator3 = (0, _getIterator3.default)((0, _entries2.default)(this.state.columnWidths)), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                        var _ref5 = _step3.value;
-
-                        var _ref6 = (0, _slicedToArray3.default)(_ref5, 2);
-
-                        var _key = _ref6[0];
-                        var _width = _ref6[1];
-
-                        this.state.columnWidths[_key] = Math.round(_width / widthSum * contentWidth);
-                        remainWidth -= this.state.columnWidths[_key];
-                    }
-                } catch (err) {
-                    _didIteratorError3 = true;
-                    _iteratorError3 = err;
-                } finally {
-                    try {
-                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                            _iterator3.return();
-                        }
-                    } finally {
-                        if (_didIteratorError3) {
-                            throw _iteratorError3;
-                        }
-                    }
-                }
-
-                if (this.state.columnWidths[this.state.dataColumns[this.state.dataColumns.length - 1].key] + remainWidth > 0) {
-                    this.state.columnWidths[this.state.dataColumns[this.state.dataColumns.length - 1].key] += remainWidth;
-                }
-            }
         }
     }, {
         key: 'componentDidUpdate',
@@ -433,6 +408,7 @@ var Table = function (_Component) {
             var state = this.state;
             var props = this.props;
             this.handleColumnWidths();
+            this.state.tableWidth = this.getTableWidth();
             if (this.props.containerHeight) {
                 var containerHeight = (0, _jquery2.default)(this.refs.container).outerHeight();
                 this.state.headerHeight = props.headerRowHeight * state.headerColumns.length + state.headerColumns.length || (0, _jquery2.default)(this.refs.container).find('.table-header').height() || 0;
@@ -687,7 +663,7 @@ Table.defaultProps = {
     rowCheckboxEnabled: undefined,
     bodyCellMultiLine: false,
     checkboxColumnWidth: 50,
-    resize: false,
+    resize: true,
     cellRender: undefined,
     loading: false,
     footerFixed: false,
@@ -697,6 +673,7 @@ Table.defaultProps = {
     showSeries: false,
     seriesColumnWidth: 50,
     showEllipsis: true,
+    autoResponse: false,
     checkboxStyle: {
         style: {
             marginLeft: 15,

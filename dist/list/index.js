@@ -58,6 +58,10 @@ var _body = require('./body');
 
 var _body2 = _interopRequireDefault(_body);
 
+var _control = require('../control');
+
+var _control2 = _interopRequireDefault(_control);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var List = function (_Component) {
@@ -165,12 +169,21 @@ var List = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
+            var _this2 = this;
+
             return _react2.default.createElement(
                 'div',
                 { className: 'list ' + (this.props.bordered ? 'bordered' : '') + ' ' + this.props.className,
                     ref: 'container',
                     style: { width: this.props.width, height: this.props.height } },
                 _react2.default.createElement(_header2.default, { ref: 'header' }),
+                this.props.hasFilterText && _react2.default.createElement(
+                    'div',
+                    { style: { margin: "0 16px" } },
+                    _react2.default.createElement(_control2.default, { type: 'text', borderStyle: 'underline', hintText: '\u8F93\u5165\u79D1\u76EE\u540D\u79F0\u67E5\u8BE2', onChange: function onChange(value) {
+                            _this2.setState({ filterText: value });
+                        } })
+                ),
                 _react2.default.createElement(_body2.default, { ref: 'body' })
             );
         }
@@ -199,5 +212,7 @@ List.defaultProps = {
     dataSourceConfig: { text: 'text', value: 'value' },
     onFilter: undefined,
     onSelect: undefined,
-    multiple: false };
+    multiple: false,
+    hasFilterText: false
+};
 exports.default = List;

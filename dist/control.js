@@ -108,6 +108,10 @@ var _formTable = require('./controls/form-table');
 
 var _formTable2 = _interopRequireDefault(_formTable);
 
+var _Control = require('./UI/Control');
+
+var _Control2 = _interopRequireDefault(_Control);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Control = function (_Component) {
@@ -184,6 +188,13 @@ var Control = function (_Component) {
                 props.disabled = props.disabled(props.data, props.context);
             }
             delete props.type;
+
+            if (props.useNewControl) {
+                return _react2.default.createElement(_Control2.default, (0, _extends3.default)({}, props, {
+                    type: type
+                }));
+            }
+
             switch (type) {
                 case 'text':
                 case 'password':

@@ -1,8 +1,3 @@
-/**
- * Created by zhengzhaowei on 2018/5/22.
- */
-
-
 import React, {Component} from 'react';
 import Auto from './controls/auto';
 import Checkbox from './controls/checkbox';
@@ -23,6 +18,7 @@ import SelectTag from './controls/select-tag';
 import SelectCheck from './controls/select-check';
 import Static from './controls/static';
 import Table from './controls/form-table';
+import NewControl from "./UI/Control";
 
 export default class Control extends Component {
 
@@ -92,6 +88,15 @@ export default class Control extends Component {
             props.disabled = props.disabled(props.data, props.context);
         }
         delete props.type;
+
+
+        if(props.useNewControl) {
+            return <NewControl
+                {...props}
+                type={type}
+            />
+        }
+
         switch (type) {
             case 'text':
             case 'password':
