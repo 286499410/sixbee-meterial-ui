@@ -123,6 +123,11 @@ var Control = function (_Component) {
             return this.controlComponent[this.props.type] || _Text2.default;
         }
     }, {
+        key: 'getControl',
+        value: function getControl() {
+            return this.control.current;
+        }
+    }, {
         key: 'render',
         value: function render() {
             var value = this.getValue();
@@ -156,13 +161,15 @@ var Control = function (_Component) {
                         dataSource: this.props.dataSource,
                         dataSourceConfig: this.props.dataSourceConfig,
                         onCreate: this.props.onCreate,
-                        menuProps: this.props.menuProps
+                        menuProps: this.props.menuProps,
+                        context: this.props.context,
+                        position: this.props.position
                     }, controlProps, {
                         className: (0, _tool.joinBlankSpace)(controlProps.className || this.props.className, errorText && 'control-error')
                     })),
-                    _react2.default.createElement(
+                    errorText && _react2.default.createElement(
                         'div',
-                        { className: 'control-error-text' },
+                        { className: 'text-small text-danger', style: { marginTop: 2 } },
                         this.getErrorText()
                     )
                 )

@@ -27,21 +27,22 @@ export default class TableBody extends Component {
         props: PropTypes.object,
         setTableState: PropTypes.func,
         handleStateChange: PropTypes.func,
-        getDataRows: PropTypes.func
+        getDataRows: PropTypes.func,
+        getTableWidth: PropTypes.func
     };
 
     constructor(props) {
         super(props);
+        this.noneScrollBar = React.createRef();
+        this.scrollBar = React.createRef();
     }
 
     componentDidMount() {
-        if (this.scrollBar) {
-            if (this.context.props.scrollTop) {
-                this.scrollBar.scrollTop(this.context.props.scrollTop);
-            }
-            if (this.context.props.scrollLeft) {
-                this.scrollBar.scrollLeft(this.context.props.scrollLeft);
-            }
+        if (this.context.props.scrollTop) {
+            this.setScrollTop(this.context.props.scrollTop);
+        }
+        if (this.context.props.scrollLeft) {
+            this.setScrollLeft(this.context.props.scrollLeft);
         }
     }
 
@@ -49,6 +50,39 @@ export default class TableBody extends Component {
         this.showEllipsis();
     }
 
+    getScrollBar() {
+        return this.scrollBar.current || this.noneScrollBar.current;
+    }
+
+    getScrollTop() {
+        const scrollBar = this.getScrollBar();
+        if (scrollBar) {
+            return scrollBar.getScrollTop();
+        }
+        return $(this.refs.container).scrollTop();
+    }
+
+    setScrollTop(scrollTop) {
+        const scrollBar = this.getScrollBar();
+        if (scrollBar) {
+            scrollBar.scrollTop(scrollTop);
+        }
+    }
+
+    getScrollLeft() {
+        const scrollBar = this.getScrollBar();
+        if (scrollBar) {
+            return scrollBar.getScrollLeft();
+        }
+        return $(this.refs.container).scrollLeft();
+    }
+
+    setScrollLeft(scrollLeft) {
+        const scrollBar = this.getScrollBar();
+        if (scrollBar) {
+            scrollBar.scrollTop(scrollLeft);
+        }
+    }
 
     /**
      * 省略的文本，加上title属性
@@ -72,8 +106,8 @@ export default class TableBody extends Component {
     };
 
     handleScroll = (event) => {
-        let scrollTop = this.scrollBar ? this.scrollBar.getScrollTop() : $(this.refs.container).scrollTop();
-        let scrollLeft = this.scrollBar ? this.scrollBar.getScrollLeft() :$(this.refs.container).scrollLeft();
+        let scrollTop = this.getScrollTop();
+        let scrollLeft = this.getScrollLeft();
         this.refs.tbody.showData(scrollTop);
         this.context.handleStateChange({
             scrollTop: scrollTop,
@@ -94,12 +128,6 @@ export default class TableBody extends Component {
         $(this.refs.masker).fadeOut();
     };
 
-    scrollBarRef = (ref) => {
-        if(ref) {
-            this.scrollBar = ref;
-        }
-    };
-
     render() {
         let state = this.context.state;
         let props = this.context.props;
@@ -109,12 +137,13 @@ export default class TableBody extends Component {
         if (props.bodyCellMultiLine) className += ' multi-line';
         if (props.striped) className += ' striped';
         if (props.className) className += ' ' + props.className;
+        let tableWidth = this.props.width || this.context.getTableWidth();
         let table = <table
             ref="table"
             className={className}
             style={{
                 tableLayout: 'fixed',
-                width: this.props.width || state.tableWidth
+                width: tableWidth
             }}>
             <TableBodyColGroup ref="thead"
                                showColumns={this.props.showColumns}
@@ -156,23 +185,25 @@ export default class TableBody extends Component {
             }
             {
                 state.dataSource.length == 0 && !props.loading && this.props.hasEmptyTip !== false ?
-                    <Scrollbars ref={this.scrollBarRef} style={{
+                    <Scrollbars ref={this.noneScrollBar} style={{
                         width: '100%',
                         height: '100%'
                     }}>
                         <div className="position-center text-center" style={{zIndex: 1}}>
                             <div>
-                                <div><img src={props.emptyDataImage} style={{maxWidth: 180, maxHeight: state.bodyHeight * 0.7 || undefined}}/></div>
+                                <div><img src={props.emptyDataImage}
+                                          style={{maxWidth: 180, maxHeight: state.bodyHeight * 0.7 || undefined}}/>
+                                </div>
                                 <div>{props.emptyDataTip}</div>
                             </div>
                         </div>
-                        <div style={{width: state.tableWidth, height: 1}}></div>
+                        <div style={{width: tableWidth, height: 1}}></div>
                     </Scrollbars>
-                     : null
+                    : null
             }
             {
                 this.props.hasScrollbar ?
-                    <Scrollbars ref={this.scrollBarRef}
+                    <Scrollbars ref={this.scrollBar}
                                 renderTrackHorizontal={({style, ...props}) =>
                                     <div {...props} style={{
                                         ...style,
@@ -316,7 +347,7 @@ class TableBodyContent extends Component {
         this.handleRowHeight(list);
         let rows = list.length;
         let showMinRows = 0, showMaxRows = Math.max(rows - 1, 0);
-        if(props.containerHeight === undefined) {
+        if (props.containerHeight === undefined) {
             return true;
         }
         if (this.state.isSameHeight) {
@@ -383,10 +414,10 @@ class TableBodyContent extends Component {
             parents[row.id] = row._parent;
         });
         let isParentCollapsed = (data) => {
-            if(parents[data.id]) {
-                if(this.isCollapsed(parents[data.id])) {
+            if (parents[data.id]) {
+                if (this.isCollapsed(parents[data.id])) {
                     return true;
-                } else if(parents[data.parent_id]) {
+                } else if (parents[data.parent_id]) {
                     return isParentCollapsed(parents[data.id]);
                 }
             }
@@ -493,7 +524,7 @@ class TableBodyContent extends Component {
     isCollapsed(data) {
         let state = this.context.state;
         let props = this.context.props;
-        if(state.collapsed[data[props.primaryKey]] === undefined) {
+        if (state.collapsed[data[props.primaryKey]] === undefined) {
             return props.defaultCollapsible;
         } else {
             return state.collapsed[data[props.primaryKey]];
@@ -517,7 +548,7 @@ class TableBodyContent extends Component {
         let bottomHeight = this.getBottomHeight(list);
         let topHideNum = 0;
         let seriesOffset = 0;
-        if(props.pager) {
+        if (props.pager) {
             seriesOffset = (props.pager.page - 1) * props.pager.limit;
         }
         for (let i = 0; i < list.length; i++) {
@@ -540,9 +571,12 @@ class TableBodyContent extends Component {
         return <tbody ref="tbody">
         {
             topHeight > 0 ? <tr>
-                {this.props.showCheckboxes ?
-                    <td style={{height: topHeight, padding: 0}}></td> : null}
+                {this.props.showCheckboxes ? <td style={{height: topHeight, padding: 0}}></td> : null}
+
                 {dataColumns.map((column, colIndex) => {
+                    if (_.isArray(this.props.showColumns) && this.props.showColumns.indexOf(column.key) < 0) {
+                        return null;
+                    }
                     return <td key={colIndex}
                                style={{height: topHeight, padding: 0}}>
                     </td>
@@ -559,10 +593,12 @@ class TableBodyContent extends Component {
                 }
                 let checked = this.isChecked(data);
                 let selected = data.id && _.get(state.selectedRow, 'id') == data.id;
+                let style = _.isFunction(props.rowStyle) ? props.rowStyle(data, rowIndex) : props.rowStyle;
                 return <tr key={data[props.primaryKey] + '' + rowIndex}
                            data-key={data[props.primaryKey]}
                            className={`${props.iconEventsBehavior}` + (selected ? ' selected' : '')}
                            onClick={this.handleRowSelect(data)}
+                           style={style}
                 >
                     {
                         props.showCheckboxes && this.props.showCheckboxes ?
@@ -653,7 +689,8 @@ class TableBodyContent extends Component {
                                                 style={{paddingLeft: indent, lineHeight: 1}}>
                                                 {
                                                     props.collapsible ? <div className="flex middle">
-                                                        <div style={{opacity: data.children && data.children.length > 0 ? 1 : 0}}>
+                                                        <div
+                                                            style={{opacity: data.children && data.children.length > 0 ? 1 : 0}}>
                                                             <Icon type="button"
                                                                   name={this.isCollapsed(data) ? "plus-square" : "minus-square"}
                                                                   size={14}

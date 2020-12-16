@@ -8,10 +8,6 @@ var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
 
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
 var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
 
 var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
@@ -19,6 +15,10 @@ var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 var _entries = require('babel-runtime/core-js/object/entries');
 
 var _entries2 = _interopRequireDefault(_entries);
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
 
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
@@ -160,11 +160,19 @@ var FormTable = function (_Component) {
         };
 
         _this.getColumnsWidth = function () {
+            var columnWidths = {};
             if (_lodash2.default.isFunction(_this.props.columnWidths)) {
-                return _this.props.columnWidths(_this);
+                columnWidths = _this.props.columnWidths(_this);
             } else {
-                return _this.props.columnWidths;
+                columnWidths = (0, _extends3.default)({}, _this.props.columnWidths);
             }
+            if (_this.props.hasSeriesNumber) {
+                columnWidths.series_number = _this.props.seriesNumberWidth;
+            }
+            if (_this.props.hasAction) {
+                columnWidths.action = _this.props.actionWidth;
+            }
+            return columnWidths;
         };
 
         _this.handleActionClick = function (actionKey, row) {
@@ -431,17 +439,17 @@ var FormTable = function (_Component) {
         value: function getColumns(columns) {
             var _this3 = this;
 
+            var columnWidths = this.getColumnsWidth();
             var tableColumns = [];
             if (this.props.hasSeriesNumber) {
                 tableColumns.push({
                     dataKey: 'series_number',
                     type: 'text',
                     label: this.props.seriesNumberText,
-                    width: this.props.seriesNumberWidth,
+                    width: columnWidths.series_number,
                     textAlign: 'center'
                 });
             }
-            var columnWidths = this.getColumnsWidth();
             columns.map(function (column) {
                 var style = void 0;
                 if (!column.static && column.type != 'static' && ['text', 'auto', 'money', 'number', 'date', 'datetime', 'select', 'time', 'calendar'].indexOf(column.type) >= 0) {
@@ -463,7 +471,7 @@ var FormTable = function (_Component) {
                     iconEvent: function iconEvent() {
                         _this3.addRow(null);
                     },
-                    width: this.props.actionWidth
+                    width: columnWidths.action
                 });
             }
             return tableColumns;
@@ -671,6 +679,7 @@ var FormTable = function (_Component) {
                     rowSelected: this.props.rowSelected,
                     onRowSelect: this.handleRowSelect,
                     columns: this.getColumns(this.props.columns),
+                    columnWidths: this.getColumnsWidth(),
                     dataSource: dataSource,
                     containerHeight: this.props.containerHeight,
                     containerWidth: this.props.containerWidth,

@@ -17,7 +17,7 @@ export default class Popover extends Component {
             width: undefined,           //宽度
             height: undefined,          //高度
         },
-        zIndex: 1000
+        zIndex: 3000
     };
 
     constructor(props) {
@@ -65,11 +65,15 @@ export default class Popover extends Component {
 
 class PopoverContent extends Component {
 
-    state = {open: false};
+    state = {
+        open: false,
+        position: {}
+    };
 
     constructor(props) {
         super(props);
         this.containerRef = React.createRef();
+        this.state.position = this.getPosition();
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -88,6 +92,7 @@ class PopoverContent extends Component {
                 containerDOM.style.top = position.top + "px";
                 containerDOM.style.opacity = "1";
                 containerDOM.style.transform = "scale(1, 1)";
+                this.state.position = position;
             });
         }
         if (this.state.open === true && this.props.open === false) {
@@ -106,8 +111,10 @@ class PopoverContent extends Component {
         containerDOM.style.transform = `scale(${this.props.scaleX}, ${this.props.scaleY})`;
         setTimeout(() => {
             let node = document.getElementById(this.props.id);
-            ReactDOM.unmountComponentAtNode(node);
-            node.parentNode.removeChild(node);
+            if(node) {
+                ReactDOM.unmountComponentAtNode(node);
+                node.parentNode.removeChild(node);
+            }
         }, 300);
     };
 
@@ -172,7 +179,7 @@ class PopoverContent extends Component {
                 <div className="full-screen-fixed" style={{zIndex: this.props.zIndex - 1}}
                      onClick={this.handleRequestClose}></div>
                 <div ref={this.containerRef} className={joinBlankSpace("popover", this.props.className)}
-                     style={{...this.props.style, ...this.getPosition()}}>
+                     style={{...this.props.style, ...this.state.position}}>
                     {this.props.children}
                 </div>
             </div>

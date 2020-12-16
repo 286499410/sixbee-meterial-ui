@@ -58,6 +58,18 @@ var Filter = function (_Component) {
 
         var _this = (0, _possibleConstructorReturn3.default)(this, (Filter.__proto__ || (0, _getPrototypeOf2.default)(Filter)).call(this, props));
 
+        _this.defaultWidth = {
+            "money-range": 300,
+            "date-range": 260,
+            "text": 200,
+            "select": 200,
+            "select-check": 200,
+            "auto": 200
+        };
+        _this.defaultFilterType = {
+            "money": "money-range",
+            "date": "date-range"
+        };
         _this.state = {
             open: false,
             value: undefined,
@@ -70,11 +82,7 @@ var Filter = function (_Component) {
                 anchorEl: event.currentTarget
             });
             var type = _this.getFilterType();
-            if (type == 'text' || type == 'auto' || type == 'date') {
-                setTimeout(function () {
-                    _this.refs.control.focus();
-                }, 50);
-            }
+
             if (type == 'date-range') {}
         };
 
@@ -83,8 +91,13 @@ var Filter = function (_Component) {
         };
 
         _this.handleReset = function (event) {
-            _this.state.value = undefined;
-            _this.refs.control.setValue(undefined);
+            if (_this.getFilterType() === 'money-range') {
+                _this.state.value = [];
+                _this.refs.control.setValue([]);
+            } else {
+                _this.state.value = undefined;
+                _this.refs.control.setValue(undefined);
+            }
             _this.filter();
         };
 
@@ -117,7 +130,7 @@ var Filter = function (_Component) {
     }, {
         key: 'getFilterType',
         value: function getFilterType() {
-            return this.props.field.filterType || this.props.field.type;
+            return this.props.field.filterType || this.defaultFilterType[this.props.field.type] || this.props.field.type;
         }
     }, {
         key: 'render',
@@ -147,7 +160,7 @@ var Filter = function (_Component) {
                         onRequestClose: this.handleRequestClose },
                     _react2.default.createElement(
                         'div',
-                        { className: 'space', style: { width: this.props.field.filterWidth || 'auto' } },
+                        { className: 'space', style: { width: this.props.field.filterWidth || this.defaultWidth[type] || 'auto' } },
                         _react2.default.createElement(_control2.default, (0, _extends3.default)({
                             ref: 'control',
                             hintText: hintText
@@ -160,6 +173,7 @@ var Filter = function (_Component) {
                             onEnter: function onEnter(event) {
                                 _this2.handleSubmit(event);
                             },
+                            textAlign: 'left',
                             type: type,
                             onChange: function onChange(value) {
                                 _this2.state.value = value;

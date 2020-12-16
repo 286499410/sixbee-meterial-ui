@@ -1,6 +1,3 @@
-/**
- * Created by zhengzhaowei on 2018/5/21.
- */
 
 import React, {Component} from 'react';
 import RaisedButton from 'material-ui/RaisedButton';

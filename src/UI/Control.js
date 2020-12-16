@@ -85,6 +85,10 @@ export default class Control extends Component {
         }
     };
 
+    getControl() {
+        return this.control.current;
+    }
+
     render() {
         let value = this.getValue();
         let Com = this.getComponent();
@@ -114,13 +118,17 @@ export default class Control extends Component {
                         dataSourceConfig={this.props.dataSourceConfig}
                         onCreate={this.props.onCreate}
                         menuProps={this.props.menuProps}
+                        context={this.props.context}
+                        position={this.props.position}
                         {...controlProps}
                         className={joinBlankSpace(
                             controlProps.className || this.props.className,
                             errorText && 'control-error'
                         )}
                     />
-                    <div className="control-error-text">{this.getErrorText()}</div>
+                    {
+                        errorText && <div className="text-small text-danger" style={{marginTop: 2}}>{this.getErrorText()}</div>
+                    }
                 </div>
             </div>
         );

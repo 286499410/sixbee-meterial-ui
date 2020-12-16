@@ -20,7 +20,8 @@ export default class TableHeader extends Component {
     static contextTypes = {
         state: PropTypes.object,
         props: PropTypes.object,
-        setTableState: PropTypes.func
+        setTableState: PropTypes.func,
+        getTableWidth: PropTypes.func,
     };
 
     constructor(props) {
@@ -46,6 +47,7 @@ export default class TableHeader extends Component {
      */
     setParentInc(col, inc) {
         if (col.parent) {
+            console.log("parent", col.parent.key, this.context.state.columnWidths[col.parent.key]);
             this.context.state.columnWidths[col.parent.key] += inc;
             this.setParentInc(col.parent, inc);
         }
@@ -77,7 +79,7 @@ export default class TableHeader extends Component {
         let root = col;
         let key = root.key;
         let startPosition = utils.getMousePosition(event);
-        let tableWidth = state.tableWidth || state.containerWidth;
+        let tableWidth = this.props.width || this.context.getTableWidth();
         let columnWidth = state.columnWidths[key];
         let onResize = props.onResize;
 
@@ -157,20 +159,22 @@ export default class TableHeader extends Component {
     handleFilter = (col) => (value, field) => {
         let props = this.context.props;
         let filterData = this.context.state.filterData;
-        let key = col.formKey || col.key;
-        if(value === undefined) {
+        let key = col.filterKey || col.formKey || col.key;
+        if(value === undefined || value === '') {
             let keys = key.split('.');
-            let len = keys.length;
-            if(len == 1) {
-                delete filterData[keys[0]];
-            } else if(len == 2) {
-                delete filterData[keys[0]][keys[1]];
-            } else if(len == 3) {
-                delete filterData[keys[0]][keys[1]][keys[2]];
-            } else if(len == 4) {
-                delete filterData[keys[0]][keys[1]][keys[2]][keys[3]];
-            } else if(len == 5) {
-                delete filterData[keys[0]][keys[1]][keys[2]][keys[3]][keys[4]];
+            if(_.get(filterData, key) !== undefined) {
+                let len = keys.length;
+                if(len == 1) {
+                    delete filterData[keys[0]];
+                } else if(len == 2) {
+                    delete filterData[keys[0]][keys[1]];
+                } else if(len == 3) {
+                    delete filterData[keys[0]][keys[1]][keys[2]];
+                } else if(len == 4) {
+                    delete filterData[keys[0]][keys[1]][keys[2]][keys[3]];
+                } else if(len == 5) {
+                    delete filterData[keys[0]][keys[1]][keys[2]][keys[3]][keys[4]];
+                }
             }
         } else {
             _.set(filterData, key, value);
@@ -208,6 +212,7 @@ export default class TableHeader extends Component {
         let className = 'table';
         if (props.bordered) className += ' bordered';
         if (props.condensed) className += ' condensed';
+        const tableWidth = this.props.width || this.context.getTableWidth();
         return <div ref="container"
                     className="table-header"
                     style={{
@@ -215,7 +220,7 @@ export default class TableHeader extends Component {
                         width: "calc(100% + 2px)",
                         ...props.headerStyle
                     }}>
-            <table className={className} style={{width: this.props.width || state.tableWidth, tableLayout: 'fixed'}}>
+            <table className={className} style={{width: tableWidth, tableLayout: 'fixed'}}>
                 <thead>
                 {
                     state.headerColumns.map((rows, i) => {
@@ -277,7 +282,7 @@ export default class TableHeader extends Component {
                                                     {col.filter ?
                                                         <Filter field={col.filter === true ? col : {...col, ...col.filter}}
                                                                 onFilter={this.handleFilter(col)}
-                                                                value={_.get(filterData, col.formKey || col.key)}/> : null}
+                                                                value={_.get(filterData, col.filterKey || col.formKey || col.key)}/> : null}
                                                     {col.sortable ?
                                                         <Sort field={col} onSort={this.handleSort(col)}/> : null}
                                                     {
@@ -285,7 +290,7 @@ export default class TableHeader extends Component {
                                                     }
                                                 </div>
                                                 {
-                                                    props.resize ?
+                                                    props.resize && i == 0?
                                                         <div className="resize"
                                                              onMouseDown={this.handleResize(col)}></div> : null
                                                 }

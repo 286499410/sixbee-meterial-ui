@@ -75,25 +75,64 @@ var TableBody = function (_Component) {
 
         _initialiseProps.call(_this);
 
+        _this.noneScrollBar = _react2.default.createRef();
+        _this.scrollBar = _react2.default.createRef();
         return _this;
     }
 
     (0, _createClass3.default)(TableBody, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-            if (this.scrollBar) {
-                if (this.context.props.scrollTop) {
-                    this.scrollBar.scrollTop(this.context.props.scrollTop);
-                }
-                if (this.context.props.scrollLeft) {
-                    this.scrollBar.scrollLeft(this.context.props.scrollLeft);
-                }
+            if (this.context.props.scrollTop) {
+                this.setScrollTop(this.context.props.scrollTop);
+            }
+            if (this.context.props.scrollLeft) {
+                this.setScrollLeft(this.context.props.scrollLeft);
             }
         }
     }, {
         key: 'componentDidUpdate',
         value: function componentDidUpdate() {
             this.showEllipsis();
+        }
+    }, {
+        key: 'getScrollBar',
+        value: function getScrollBar() {
+            return this.scrollBar.current || this.noneScrollBar.current;
+        }
+    }, {
+        key: 'getScrollTop',
+        value: function getScrollTop() {
+            var scrollBar = this.getScrollBar();
+            if (scrollBar) {
+                return scrollBar.getScrollTop();
+            }
+            return (0, _jquery2.default)(this.refs.container).scrollTop();
+        }
+    }, {
+        key: 'setScrollTop',
+        value: function setScrollTop(scrollTop) {
+            var scrollBar = this.getScrollBar();
+            if (scrollBar) {
+                scrollBar.scrollTop(scrollTop);
+            }
+        }
+    }, {
+        key: 'getScrollLeft',
+        value: function getScrollLeft() {
+            var scrollBar = this.getScrollBar();
+            if (scrollBar) {
+                return scrollBar.getScrollLeft();
+            }
+            return (0, _jquery2.default)(this.refs.container).scrollLeft();
+        }
+    }, {
+        key: 'setScrollLeft',
+        value: function setScrollLeft(scrollLeft) {
+            var scrollBar = this.getScrollBar();
+            if (scrollBar) {
+                scrollBar.scrollTop(scrollLeft);
+            }
         }
     }, {
         key: 'render',
@@ -106,6 +145,7 @@ var TableBody = function (_Component) {
             if (props.bodyCellMultiLine) className += ' multi-line';
             if (props.striped) className += ' striped';
             if (props.className) className += ' ' + props.className;
+            var tableWidth = this.props.width || this.context.getTableWidth();
             var table = _react2.default.createElement(
                 'table',
                 {
@@ -113,7 +153,7 @@ var TableBody = function (_Component) {
                     className: className,
                     style: {
                         tableLayout: 'fixed',
-                        width: this.props.width || state.tableWidth
+                        width: tableWidth
                     } },
                 _react2.default.createElement(TableBodyColGroup, { ref: 'thead',
                     showColumns: this.props.showColumns,
@@ -156,7 +196,7 @@ var TableBody = function (_Component) {
                 ) : null,
                 state.dataSource.length == 0 && !props.loading && this.props.hasEmptyTip !== false ? _react2.default.createElement(
                     _reactCustomScrollbars.Scrollbars,
-                    { ref: this.scrollBarRef, style: {
+                    { ref: this.noneScrollBar, style: {
                             width: '100%',
                             height: '100%'
                         } },
@@ -169,7 +209,8 @@ var TableBody = function (_Component) {
                             _react2.default.createElement(
                                 'div',
                                 null,
-                                _react2.default.createElement('img', { src: props.emptyDataImage, style: { maxWidth: 180, maxHeight: state.bodyHeight * 0.7 || undefined } })
+                                _react2.default.createElement('img', { src: props.emptyDataImage,
+                                    style: { maxWidth: 180, maxHeight: state.bodyHeight * 0.7 || undefined } })
                             ),
                             _react2.default.createElement(
                                 'div',
@@ -178,11 +219,11 @@ var TableBody = function (_Component) {
                             )
                         )
                     ),
-                    _react2.default.createElement('div', { style: { width: state.tableWidth, height: 1 } })
+                    _react2.default.createElement('div', { style: { width: tableWidth, height: 1 } })
                 ) : null,
                 this.props.hasScrollbar ? _react2.default.createElement(
                     _reactCustomScrollbars.Scrollbars,
-                    { ref: this.scrollBarRef,
+                    { ref: this.scrollBar,
                         renderTrackHorizontal: function renderTrackHorizontal(_ref) {
                             var style = _ref.style,
                                 props = (0, _objectWithoutProperties3.default)(_ref, ['style']);
@@ -274,7 +315,8 @@ TableBody.contextTypes = {
     props: _propTypes2.default.object,
     setTableState: _propTypes2.default.func,
     handleStateChange: _propTypes2.default.func,
-    getDataRows: _propTypes2.default.func
+    getDataRows: _propTypes2.default.func,
+    getTableWidth: _propTypes2.default.func
 };
 
 var _initialiseProps = function _initialiseProps() {
@@ -299,8 +341,8 @@ var _initialiseProps = function _initialiseProps() {
     };
 
     this.handleScroll = function (event) {
-        var scrollTop = _this2.scrollBar ? _this2.scrollBar.getScrollTop() : (0, _jquery2.default)(_this2.refs.container).scrollTop();
-        var scrollLeft = _this2.scrollBar ? _this2.scrollBar.getScrollLeft() : (0, _jquery2.default)(_this2.refs.container).scrollLeft();
+        var scrollTop = _this2.getScrollTop();
+        var scrollLeft = _this2.getScrollLeft();
         _this2.refs.tbody.showData(scrollTop);
         _this2.context.handleStateChange({
             scrollTop: scrollTop,
@@ -319,12 +361,6 @@ var _initialiseProps = function _initialiseProps() {
     this.hideMasker = function () {
         _this2.hasMasker = false;
         (0, _jquery2.default)(_this2.refs.masker).fadeOut();
-    };
-
-    this.scrollBarRef = function (ref) {
-        if (ref) {
-            _this2.scrollBar = ref;
-        }
     };
 };
 
@@ -544,6 +580,9 @@ var TableBodyContent = function (_Component2) {
                     null,
                     this.props.showCheckboxes ? _react2.default.createElement('td', { style: { height: topHeight, padding: 0 } }) : null,
                     dataColumns.map(function (column, colIndex) {
+                        if (_lodash2.default.isArray(_this7.props.showColumns) && _this7.props.showColumns.indexOf(column.key) < 0) {
+                            return null;
+                        }
                         return _react2.default.createElement('td', { key: colIndex,
                             style: { height: topHeight, padding: 0 } });
                     })
@@ -555,12 +594,14 @@ var TableBodyContent = function (_Component2) {
                     }
                     var checked = _this7.isChecked(data);
                     var selected = data.id && _lodash2.default.get(state.selectedRow, 'id') == data.id;
+                    var style = _lodash2.default.isFunction(props.rowStyle) ? props.rowStyle(data, rowIndex) : props.rowStyle;
                     return _react2.default.createElement(
                         'tr',
                         { key: data[props.primaryKey] + '' + rowIndex,
                             'data-key': data[props.primaryKey],
                             className: '' + props.iconEventsBehavior + (selected ? ' selected' : ''),
-                            onClick: _this7.handleRowSelect(data)
+                            onClick: _this7.handleRowSelect(data),
+                            style: style
                         },
                         props.showCheckboxes && _this7.props.showCheckboxes ? _react2.default.createElement(
                             'td',
@@ -659,7 +700,8 @@ var TableBodyContent = function (_Component2) {
                                                 { className: 'flex middle' },
                                                 _react2.default.createElement(
                                                     'div',
-                                                    { style: { opacity: data.children && data.children.length > 0 ? 1 : 0 } },
+                                                    {
+                                                        style: { opacity: data.children && data.children.length > 0 ? 1 : 0 } },
                                                     _react2.default.createElement(_icon2.default, { type: 'button',
                                                         name: _this7.isCollapsed(data) ? "plus-square" : "minus-square",
                                                         size: 14,

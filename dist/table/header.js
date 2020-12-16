@@ -91,6 +91,7 @@ var TableHeader = function (_Component) {
         key: 'setParentInc',
         value: function setParentInc(col, inc) {
             if (col.parent) {
+                console.log("parent", col.parent.key, this.context.state.columnWidths[col.parent.key]);
                 this.context.state.columnWidths[col.parent.key] += inc;
                 this.setParentInc(col.parent, inc);
             }
@@ -134,6 +135,7 @@ var TableHeader = function (_Component) {
             var className = 'table';
             if (props.bordered) className += ' bordered';
             if (props.condensed) className += ' condensed';
+            var tableWidth = this.props.width || this.context.getTableWidth();
             return _react2.default.createElement(
                 'div',
                 { ref: 'container',
@@ -144,7 +146,7 @@ var TableHeader = function (_Component) {
                     }, props.headerStyle) },
                 _react2.default.createElement(
                     'table',
-                    { className: className, style: { width: this.props.width || state.tableWidth, tableLayout: 'fixed' } },
+                    { className: className, style: { width: tableWidth, tableLayout: 'fixed' } },
                     _react2.default.createElement(
                         'thead',
                         null,
@@ -214,11 +216,11 @@ var TableHeader = function (_Component) {
                                             ),
                                             col.filter ? _react2.default.createElement(_filter2.default, { field: col.filter === true ? col : (0, _extends3.default)({}, col, col.filter),
                                                 onFilter: _this3.handleFilter(col),
-                                                value: _lodash2.default.get(filterData, col.formKey || col.key) }) : null,
+                                                value: _lodash2.default.get(filterData, col.filterKey || col.formKey || col.key) }) : null,
                                             col.sortable ? _react2.default.createElement(_sort2.default, { field: col, onSort: _this3.handleSort(col) }) : null,
                                             col.icon ? _react2.default.createElement(_icon2.default, col.icon) : null
                                         ),
-                                        props.resize ? _react2.default.createElement('div', { className: 'resize',
+                                        props.resize && i == 0 ? _react2.default.createElement('div', { className: 'resize',
                                             onMouseDown: _this3.handleResize(col) }) : null
                                     );
                                 }),
@@ -247,7 +249,8 @@ TableHeader.defaultProps = {
 TableHeader.contextTypes = {
     state: _propTypes2.default.object,
     props: _propTypes2.default.object,
-    setTableState: _propTypes2.default.func
+    setTableState: _propTypes2.default.func,
+    getTableWidth: _propTypes2.default.func
 };
 
 var _initialiseProps = function _initialiseProps() {
@@ -260,7 +263,7 @@ var _initialiseProps = function _initialiseProps() {
             var root = col;
             var key = root.key;
             var startPosition = _utils2.default.getMousePosition(event);
-            var tableWidth = state.tableWidth || state.containerWidth;
+            var tableWidth = _this4.props.width || _this4.context.getTableWidth();
             var columnWidth = state.columnWidths[key];
             var onResize = props.onResize;
 
@@ -314,20 +317,22 @@ var _initialiseProps = function _initialiseProps() {
         return function (value, field) {
             var props = _this4.context.props;
             var filterData = _this4.context.state.filterData;
-            var key = col.formKey || col.key;
-            if (value === undefined) {
+            var key = col.filterKey || col.formKey || col.key;
+            if (value === undefined || value === '') {
                 var keys = key.split('.');
-                var len = keys.length;
-                if (len == 1) {
-                    delete filterData[keys[0]];
-                } else if (len == 2) {
-                    delete filterData[keys[0]][keys[1]];
-                } else if (len == 3) {
-                    delete filterData[keys[0]][keys[1]][keys[2]];
-                } else if (len == 4) {
-                    delete filterData[keys[0]][keys[1]][keys[2]][keys[3]];
-                } else if (len == 5) {
-                    delete filterData[keys[0]][keys[1]][keys[2]][keys[3]][keys[4]];
+                if (_lodash2.default.get(filterData, key) !== undefined) {
+                    var len = keys.length;
+                    if (len == 1) {
+                        delete filterData[keys[0]];
+                    } else if (len == 2) {
+                        delete filterData[keys[0]][keys[1]];
+                    } else if (len == 3) {
+                        delete filterData[keys[0]][keys[1]][keys[2]];
+                    } else if (len == 4) {
+                        delete filterData[keys[0]][keys[1]][keys[2]][keys[3]];
+                    } else if (len == 5) {
+                        delete filterData[keys[0]][keys[1]][keys[2]][keys[3]][keys[4]];
+                    }
                 }
             } else {
                 _lodash2.default.set(filterData, key, value);

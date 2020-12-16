@@ -36,6 +36,7 @@ export default class Date2 extends Component {
     };
 
     state = {
+        inputText: '',
         anchorEl: {},
         value: undefined,
         open: false,
@@ -69,6 +70,7 @@ export default class Date2 extends Component {
                 value = utils.date('Y-m-d', value);
             }
             this.state.value = value;
+            this.state.inputText = value || '';
         }
     }
 
@@ -96,13 +98,15 @@ export default class Date2 extends Component {
     }
 
     /**
-     * 文本不支持修改，只允许全部删除
+     * 文本支持修改
      * @param event
      */
     handleTextChange = (event) => {
-        if (event.target.value === '') {
+        const inputText = event.target.value;
+        if (inputText === '') {
             this.setValue('');
         }
+        this.setState({inputText});
     };
 
     /**
@@ -113,7 +117,8 @@ export default class Date2 extends Component {
         let value = utils.dateToStr(date);
         this.setValue(value);
         this.setState({
-            open: false
+            open: false,
+            inputText: value
         });
     };
 
@@ -167,6 +172,15 @@ export default class Date2 extends Component {
      */
     handleRequestClose = (event) => {
         this.setState({open: false});
+        if(this.state.inputText !== this.state.value) {
+            const regex = /^\d{4}(-|\/)((0?[1-9])|(1[0-2]))(-|\/)((0?[1-9])|(1[0-9])|(2[0-9])|(3[0-1]))$/;
+            if(regex.test(this.state.inputText)) {
+                this.state.inputText = this.state.inputText.replace(/\//g, '-');
+            } else {
+                this.state.inputText = '';
+            }
+            this.setValue(this.state.inputText);
+        }
     };
 
     focus = () => {
@@ -188,7 +202,7 @@ export default class Date2 extends Component {
             fullWidth={this.props.fullWidth}
             floatingLabelText={label}
             type={'text'}
-            value={value === null || value === undefined ? '' : value}
+            value={this.state.inputText}
             disabled={this.props.disabled}
             onChange={this.handleTextChange}
             onBlur={this.handleBlur}

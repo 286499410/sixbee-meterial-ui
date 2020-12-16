@@ -79,6 +79,7 @@ var Date2 = function (_Component) {
         var _this = (0, _possibleConstructorReturn3.default)(this, (Date2.__proto__ || (0, _getPrototypeOf2.default)(Date2)).call(this, props));
 
         _this.state = {
+            inputText: '',
             anchorEl: {},
             value: undefined,
             open: false,
@@ -86,16 +87,19 @@ var Date2 = function (_Component) {
         };
 
         _this.handleTextChange = function (event) {
-            if (event.target.value === '') {
+            var inputText = event.target.value;
+            if (inputText === '') {
                 _this.setValue('');
             }
+            _this.setState({ inputText: inputText });
         };
 
         _this.handleChange = function (date) {
             var value = _utils2.default.dateToStr(date);
             _this.setValue(value);
             _this.setState({
-                open: false
+                open: false,
+                inputText: value
             });
         };
 
@@ -129,6 +133,15 @@ var Date2 = function (_Component) {
 
         _this.handleRequestClose = function (event) {
             _this.setState({ open: false });
+            if (_this.state.inputText !== _this.state.value) {
+                var regex = /^\d{4}(-|\/)((0?[1-9])|(1[0-2]))(-|\/)((0?[1-9])|(1[0-9])|(2[0-9])|(3[0-1]))$/;
+                if (regex.test(_this.state.inputText)) {
+                    _this.state.inputText = _this.state.inputText.replace(/\//g, '-');
+                } else {
+                    _this.state.inputText = '';
+                }
+                _this.setValue(_this.state.inputText);
+            }
         };
 
         _this.focus = function () {
@@ -161,6 +174,7 @@ var Date2 = function (_Component) {
                     value = _utils2.default.date('Y-m-d', value);
                 }
                 this.state.value = value;
+                this.state.inputText = value || '';
             }
         }
     }, {
@@ -197,7 +211,7 @@ var Date2 = function (_Component) {
                 fullWidth: this.props.fullWidth,
                 floatingLabelText: label,
                 type: 'text',
-                value: value === null || value === undefined ? '' : value,
+                value: this.state.inputText,
                 disabled: this.props.disabled,
                 onChange: this.handleTextChange,
                 onBlur: this.handleBlur,

@@ -5,6 +5,18 @@ import Menu from "./Menu";
 import {getDataFromDataSourceByValue, getFilterDataSource, isEmpty, joinBlankSpace, replaceText} from "./tool";
 import Icon from "./Icon";
 import Divider from "./Divider";
+import Form from "../form";
+import FormTable from "../controls/form-table";
+
+const getFilterText = (props) => {
+    let index = props.dataSource.indexOf(props.value);
+    if (index >= 0) {
+        return props.dataSource[index];
+    }
+    let data = getDataFromDataSourceByValue(props.value, props.dataSource, props.dataSourceConfig);
+    const text = data ? (!_.isObject(data) ? data : replaceText(data, props.dataSourceConfig.text)) : (!props.forceSelect ? props.value : '');
+    return (text !== undefined) ? text : '';
+};
 
 export default class Auto extends Component {
 
@@ -19,32 +31,51 @@ export default class Auto extends Component {
     };
 
     state = {
+        isFocus: false,
         open: false,
         anchorEl: {},
         openType: 'focus',  //focus,pullDown
         dataSource: [],
         filterText: '',
+        value: undefined
     };
 
     constructor(props) {
         super(props);
         this.ref = React.createRef();
         this.text = React.createRef();
-        this.loadDataSource().then((dataSource) => {
-            this.state.filterText = this.getCurrentText(dataSource);
-            this.state.dataSource = dataSource;
-            if (this.updater.isMounted(this)) {
-                this.forceUpdate();
-            }
-        });
+    }
+
+    componentDidMount() {
+        this.setDataSource();
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
-        let dataSource = nextProps.dataSource;
-        if (_.isArray(dataSource) && !_.isEqual(prevState.dataSource, dataSource)) {
-            return {dataSource};
+        let state = {};
+        if (nextProps.value !== prevState.value) {
+            state.value = nextProps.value;
+            state.filterText = getFilterText({
+                ...nextProps,
+                dataSource: state.dataSource || prevState.dataSource
+            })
         }
-        return null;
+        return state;
+    }
+
+    /**
+     * 设置数据源
+     * @returns {Promise<void>}
+     */
+    async setDataSource() {
+        const dataSource = await this.loadDataSource();
+        this.setState({
+            filterText: getFilterText({
+                ...this.props,
+                dataSource
+            }),
+            dataSource
+        });
+        return dataSource;
     }
 
     /**
@@ -53,7 +84,15 @@ export default class Auto extends Component {
      */
     async loadDataSource() {
         let filterText = this.state.filterText;
-        return _.isFunction(this.props.dataSource) ? await this.props.dataSource({filterText}) : this.props.dataSource;
+        const context = this.props.context;
+        const FormTable2 = (context instanceof FormTable) ? context : undefined;
+        const Form2 = FormTable2 ? context.props.context : context;
+        return _.isFunction(this.props.dataSource) ? await this.props.dataSource({
+            filterText,
+            Form: Form2,
+            FormTable: FormTable2,
+            Control: this
+        }) : this.props.dataSource;
     }
 
     focus() {
@@ -85,10 +124,22 @@ export default class Auto extends Component {
      */
     handleFocus = (event) => {
         this.setState({
+            isFocus: true,
             openType: 'focus',
             open: true,
             anchorEl: this.ref.current
         });
+    };
+
+    /**
+     * 失去焦点
+     * @param event
+     */
+    handleBlur = ({event}) => {
+        if (event.target.value === '') {
+            this.handleChange('');
+        }
+        this.setState({isFocus: false});
     };
 
     /**
@@ -112,12 +163,21 @@ export default class Auto extends Component {
         this.setState({open: false});
     };
 
+    /**
+     * 下拉选项弹出层关闭时触发
+     * @param event
+     */
     onRequestClose = (event) => {
         if (this.props.forceSelect) {
             if (this.state.filterText === '') {
                 this.handleChange('');
             } else {
-                this.setState({filterText: this.getCurrentText()});
+                this.setState({
+                    filterText: getFilterText({
+                        ...this.props,
+                        dataSource: this.state.dataSource
+                    })
+                });
             }
         } else {
             this.handleChange(this.state.filterText);
@@ -132,17 +192,23 @@ export default class Auto extends Component {
      * @returns {Function}
      */
     handleSelect = ({value, data, event}) => {
-        event.stopPropagation();
-        this.handleClose(event);
-        this.setState({filterText: this.getText(data)});
+        if (event) {
+            event.stopPropagation();
+            this.handleClose(event);
+        }
+        this.setState({
+            filterText: this.getText(data),
+            selecting: true
+        });
         this.handleChange(this.getValue(data));
     };
+
 
     handleCreate = (event) => {
         this.onRequestClose(event);
         setTimeout(() => {
             if (this.props.onCreate) {
-                this.props.onCreate();
+                this.props.onCreate({Form: this.props.context, Control: this});
             }
         }, 100);
     };
@@ -168,22 +234,17 @@ export default class Auto extends Component {
         return getFilterDataSource(this.state.filterText, this.state.dataSource, this.props.dataSourceConfig, this.filter);
     }
 
+    getData(value) {
+        return _.find(this.state.dataSource, {[this.props.dataSourceConfig.value]: value});
+    }
+
     getStyle() {
         let style = {...this.props.style};
         if (this.state.open) {
             style.position = 'relative';
-            style.zIndex = _.get(this.props, 'popoverProps.zIndex', 1000);
+            style.zIndex = _.get(this.props, 'popoverProps.zIndex', 3000);
         }
         return style;
-    }
-
-    getCurrentText(dataSource = this.state.dataSource) {
-        let index = dataSource.indexOf(this.props.value);
-        if (index >= 0) {
-            return dataSource[index];
-        }
-        let data = getDataFromDataSourceByValue(this.props.value, dataSource, this.props.dataSourceConfig);
-        return data ? this.getText(data) : (!this.props.forceSelect ? this.props.value : '');
     }
 
     getText(data) {
@@ -200,6 +261,11 @@ export default class Auto extends Component {
         return _.get(data, this.props.dataSourceConfig.value);
     }
 
+    setValue(value) {
+        let data = this.getData(value);
+        this.handleSelect({value, data});
+    }
+
     render() {
         return (
             <div ref={this.ref}>
@@ -210,6 +276,7 @@ export default class Auto extends Component {
                     <Text ref={this.text}
                           className="clear-style grow"
                           onFocus={this.handleFocus}
+                          onBlur={this.handleBlur}
                           value={this.state.filterText}
                           onChange={this.handleInputChange}
                           placeholder={this.props.placeholder}

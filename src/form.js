@@ -142,10 +142,10 @@ export default class Form extends Component {
         }
         //提取控件默认值
         this.state.fieldDefaultData = {};
-        this.setFieldDefaultData(this.props.fields);
+        this.setFieldDefaultData(props.fields);
         //提取控件原值
         this.state.feildOriginData = {};
-        this.setFieldOriginData(this.props.fields);
+        this.setFieldOriginData(props.fields);
     };
 
     componentDidMount() {
@@ -346,7 +346,9 @@ export default class Form extends Component {
                             if (json.errCode == 10002 && json.validator) {
                                 //提交后，服务器返回的错误验证信息
                                 this.setFormStatus(STATUS_CHECKERROR);
-                                this.setState({errorText: json.validator});
+                                this.setState({
+                                    errorText: this.props.handleValidator ? this.props.handleValidator(json.validator) : json.validator
+                                });
                             } else {
                                 this.setFormStatus(STATUS_ERROR);
                             }
@@ -767,7 +769,8 @@ class FormActions extends Component {
                         actions.map((action, index) => {
                             switch (action.type) {
                                 case 'text':
-                                    return <div key={index} style={{marginLeft: 12, ...action.style}}>{action.label}</div>;
+                                    return <div key={index}
+                                                style={{marginLeft: 12, ...action.style}}>{action.label}</div>;
                                 case 'render':
                                     return <div key={index}>{action.render(this.context.Form)}</div>;
                                 default:

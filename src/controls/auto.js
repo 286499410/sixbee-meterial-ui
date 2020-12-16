@@ -269,7 +269,7 @@ export default class Auto extends Component {
         }
         let autoComplete = <AutoComplete
             ref={"auto"}
-            filter={this.props.filter || this.filter}
+            filter={_.isFunction(this.props.filter) ? this.props.filter : this.filter}
             name={this.props.name || this.props.dataKey || utils.uuid()}
             fullWidth={this.props.fullWidth}
             floatingLabelText={label}

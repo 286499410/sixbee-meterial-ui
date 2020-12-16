@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _promise = require('babel-runtime/core-js/promise');
 
 var _promise2 = _interopRequireDefault(_promise);
@@ -176,16 +180,21 @@ var Nav2 = function (_Component) {
             var key = item.key || item.dataKey;
             if (_lodash2.default.isArray(item.children) && item.children.length > 0) {
                 var children = [],
-                    selected = false;
-                item.children.map(function (subitem, index) {
+                    selected = false,
+                    groups = [];
+                item.children.map(function (subItem, index) {
+                    if (groups.indexOf(subItem.group_name) < 0) {
+                        groups.push(subItem.group_name);
+                    }
                     var col = parseInt(index / 7);
-                    var ret = _this.renderNavItem(subitem, key);
+                    var ret = _this.renderNavItem(subItem, key);
                     if (!children[col]) {
                         children[col] = [];
                     }
                     children[col].push(ret.component);
                     selected = selected || ret.selected;
                 });
+                var hasGroups = groups.length > 2 || groups.length == 1 && groups[1];
                 return {
                     component: _react2.default.createElement(
                         Subnav,
@@ -198,12 +207,45 @@ var Nav2 = function (_Component) {
                             iconPrefix: _this.props.iconPrefix,
                             folded: _this.isFolded(item),
                             selected: selected,
+                            containerStyle: hasGroups ? (0, _extends3.default)({
+                                maxHeight: 400,
+                                flexWrap: "wrap",
+                                flexDirection: "column"
+                            }, item.subStyle) : undefined,
                             onClick: _this.handleFold(item, parentKey) },
-                        children.map(function (data, index) {
+                        !hasGroups ? children.map(function (data, index) {
                             return _react2.default.createElement(
                                 'ul',
                                 { key: index, className: 'sub-nav' },
                                 data
+                            );
+                        }) : groups.map(function (group_name, index) {
+                            return _react2.default.createElement(
+                                'ul',
+                                { key: index, className: 'sub-nav' },
+                                _react2.default.createElement(
+                                    'li',
+                                    { className: 'text-primary', style: { fontSize: 16, paddingLeft: 14 } },
+                                    _lodash2.default.get(item, 'groupHelperText.' + group_name) ? _react2.default.createElement(
+                                        'div',
+                                        { className: 'flex middle' },
+                                        _react2.default.createElement(
+                                            'div',
+                                            null,
+                                            group_name
+                                        ),
+                                        _react2.default.createElement(
+                                            'div',
+                                            null,
+                                            _react2.default.createElement(_icon2.default, { type: 'button', name: 'question-circle', tooltip: _lodash2.default.get(item, 'groupHelperText.' + group_name), color: '#222' })
+                                        )
+                                    ) : group_name
+                                ),
+                                item.children.filter(function (subItem) {
+                                    return subItem.group_name == group_name;
+                                }).map(function (subItem) {
+                                    return _this.renderNavItem(subItem, key).component;
+                                })
                             );
                         })
                     ),
@@ -220,6 +262,7 @@ var Nav2 = function (_Component) {
                         onClick: _this.handleSelect(item),
                         icon: item.icon,
                         iconPrefix: _this.props.iconPrefix,
+                        helperText: item.helper_text,
                         label: item.label || item.title }),
                     selected: _selected
                 };
@@ -246,9 +289,10 @@ var Nav2 = function (_Component) {
             (0, _jquery2.default)(this.refs.container).find('>.nav-item>.sub-nav-container').each(function () {
                 var height = (0, _jquery2.default)(this)[0].scrollHeight;
                 var grandson = (0, _jquery2.default)(this).find('.sub-nav-container');
-                if (height && grandson.length == 0) {
+                if (height && grandson.length == 0 && !(0, _jquery2.default)(this)[0].style.maxHeight) {
                     (0, _jquery2.default)(this).css('max-height', height);
                 }
+                (0, _jquery2.default)(this).css("width", (0, _jquery2.default)(this).find(".sub-nav").last().offset().left - (0, _jquery2.default)(this).find(".sub-nav").first().offset().left + (0, _jquery2.default)(this).find(".sub-nav").last().width() + 36);
             });
         }
     }, {
@@ -360,7 +404,8 @@ var Subnav = function (_Component2) {
                     'label',
                     { className: 'folder', onClick: this.handleClick, onDoubleClick: this.handleDoubleClick,
                         onMouseEnter: this.handleMouseEnter },
-                    this.props.icon ? _react2.default.createElement(_icon2.default, { name: this.props.icon, classPrefix: this.props.iconPrefix, iconStyle: { paddingRight: 6 } }) : null,
+                    this.props.icon ? _react2.default.createElement(_icon2.default, { name: this.props.icon, classPrefix: this.props.iconPrefix,
+                        iconStyle: { paddingRight: 6 } }) : null,
                     _react2.default.createElement(
                         'span',
                         { className: 'label' },
@@ -370,7 +415,7 @@ var Subnav = function (_Component2) {
                 ),
                 _react2.default.createElement(
                     'div',
-                    { className: 'sub-nav-container' },
+                    { className: 'sub-nav-container', style: this.props.containerStyle },
                     this.props.children
                 )
             );
@@ -405,16 +450,26 @@ var NavItem = function (_Component3) {
         value: function render() {
             return _react2.default.createElement(
                 'li',
-                { className: 'nav-item' + (this.props.selected ? ' selected' : ''), 'data-key': this.props.itemKey,
+                { className: 'nav-item ' + (this.props.selected ? ' selected' : ''), 'data-key': this.props.itemKey,
                     'auth-key': this.props.itemKey },
                 _react2.default.createElement(
                     'label',
                     { onClick: this.handleClick },
-                    this.props.icon ? _react2.default.createElement(_icon2.default, { name: this.props.icon, classPrefix: this.props.iconPrefix, style: { paddingRight: 6 } }) : null,
+                    this.props.icon ? _react2.default.createElement(_icon2.default, { name: this.props.icon, classPrefix: this.props.iconPrefix,
+                        style: { paddingRight: 6 } }) : null,
                     _react2.default.createElement(
                         'span',
-                        { className: 'label' },
-                        this.props.label
+                        { className: 'label', style: this.props.selected && this.props.helperText ? { transform: "none" } : undefined },
+                        this.props.helperText ? _react2.default.createElement(
+                            'div',
+                            { className: 'flex middle' },
+                            _react2.default.createElement(
+                                'div',
+                                null,
+                                this.props.label
+                            ),
+                            _react2.default.createElement(_icon2.default, { type: 'button', name: 'question-circle', tooltip: this.props.helperText, color: '#222' })
+                        ) : this.props.label
                     )
                 )
             );

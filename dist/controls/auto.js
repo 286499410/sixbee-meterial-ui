@@ -278,7 +278,7 @@ var _initialiseProps = function _initialiseProps() {
         }
         var autoComplete = _react2.default.createElement(_AutoComplete2.default, {
             ref: "auto",
-            filter: _this4.props.filter || _this4.filter,
+            filter: _lodash2.default.isFunction(_this4.props.filter) ? _this4.props.filter : _this4.filter,
             name: _this4.props.name || _this4.props.dataKey || _utils2.default.uuid(),
             fullWidth: _this4.props.fullWidth,
             floatingLabelText: label,

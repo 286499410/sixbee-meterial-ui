@@ -75,8 +75,9 @@ export default class Control extends Component {
     }
 
     focus() {
-        if (this.getControl()) {
-            this.getControl().focus();
+        let control = this.getControl();
+        if (control && control.focus) {
+            control.focus();
         }
     }
 
@@ -92,6 +93,7 @@ export default class Control extends Component {
 
         if(props.useNewControl) {
             return <NewControl
+                ref={type === 'render' ? undefined : "control"}
                 {...props}
                 type={type}
             />

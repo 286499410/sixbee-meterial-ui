@@ -116,7 +116,7 @@ export default class FormTable extends Component {
     initData(props) {
         if (_.isArray(props.value)) {
             this.state.value = props.value;
-        } else if(props.value === undefined) {
+        } else if (props.value === undefined) {
             this.state.value = [];
         }
     }
@@ -132,7 +132,7 @@ export default class FormTable extends Component {
     checkMinRow(props = this.props) {
         if (this.state.value.length < props.minRows) {
             for (let i = this.state.value.length; i < props.minRows; i++) {
-                this.addDataRow(i,  this.getDefaultRowData(props), false);
+                this.addDataRow(i, this.getDefaultRowData(props), false);
             }
         }
     }
@@ -171,13 +171,13 @@ export default class FormTable extends Component {
         value.map(row => {
             let flag = false;
             Object.entries(row).map(([key, val]) => {
-                if(key !== '_key') {
-                    if(val !== '' && val !== undefined && val !== null && (!_.isArray(val) || val.length > 0)) {
+                if (key !== '_key') {
+                    if (val !== '' && val !== undefined && val !== null && (!_.isArray(val) || val.length > 0)) {
                         flag = true;
                     }
                 }
             });
-            if(flag) {
+            if (flag) {
                 filteredValue.push(row);
             }
         });
@@ -209,7 +209,7 @@ export default class FormTable extends Component {
      * @param row
      * @param defaultData
      */
-    addRow(row, defaultData =  this.getDefaultRowData()) {
+    addRow(row, defaultData = this.getDefaultRowData()) {
         if (row === undefined) row = this.getCurrentRow();
         this.addDataRow(row, defaultData);
     }
@@ -322,7 +322,7 @@ export default class FormTable extends Component {
      * @returns {Function}
      */
     handleBlur = (row, column) => (event, control) => {
-        if(column.onBlur) {
+        if (column.onBlur) {
             let value = _.get(this.getRowData(row), column.dataKey);
             column.onBlur(value, control, this, row);
         }
@@ -364,7 +364,7 @@ export default class FormTable extends Component {
      * @param row
      * @param defaultData
      */
-    addDataRow(row, defaultData =  this.getDefaultRowData(), update = true) {
+    addDataRow(row, defaultData = this.getDefaultRowData(), update = true) {
         let data = {}, value = this.state.value;
         this.props.columns.map((column) => {
             data[column.key] = "";
@@ -397,7 +397,7 @@ export default class FormTable extends Component {
     setRowData(row, data, forceUpdate = true) {
         let value = this.state.value;
         Object.assign(value[row], data);
-        if(forceUpdate) {
+        if (forceUpdate) {
             this.setValue(value);
         }
     }
@@ -416,20 +416,20 @@ export default class FormTable extends Component {
      * @returns {Array}
      */
     getColumns(columns) {
+        let columnWidths = this.getColumnsWidth();
         let tableColumns = [];
         if (this.props.hasSeriesNumber) {
             tableColumns.push({
                 dataKey: 'series_number',
                 type: 'text',
                 label: this.props.seriesNumberText,
-                width: this.props.seriesNumberWidth,
+                width: columnWidths.series_number,
                 textAlign: 'center'
             });
         }
-        let columnWidths = this.getColumnsWidth();
         columns.map((column) => {
             let style;
-            if(!column.static && column.type != 'static' && ['text', 'auto', 'money', 'number', 'date', 'datetime', 'select', 'time', 'calendar'].indexOf(column.type) >= 0) {
+            if (!column.static && column.type != 'static' && ['text', 'auto', 'money', 'number', 'date', 'datetime', 'select', 'time', 'calendar'].indexOf(column.type) >= 0) {
                 style = this.props.editableStyle;
             }
             tableColumns.push({
@@ -449,7 +449,7 @@ export default class FormTable extends Component {
                 iconEvent: () => {
                     this.addRow(null);
                 },
-                width: this.props.actionWidth
+                width: columnWidths.action
             });
         }
         return tableColumns;
@@ -460,11 +460,19 @@ export default class FormTable extends Component {
      * @returns {*}
      */
     getColumnsWidth = () => {
+        let columnWidths = {};
         if (_.isFunction(this.props.columnWidths)) {
-            return this.props.columnWidths(this);
+            columnWidths = this.props.columnWidths(this);
         } else {
-            return this.props.columnWidths;
+            columnWidths = {...this.props.columnWidths};
         }
+        if (this.props.hasSeriesNumber) {
+            columnWidths.series_number = this.props.seriesNumberWidth;
+        }
+        if (this.props.hasAction) {
+            columnWidths.action = this.props.actionWidth;
+        }
+        return columnWidths;
     };
 
     /**
@@ -695,9 +703,10 @@ export default class FormTable extends Component {
         let footerData = this.props.footerData ? this.props.footerData(this) : null;
         return <div style={{marginBottom: 20, ...this.props.style, ...this.props.rootStyle}}>
             {
-                this.props.label === false || this.props.label === undefined ? null : <div style={this.props.labelStyle}>
-                    <span style={style.label}>{this.props.label}</span>
-                </div>
+                this.props.label === false || this.props.label === undefined ? null :
+                    <div style={this.props.labelStyle}>
+                        <span style={style.label}>{this.props.label}</span>
+                    </div>
             }
             <Table ref="table"
                    className={this.props.tableClassName}
@@ -705,6 +714,7 @@ export default class FormTable extends Component {
                    rowSelected={this.props.rowSelected}
                    onRowSelect={this.handleRowSelect}
                    columns={this.getColumns(this.props.columns)}
+                   columnWidths={this.getColumnsWidth()}
                    dataSource={dataSource}
                    containerHeight={this.props.containerHeight}
                    containerWidth={this.props.containerWidth}
@@ -715,7 +725,7 @@ export default class FormTable extends Component {
                    headerTextAlign="center"
                    showCheckboxes={this.props.showCheckboxes}
                    rowCheckboxEnabled={this.props.rowCheckboxEnabled}
-                   //fixedRightColumns={this.props.fixedRightColumns}
+                    //fixedRightColumns={this.props.fixedRightColumns}
                    emptyDataTip="还没添加数据"
                    pager={pager}
                    mode={pager ? 'local' : undefined}
@@ -726,7 +736,7 @@ export default class FormTable extends Component {
                 this.props.hasFooterAddAction ? <div
                     className="border-primary text-center cursor-pointer"
                     style={style.footerAction}
-                    onClick={this.addRow.bind(this, this.state.value.length,  this.getDefaultRowData(), true)}>
+                    onClick={this.addRow.bind(this, this.state.value.length, this.getDefaultRowData(), true)}>
                     <FontIcon className="iconfont icon-plus"/>
                 </div> : null
             }

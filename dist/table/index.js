@@ -108,7 +108,8 @@ var Table = function (_Component) {
                 setTableState: this.setTableState.bind(this),
                 handleStateChange: this.handleStateChange.bind(this),
                 getDataRows: this.getDataRows.bind(this),
-                cellRender: this.cellRender.bind(this)
+                cellRender: this.cellRender.bind(this),
+                getTableWidth: this.getTableWidth.bind(this)
             };
         }
     }]);
@@ -238,9 +239,9 @@ var Table = function (_Component) {
                 if (hasChildren[key]) return 0;
                 return value;
             });
-            return props.tableWidth || Math.max(this.getCheckboxColumnWidth() + this.getSeriesColumnWidth() + columnWidths.length > 0 ? columnWidths.reduce(function (total, num) {
+            return props.tableWidth || Math.max(this.getCheckboxColumnWidth() + this.getSeriesColumnWidth() + (columnWidths.length > 0 ? columnWidths.reduce(function (total, num) {
                 return total + num;
-            }) : 0, _lodash2.default.isString(this.state.containerWidth) ? 0 : this.state.containerWidth, props.tableMinWidth || 0);
+            }, 0) : 0), _lodash2.default.isString(this.state.containerWidth) ? 0 : this.state.containerWidth, props.tableMinWidth || 0);
         }
     }, {
         key: 'initData',
@@ -333,7 +334,12 @@ var Table = function (_Component) {
     }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-            this.state.containerWidth = (0, _jquery2.default)(this.refs.container).outerWidth() || '100%';
+            var containerWidth = (0, _jquery2.default)(this.refs.container).outerWidth() || '100%';
+            if (this.state.containerWidth !== containerWidth) {
+                this.state.containerWidth = containerWidth;
+                this.refs.fixedLeft && this.refs.fixedLeft.forceUpdate();
+                this.refs.fixedRight && this.refs.fixedRight.forceUpdate();
+            }
             this.componentDidUpdate();
         }
     }, {
@@ -624,7 +630,8 @@ Table.childContextTypes = {
     setTableState: _propTypes2.default.func,
     handleStateChange: _propTypes2.default.func,
     getDataRows: _propTypes2.default.func,
-    cellRender: _propTypes2.default.func
+    cellRender: _propTypes2.default.func,
+    getTableWidth: _propTypes2.default.func
 };
 Table.defaultProps = {
     headerTextAlign: 'center',
@@ -674,6 +681,7 @@ Table.defaultProps = {
     seriesColumnWidth: 50,
     showEllipsis: true,
     autoResponse: false,
+    rowStyle: undefined,
     checkboxStyle: {
         style: {
             marginLeft: 15,

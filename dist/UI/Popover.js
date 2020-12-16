@@ -106,7 +106,7 @@ Popover.defaultProps = {
     style: {
         width: undefined,
         height: undefined },
-    zIndex: 1000
+    zIndex: 3000
 };
 exports.default = Popover;
 
@@ -118,7 +118,10 @@ var PopoverContent = function (_Component2) {
 
         var _this2 = (0, _possibleConstructorReturn3.default)(this, (PopoverContent.__proto__ || (0, _getPrototypeOf2.default)(PopoverContent)).call(this, props));
 
-        _this2.state = { open: false };
+        _this2.state = {
+            open: false,
+            position: {}
+        };
 
         _this2.unmount = function () {
             var containerDOM = _reactDom2.default.findDOMNode(_this2.containerRef.current);
@@ -126,8 +129,10 @@ var PopoverContent = function (_Component2) {
             containerDOM.style.transform = 'scale(' + _this2.props.scaleX + ', ' + _this2.props.scaleY + ')';
             setTimeout(function () {
                 var node = document.getElementById(_this2.props.id);
-                _reactDom2.default.unmountComponentAtNode(node);
-                node.parentNode.removeChild(node);
+                if (node) {
+                    _reactDom2.default.unmountComponentAtNode(node);
+                    node.parentNode.removeChild(node);
+                }
             }, 300);
         };
 
@@ -139,6 +144,7 @@ var PopoverContent = function (_Component2) {
         };
 
         _this2.containerRef = _react2.default.createRef();
+        _this2.state.position = _this2.getPosition();
         return _this2;
     }
 
@@ -155,6 +161,7 @@ var PopoverContent = function (_Component2) {
                     containerDOM.style.top = position.top + "px";
                     containerDOM.style.opacity = "1";
                     containerDOM.style.transform = "scale(1, 1)";
+                    _this3.state.position = position;
                 });
             }
             if (this.state.open === true && this.props.open === false) {
@@ -228,7 +235,7 @@ var PopoverContent = function (_Component2) {
                     _react2.default.createElement(
                         'div',
                         { ref: this.containerRef, className: (0, _tool.joinBlankSpace)("popover", this.props.className),
-                            style: (0, _extends3.default)({}, this.props.style, this.getPosition()) },
+                            style: (0, _extends3.default)({}, this.props.style, this.state.position) },
                         this.props.children
                     )
                 );

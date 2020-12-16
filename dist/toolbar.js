@@ -223,6 +223,7 @@ var Toolbar = function (_Component) {
             var _this2 = this;
 
             var dataSource = this.state.dataSource || this.props.dataSource;
+            var AuthKey = App && App.lib("authKey");
             return _react2.default.createElement(
                 'div',
                 { className: 'toolbar', style: this.props.style },
@@ -247,7 +248,7 @@ var Toolbar = function (_Component) {
                                 { className: 'toolbar-item',
                                     key: j,
                                     onClick: _this2.handleClick(event),
-                                    'auth-key': _lodash2.default.isFunction(event.authKey) ? event.authKey() : event.authKey },
+                                    'auth-key': _lodash2.default.isFunction(event.authKey) ? event.authKey() : AuthKey ? AuthKey.get(event.authKey) : event.authKey },
                                 _this2.renderEvent(event)
                             );
                         })

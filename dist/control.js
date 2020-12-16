@@ -174,8 +174,9 @@ var Control = function (_Component) {
     }, {
         key: 'focus',
         value: function focus() {
-            if (this.getControl()) {
-                this.getControl().focus();
+            var control = this.getControl();
+            if (control && control.focus) {
+                control.focus();
             }
         }
     }, {
@@ -190,7 +191,9 @@ var Control = function (_Component) {
             delete props.type;
 
             if (props.useNewControl) {
-                return _react2.default.createElement(_Control2.default, (0, _extends3.default)({}, props, {
+                return _react2.default.createElement(_Control2.default, (0, _extends3.default)({
+                    ref: type === 'render' ? undefined : "control"
+                }, props, {
                     type: type
                 }));
             }

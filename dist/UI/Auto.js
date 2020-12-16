@@ -4,9 +4,9 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _extends2 = require('babel-runtime/helpers/extends');
+var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
 
-var _extends3 = _interopRequireDefault(_extends2);
+var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
 var _regenerator = require('babel-runtime/regenerator');
 
@@ -15,6 +15,10 @@ var _regenerator2 = _interopRequireDefault(_regenerator);
 var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
 
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
@@ -62,7 +66,25 @@ var _Divider = require('./Divider');
 
 var _Divider2 = _interopRequireDefault(_Divider);
 
+var _form = require('../form');
+
+var _form2 = _interopRequireDefault(_form);
+
+var _formTable = require('../controls/form-table');
+
+var _formTable2 = _interopRequireDefault(_formTable);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var getFilterText = function getFilterText(props) {
+    var index = props.dataSource.indexOf(props.value);
+    if (index >= 0) {
+        return props.dataSource[index];
+    }
+    var data = (0, _tool.getDataFromDataSourceByValue)(props.value, props.dataSource, props.dataSourceConfig);
+    var text = data ? !_.isObject(data) ? data : (0, _tool.replaceText)(data, props.dataSourceConfig.text) : !props.forceSelect ? props.value : '';
+    return text !== undefined ? text : '';
+};
 
 var Auto = function (_Component) {
     (0, _inherits3.default)(Auto, _Component);
@@ -73,11 +95,13 @@ var Auto = function (_Component) {
         var _this = (0, _possibleConstructorReturn3.default)(this, (Auto.__proto__ || (0, _getPrototypeOf2.default)(Auto)).call(this, props));
 
         _this.state = {
+            isFocus: false,
             open: false,
             anchorEl: {},
             openType: 'focus',
             dataSource: [],
-            filterText: ''
+            filterText: '',
+            value: undefined
         };
 
         _this.handleInputChange = function (_ref) {
@@ -97,10 +121,20 @@ var Auto = function (_Component) {
 
         _this.handleFocus = function (event) {
             _this.setState({
+                isFocus: true,
                 openType: 'focus',
                 open: true,
                 anchorEl: _this.ref.current
             });
+        };
+
+        _this.handleBlur = function (_ref2) {
+            var event = _ref2.event;
+
+            if (event.target.value === '') {
+                _this.handleChange('');
+            }
+            _this.setState({ isFocus: false });
         };
 
         _this.handlePullDown = function (event) {
@@ -121,7 +155,11 @@ var Auto = function (_Component) {
                 if (_this.state.filterText === '') {
                     _this.handleChange('');
                 } else {
-                    _this.setState({ filterText: _this.getCurrentText() });
+                    _this.setState({
+                        filterText: getFilterText((0, _extends3.default)({}, _this.props, {
+                            dataSource: _this.state.dataSource
+                        }))
+                    });
                 }
             } else {
                 _this.handleChange(_this.state.filterText);
@@ -129,14 +167,19 @@ var Auto = function (_Component) {
             _this.handleClose(event);
         };
 
-        _this.handleSelect = function (_ref2) {
-            var value = _ref2.value,
-                data = _ref2.data,
-                event = _ref2.event;
+        _this.handleSelect = function (_ref3) {
+            var value = _ref3.value,
+                data = _ref3.data,
+                event = _ref3.event;
 
-            event.stopPropagation();
-            _this.handleClose(event);
-            _this.setState({ filterText: _this.getText(data) });
+            if (event) {
+                event.stopPropagation();
+                _this.handleClose(event);
+            }
+            _this.setState({
+                filterText: _this.getText(data),
+                selecting: true
+            });
             _this.handleChange(_this.getValue(data));
         };
 
@@ -144,7 +187,7 @@ var Auto = function (_Component) {
             _this.onRequestClose(event);
             setTimeout(function () {
                 if (_this.props.onCreate) {
-                    _this.props.onCreate();
+                    _this.props.onCreate({ Form: _this.props.context, Control: _this });
                 }
             }, 100);
         };
@@ -159,47 +202,38 @@ var Auto = function (_Component) {
 
         _this.ref = _react2.default.createRef();
         _this.text = _react2.default.createRef();
-        _this.loadDataSource().then(function (dataSource) {
-            _this.state.filterText = _this.getCurrentText(dataSource);
-            _this.state.dataSource = dataSource;
-            if (_this.updater.isMounted(_this)) {
-                _this.forceUpdate();
-            }
-        });
         return _this;
     }
 
     (0, _createClass3.default)(Auto, [{
-        key: 'loadDataSource',
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            this.setDataSource();
+        }
+    }, {
+        key: 'setDataSource',
         value: function () {
-            var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
-                var filterText;
+            var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
+                var dataSource;
                 return _regenerator2.default.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
-                                filterText = this.state.filterText;
+                                _context.next = 2;
+                                return this.loadDataSource();
 
-                                if (!_.isFunction(this.props.dataSource)) {
-                                    _context.next = 7;
-                                    break;
-                                }
+                            case 2:
+                                dataSource = _context.sent;
 
-                                _context.next = 4;
-                                return this.props.dataSource({ filterText: filterText });
+                                this.setState({
+                                    filterText: getFilterText((0, _extends3.default)({}, this.props, {
+                                        dataSource: dataSource
+                                    })),
+                                    dataSource: dataSource
+                                });
+                                return _context.abrupt('return', dataSource);
 
-                            case 4:
-                                _context.t0 = _context.sent;
-                                _context.next = 8;
-                                break;
-
-                            case 7:
-                                _context.t0 = this.props.dataSource;
-
-                            case 8:
-                                return _context.abrupt('return', _context.t0);
-
-                            case 9:
+                            case 5:
                             case 'end':
                                 return _context.stop();
                         }
@@ -207,8 +241,60 @@ var Auto = function (_Component) {
                 }, _callee, this);
             }));
 
+            function setDataSource() {
+                return _ref4.apply(this, arguments);
+            }
+
+            return setDataSource;
+        }()
+    }, {
+        key: 'loadDataSource',
+        value: function () {
+            var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
+                var filterText, context, FormTable2, Form2;
+                return _regenerator2.default.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                filterText = this.state.filterText;
+                                context = this.props.context;
+                                FormTable2 = context instanceof _formTable2.default ? context : undefined;
+                                Form2 = FormTable2 ? context.props.context : context;
+
+                                if (!_.isFunction(this.props.dataSource)) {
+                                    _context2.next = 10;
+                                    break;
+                                }
+
+                                _context2.next = 7;
+                                return this.props.dataSource({
+                                    filterText: filterText,
+                                    Form: Form2,
+                                    FormTable: FormTable2,
+                                    Control: this
+                                });
+
+                            case 7:
+                                _context2.t0 = _context2.sent;
+                                _context2.next = 11;
+                                break;
+
+                            case 10:
+                                _context2.t0 = this.props.dataSource;
+
+                            case 11:
+                                return _context2.abrupt('return', _context2.t0);
+
+                            case 12:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
             function loadDataSource() {
-                return _ref3.apply(this, arguments);
+                return _ref5.apply(this, arguments);
             }
 
             return loadDataSource;
@@ -229,26 +315,19 @@ var Auto = function (_Component) {
             return (0, _tool.getFilterDataSource)(this.state.filterText, this.state.dataSource, this.props.dataSourceConfig, this.filter);
         }
     }, {
+        key: 'getData',
+        value: function getData(value) {
+            return _.find(this.state.dataSource, (0, _defineProperty3.default)({}, this.props.dataSourceConfig.value, value));
+        }
+    }, {
         key: 'getStyle',
         value: function getStyle() {
             var style = (0, _extends3.default)({}, this.props.style);
             if (this.state.open) {
                 style.position = 'relative';
-                style.zIndex = _.get(this.props, 'popoverProps.zIndex', 1000);
+                style.zIndex = _.get(this.props, 'popoverProps.zIndex', 3000);
             }
             return style;
-        }
-    }, {
-        key: 'getCurrentText',
-        value: function getCurrentText() {
-            var dataSource = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.state.dataSource;
-
-            var index = dataSource.indexOf(this.props.value);
-            if (index >= 0) {
-                return dataSource[index];
-            }
-            var data = (0, _tool.getDataFromDataSourceByValue)(this.props.value, dataSource, this.props.dataSourceConfig);
-            return data ? this.getText(data) : !this.props.forceSelect ? this.props.value : '';
         }
     }, {
         key: 'getText',
@@ -267,6 +346,12 @@ var Auto = function (_Component) {
             return _.get(data, this.props.dataSourceConfig.value);
         }
     }, {
+        key: 'setValue',
+        value: function setValue(value) {
+            var data = this.getData(value);
+            this.handleSelect({ value: value, data: data });
+        }
+    }, {
         key: 'render',
         value: function render() {
             var _this2 = this;
@@ -283,6 +368,7 @@ var Auto = function (_Component) {
                     _react2.default.createElement(_Text2.default, { ref: this.text,
                         className: 'clear-style grow',
                         onFocus: this.handleFocus,
+                        onBlur: this.handleBlur,
                         value: this.state.filterText,
                         onChange: this.handleInputChange,
                         placeholder: this.props.placeholder
@@ -340,11 +426,14 @@ var Auto = function (_Component) {
     }], [{
         key: 'getDerivedStateFromProps',
         value: function getDerivedStateFromProps(nextProps, prevState) {
-            var dataSource = nextProps.dataSource;
-            if (_.isArray(dataSource) && !_.isEqual(prevState.dataSource, dataSource)) {
-                return { dataSource: dataSource };
+            var state = {};
+            if (nextProps.value !== prevState.value) {
+                state.value = nextProps.value;
+                state.filterText = getFilterText((0, _extends3.default)({}, nextProps, {
+                    dataSource: state.dataSource || prevState.dataSource
+                }));
             }
-            return null;
+            return state;
         }
     }]);
     return Auto;

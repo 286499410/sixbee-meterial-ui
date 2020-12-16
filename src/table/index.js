@@ -24,7 +24,8 @@ export default class Table extends Component {
         setTableState: PropTypes.func,
         handleStateChange: PropTypes.func,
         getDataRows: PropTypes.func,
-        cellRender: PropTypes.func
+        cellRender: PropTypes.func,
+        getTableWidth: PropTypes.func
     };
 
     static defaultProps = {
@@ -75,6 +76,7 @@ export default class Table extends Component {
         seriesColumnWidth: 50,                  //序号列宽度
         showEllipsis: true,                     //显示省略内容
         autoResponse: false,                    //自适应
+        rowStyle: undefined,                    //行样式
         checkboxStyle: {
             style: {
                 marginLeft: 15,
@@ -123,6 +125,7 @@ export default class Table extends Component {
             handleStateChange: this.handleStateChange.bind(this),
             getDataRows: this.getDataRows.bind(this),
             cellRender: this.cellRender.bind(this),
+            getTableWidth: this.getTableWidth.bind(this)
         }
     }
 
@@ -157,7 +160,7 @@ export default class Table extends Component {
         });
         return props.tableWidth ||
             Math.max(
-                this.getCheckboxColumnWidth() + this.getSeriesColumnWidth() + columnWidths.length > 0 ? columnWidths.reduce((total, num) => total + num) : 0,
+                this.getCheckboxColumnWidth() + this.getSeriesColumnWidth() + (columnWidths.length > 0 ? columnWidths.reduce((total, num) => total + num, 0) : 0),
                 _.isString(this.state.containerWidth) ? 0 : this.state.containerWidth,
                 props.tableMinWidth || 0
             );
@@ -221,7 +224,12 @@ export default class Table extends Component {
     }
 
     componentDidMount() {
-        this.state.containerWidth = $(this.refs.container).outerWidth() || '100%';
+        let containerWidth = $(this.refs.container).outerWidth() || '100%';
+        if(this.state.containerWidth !== containerWidth) {
+            this.state.containerWidth = containerWidth;
+            this.refs.fixedLeft && this.refs.fixedLeft.forceUpdate();
+            this.refs.fixedRight && this.refs.fixedRight.forceUpdate();
+        }
         this.componentDidUpdate();
     }
 

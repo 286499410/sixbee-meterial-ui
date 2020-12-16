@@ -157,6 +157,7 @@ export default class Toolbar extends Component {
 
     render() {
         let dataSource = this.state.dataSource || this.props.dataSource;
+        let AuthKey = App && App.lib("authKey");
         return <div className="toolbar" style={this.props.style}>
             {
                 dataSource.map((rows, index) => {
@@ -176,7 +177,7 @@ export default class Toolbar extends Component {
                             return <div className="toolbar-item"
                                         key={j}
                                         onClick={this.handleClick(event)}
-                                        auth-key={_.isFunction(event.authKey) ? event.authKey() : event.authKey}>
+                                        auth-key={_.isFunction(event.authKey) ? event.authKey() : (AuthKey ? AuthKey.get(event.authKey) : event.authKey)}>
                                 {this.renderEvent(event)}
                             </div>
                         })}

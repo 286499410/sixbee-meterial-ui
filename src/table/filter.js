@@ -30,6 +30,20 @@ export default class Filter extends Component {
         onFilter: undefined
     };
 
+    defaultWidth = {
+        "money-range": 300,
+        "date-range": 260,
+        "text": 200,
+        "select": 200,
+        "select-check": 200,
+        "auto": 200
+    };
+
+    defaultFilterType = {
+        "money": "money-range",
+        "date": "date-range"
+    };
+
     state = {
         open: false,
         value: undefined,
@@ -55,11 +69,11 @@ export default class Filter extends Component {
             anchorEl: event.currentTarget
         });
         let type = this.getFilterType();
-        if (type == 'text' || type == 'auto' || type == 'date') {
-            setTimeout(() => {
-                this.refs.control.focus();
-            }, 50);
-        }
+        // if (type == 'text' || type == 'auto' || type == 'date') {
+        //     setTimeout(() => {
+        //         this.refs.control.focus();
+        //     }, 50);
+        // }
         if(type == 'date-range') {
             // setTimeout(() => {
             //     this.refs.control.refs.control.refs.container.click();
@@ -72,8 +86,13 @@ export default class Filter extends Component {
     };
 
     handleReset = (event) => {
-        this.state.value = undefined;
-        this.refs.control.setValue(undefined);
+        if(this.getFilterType() === 'money-range') {
+            this.state.value = [];
+            this.refs.control.setValue([]);
+        } else {
+            this.state.value = undefined;
+            this.refs.control.setValue(undefined);
+        }
         this.filter();
     };
 
@@ -89,7 +108,7 @@ export default class Filter extends Component {
     }
 
     getFilterType() {
-        return this.props.field.filterType || this.props.field.type;
+        return this.props.field.filterType || this.defaultFilterType[this.props.field.type] || this.props.field.type;
     }
 
     render() {
@@ -110,7 +129,7 @@ export default class Filter extends Component {
                      open={this.state.open}
                      anchorEl={this.state.anchorEl}
                      onRequestClose={this.handleRequestClose}>
-                <div className="space" style={{width: this.props.field.filterWidth || 'auto'}}>
+                <div className="space" style={{width: this.props.field.filterWidth || this.defaultWidth[type] || 'auto'}}>
                     <Control
                         ref="control"
                         hintText={hintText}
@@ -123,6 +142,7 @@ export default class Filter extends Component {
                         onEnter={(event) => {
                             this.handleSubmit(event);
                         }}
+                        textAlign="left"
                         type={type}
                         onChange={(value) => {
                             this.state.value = value;

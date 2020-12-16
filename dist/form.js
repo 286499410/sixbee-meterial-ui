@@ -323,7 +323,9 @@ var Form = function (_Component) {
                             res.json().then(function (json) {
                                 if (json.errCode == 10002 && json.validator) {
                                     _this5.setFormStatus(STATUS_CHECKERROR);
-                                    _this5.setState({ errorText: json.validator });
+                                    _this5.setState({
+                                        errorText: _this5.props.handleValidator ? _this5.props.handleValidator(json.validator) : json.validator
+                                    });
                                 } else {
                                     _this5.setFormStatus(STATUS_ERROR);
                                 }
@@ -549,10 +551,10 @@ var _initialiseProps = function _initialiseProps() {
         }
 
         _this7.state.fieldDefaultData = {};
-        _this7.setFieldDefaultData(_this7.props.fields);
+        _this7.setFieldDefaultData(props.fields);
 
         _this7.state.feildOriginData = {};
-        _this7.setFieldOriginData(_this7.props.fields);
+        _this7.setFieldOriginData(props.fields);
     };
 
     this.handleChange = function (field) {
@@ -897,7 +899,8 @@ var FormActions = function (_Component2) {
                                 case 'text':
                                     return _react2.default.createElement(
                                         'div',
-                                        { key: index, style: (0, _extends3.default)({ marginLeft: 12 }, action.style) },
+                                        { key: index,
+                                            style: (0, _extends3.default)({ marginLeft: 12 }, action.style) },
                                         action.label
                                     );
                                 case 'render':
