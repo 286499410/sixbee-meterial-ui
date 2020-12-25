@@ -51,7 +51,7 @@ export default class Icon extends Component {
     };
 
     render() {
-        let iconClassName = this.props.classPrefix + this.props.name;
+        let iconClassName = this.props.classPrefix + this.props.name + (this.props.className ? " " + this.props.className: "");
         let tooltip = this.props.tooltip;
         if(tooltip && tooltip.indexOf("\n") >= 0) {
             tooltip = tooltip.replace("\n", "<br/>");
@@ -107,6 +107,7 @@ export default class Icon extends Component {
                                  fontSize: this.props.size,
                                  ...this.props.iconStyle
                              }}
+                             onClick={this.handleClick}
             />
         }
     }

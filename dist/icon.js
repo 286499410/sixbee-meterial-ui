@@ -82,7 +82,7 @@ var Icon = function (_Component) {
     (0, _createClass3.default)(Icon, [{
         key: 'render',
         value: function render() {
-            var iconClassName = this.props.classPrefix + this.props.name;
+            var iconClassName = this.props.classPrefix + this.props.name + (this.props.className ? " " + this.props.className : "");
             var tooltip = this.props.tooltip;
             if (tooltip && tooltip.indexOf("\n") >= 0) {
                 tooltip = tooltip.replace("\n", "<br/>");
@@ -140,7 +140,8 @@ var Icon = function (_Component) {
                     hoverColor: this.props.hoverColor,
                     style: (0, _extends3.default)({
                         fontSize: this.props.size
-                    }, this.props.iconStyle)
+                    }, this.props.iconStyle),
+                    onClick: this.handleClick
                 });
             }
         }

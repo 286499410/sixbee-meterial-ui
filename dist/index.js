@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.FullScreen = exports.Windows = exports.getMuiTheme = exports.MuiThemeProvider = exports.utils = exports.RefreshIndicator = exports.MaterialMenuItem = exports.MaterialMenu = exports.MaterialList = exports.Popover = exports.LinearProgress = exports.Stepper = exports.Scrollbars = exports.Tabs = exports.Nav2 = exports.Nav = exports.Button = exports.List = exports.DropDown = exports.Toolbar = exports.Dialog = exports.Layout = exports.Drawer = exports.Badge = exports.Avatar = exports.Paper = exports.Detail = exports.SvgIcon = exports.Icon = exports.TableHeader = exports.Table = exports.Form = exports.Editor = exports.Control = exports.Image = exports.FormTable = exports.Time = exports.Text = exports.SelectTag = exports.Select = exports.Radio = exports.MoneyRange = exports.Money = exports.File = exports.DateRange = exports.DateTime = exports.Date = exports.ContextMenu = exports.Checkbox = exports.Auto = exports.Alert = undefined;
+exports.DetailTable = exports.Sortable = exports.FullScreen = exports.Windows = exports.getMuiTheme = exports.MuiThemeProvider = exports.utils = exports.RefreshIndicator = exports.MaterialMenuItem = exports.MaterialMenu = exports.MaterialList = exports.Popover = exports.LinearProgress = exports.Stepper = exports.Scrollbars = exports.Tabs = exports.Nav2 = exports.Nav = exports.Button = exports.List = exports.DropDown = exports.Toolbar = exports.Dialog = exports.Layout = exports.Drawer = exports.Badge = exports.Avatar = exports.Paper = exports.Detail = exports.SvgIcon = exports.Icon = exports.TableHeader = exports.Table = exports.Form = exports.Editor = exports.Control = exports.Image = exports.FormTable = exports.Time = exports.Text = exports.SelectTag = exports.Select = exports.Radio = exports.MoneyRange = exports.Money = exports.File = exports.DateRange = exports.DateTime = exports.Date = exports.ContextMenu = exports.Checkbox = exports.Auto = exports.Alert = undefined;
 
 var _auto = require('./controls/auto');
 
@@ -207,6 +207,14 @@ var _getMuiTheme = require('material-ui/styles/getMuiTheme');
 
 var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
+var _sortable = require('./sortable');
+
+var _sortable2 = _interopRequireDefault(_sortable);
+
+var _detailTable = require('./detail-table');
+
+var _detailTable2 = _interopRequireDefault(_detailTable);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.Alert = _alert2.default;
@@ -260,3 +268,5 @@ exports.MuiThemeProvider = _MuiThemeProvider2.default;
 exports.getMuiTheme = _getMuiTheme2.default;
 exports.Windows = _windows2.default;
 exports.FullScreen = _fullScreen2.default;
+exports.Sortable = _sortable2.default;
+exports.DetailTable = _detailTable2.default;

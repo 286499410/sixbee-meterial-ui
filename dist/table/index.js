@@ -509,7 +509,7 @@ var Table = function (_Component) {
             var parent = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
             var rows = [];
-            var collapsibleKey = this.props.collapsibleKey || this.state.dataColumns[0].key;
+            var collapsibleKey = this.props.collapsibleKey || _lodash2.default.get(this.state.dataColumns, "0.key");
             dataSource.map(function (data) {
                 var indentData = {};
                 indentData[collapsibleKey + '_indent'] = indent;

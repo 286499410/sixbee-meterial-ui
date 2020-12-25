@@ -50,6 +50,9 @@ import FullScreen from './full-screen';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import Sortable from "./sortable";
+import DetailTable from "./detail-table";
+
 export {
     Alert,
     Auto,
@@ -101,5 +104,7 @@ export {
     MuiThemeProvider,
     getMuiTheme,
     Windows,
-    FullScreen
+    FullScreen,
+    Sortable,
+    DetailTable
 };

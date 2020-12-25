@@ -412,7 +412,7 @@ export default class Table extends Component {
      */
     getFilteredRows(dataSource, indent = 0, parent = null) {
         let rows = [];
-        let collapsibleKey = this.props.collapsibleKey || this.state.dataColumns[0].key;
+        let collapsibleKey = this.props.collapsibleKey || _.get(this.state.dataColumns, "0.key");
         dataSource.map((data) => {
             let indentData = {};
             indentData[`${collapsibleKey}_indent`] = indent;
