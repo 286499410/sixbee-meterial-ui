@@ -8,13 +8,13 @@ var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
 
-var _values = require('babel-runtime/core-js/object/values');
-
-var _values2 = _interopRequireDefault(_values);
-
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
+
+var _values = require('babel-runtime/core-js/object/values');
+
+var _values2 = _interopRequireDefault(_values);
 
 var _extends2 = require('babel-runtime/helpers/extends');
 
@@ -52,9 +52,9 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _Checkbox = require('material-ui/Checkbox');
+var _checkbox = require('./checkbox');
 
-var _Checkbox2 = _interopRequireDefault(_Checkbox);
+var _checkbox2 = _interopRequireDefault(_checkbox);
 
 var _utils = require('../utils');
 
@@ -76,21 +76,6 @@ var _pager2 = _interopRequireDefault(_pager);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var style = {
-    checkboxStyle: {
-        style: {
-            display: "inline-block",
-            width: 20,
-            height: 20
-        },
-        iconStyle: {
-            left: 0,
-            width: 20,
-            height: 20
-        }
-    }
-};
-
 var Table = function (_Component) {
     (0, _inherits3.default)(Table, _Component);
     (0, _createClass3.default)(Table, [{
@@ -110,6 +95,7 @@ var Table = function (_Component) {
         _this.state = {
             key: new Date().getTime(),
             checked: {},
+            detailChecked: {},
             scrollLeft: 0,
             scrollTop: 0,
             checkboxColumnWidth: 50,
@@ -120,12 +106,20 @@ var Table = function (_Component) {
 
         _this.handleCheckAll = function (event, isInputChecked) {
             var checked = {};
+            var detailChecked = {};
+            var _this$props$mainInfo$ = _this.props.mainInfo.primaryKey,
+                primaryKey = _this$props$mainInfo$ === undefined ? "id" : _this$props$mainInfo$;
+
             if (isInputChecked) {
                 _this.props.dataSource.forEach(function (data) {
-                    checked[_lodash2.default.get(data, _this.props.primaryKey)] = true;
+                    checked[_lodash2.default.get(data, primaryKey)] = 1;
+                    var details = _lodash2.default.get(data, _this.props.detailKey) || [];
+                    details.forEach(function (detail) {
+                        detailChecked[_lodash2.default.get(detail, _this.props.primaryKey)] = 1;
+                    });
                 });
             }
-            _this.setChecked(checked);
+            _this.setChecked(checked, detailChecked);
         };
 
         _this.handleScroll = function (event) {
@@ -151,6 +145,8 @@ var Table = function (_Component) {
     (0, _createClass3.default)(Table, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
+            var _this2 = this;
+
             var forceUpdate = 0;
             if (this.refs.container) {
                 var state = this.state;
@@ -174,6 +170,14 @@ var Table = function (_Component) {
                     forceUpdate = 1;
                 }
             }
+            if (this.refs.header) {
+                (0, _jquery2.default)(this.refs.header).scrollLeft(this.props.scrollLeft);
+            }
+            setTimeout(function () {
+                _this2.refs.Content.scrollTop(_this2.props.scrollTop);
+                _this2.refs.Content.scrollLeft(_this2.props.scrollLeft);
+            }, 1200);
+
             if (forceUpdate) {
                 this.forceUpdate();
             }
@@ -207,7 +211,18 @@ var Table = function (_Component) {
     }, {
         key: 'isAllChecked',
         value: function isAllChecked() {
-            return this.props.dataSource.length !== 0 && (0, _keys2.default)(this.state.checked).length === this.props.dataSource.length;
+            var checkedLength = (0, _values2.default)(this.state.checked).filter(function (item) {
+                return item == 1;
+            }).length;
+            if (this.props.dataSource.length === 0 || checkedLength === 0 && (0, _values2.default)(this.state.checked).filter(function (item) {
+                return item == 2;
+            }).length === 0) {
+                return 0;
+            }
+            if (this.props.dataSource.length === checkedLength) {
+                return 1;
+            }
+            return 2;
         }
     }, {
         key: 'getTableWidth',
@@ -231,17 +246,21 @@ var Table = function (_Component) {
         value: function getMainInfoWidth() {
             var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props;
 
+            var marginLeft = 24;
             var width = props.mainInfo.columns.reduce(function (total, column) {
-                return total + column.width || 0;
+                return total + ((column.width || 0) + marginLeft);
             }, 0);
-            if (this.props.showCheckboxes) width += this.state.checkboxColumnWidth;
+            if (this.props.showCheckboxes) width += this.state.checkboxColumnWidth || this.props.checkboxColumnWidth;
             width += props.mainInfo.actionWidth || 0;
             return width;
         }
     }, {
         key: 'setChecked',
-        value: function setChecked(checked) {
-            this.handleStateChange({ checked: checked });
+        value: function setChecked() {
+            var checked = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.state.checked;
+            var detailChecked = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.state.detailChecked;
+
+            this.handleStateChange({ checked: checked, detailChecked: detailChecked });
             this.forceUpdate();
         }
     }, {
@@ -252,22 +271,29 @@ var Table = function (_Component) {
                 this.props.onStateChange({
                     scrollLeft: this.state.scrollLeft,
                     scrollTop: this.state.scrollTop,
-                    checked: this.state.checked
+                    checked: this.state.checked,
+                    detailChecked: this.state.detailChecked,
+                    columnWidths: this.state.columnWidths,
+                    checkboxColumnWidth: this.state.checkboxColumnWidth
                 });
             }
         }
     }, {
         key: 'render',
         value: function render() {
-            var _this2 = this;
+            var _this3 = this;
 
             var tableWidth = this.getTableWidth();
             var mainInfoWidth = this.getMainInfoWidth();
             var columnWidths = this.getColumnWidths();
             var width = Math.max(tableWidth, mainInfoWidth, this.state.containerWidth);
+            var _props$mainInfo$showC = this.props.mainInfo.showCheckboxes,
+                showCheckboxes = _props$mainInfo$showC === undefined ? true : _props$mainInfo$showC;
+
             return _react2.default.createElement(
                 'div',
-                { ref: 'container', className: 'table-container bordered full-height text-small relative', style: { overflow: "hidden" } },
+                { ref: 'container', className: 'table-container bordered full-height text-small relative',
+                    style: { overflow: "hidden" } },
                 this.props.fixedCheckbox && _react2.default.createElement(FixedCheckbox, null),
                 this.props.hasHeader && _react2.default.createElement(
                     'div',
@@ -293,17 +319,24 @@ var Table = function (_Component) {
                             _react2.default.createElement(
                                 'tr',
                                 null,
-                                this.props.showCheckboxes && _react2.default.createElement(
+                                (this.props.showCheckboxes || showCheckboxes) && _react2.default.createElement(
                                     'th',
-                                    { ref: 'checkboxAll', style: { width: this.state.checkboxColumnWidth || this.props.checkboxColumnWidth, textAlign: "center", lineHeight: 1 } },
-                                    _react2.default.createElement(_Checkbox2.default, (0, _extends3.default)({ checked: this.isAllChecked(), onCheck: this.handleCheckAll }, style.checkboxStyle))
+                                    { ref: 'checkboxAll', style: {
+                                            width: this.state.checkboxColumnWidth || this.props.checkboxColumnWidth,
+                                            textAlign: "center",
+                                            lineHeight: 1
+                                        } },
+                                    _react2.default.createElement(_checkbox2.default, { checked: this.isAllChecked(), onCheck: this.handleCheckAll })
                                 ),
                                 this.props.columns.map(function (column, index) {
                                     return _react2.default.createElement(
                                         'th',
                                         { key: index,
                                             'col-key': column.key,
-                                            style: { width: columnWidths[column.key] } },
+                                            style: {
+                                                width: columnWidths[column.key],
+                                                textAlign: "center"
+                                            } },
                                         column.label
                                     );
                                 }),
@@ -317,12 +350,13 @@ var Table = function (_Component) {
                     { style: { flexGrow: 1 } },
                     _react2.default.createElement(
                         _reactCustomScrollbars.Scrollbars,
-                        { onScroll: this.handleScroll, style: {
+                        { ref: 'Content', onScroll: this.handleScroll, style: {
                                 width: '100%',
                                 height: '100%'
                             } },
                         this.props.dataSource.map(function (data, index) {
-                            return _react2.default.createElement(Content, { key: index, data: data, width: width, extraWidth: _this2.state.extraWidth });
+                            return _react2.default.createElement(Content, { key: index, data: data, width: width,
+                                extraWidth: _this3.state.extraWidth });
                         })
                     )
                 ),
@@ -337,6 +371,7 @@ Table.childContextTypes = {
     Table: _propTypes2.default.object
 };
 Table.defaultProps = {
+
     emptyDataTip: '没有找到相关数据',
     emptyDataImage: '/image/nodata.png',
     hasHeader: true,
@@ -344,12 +379,20 @@ Table.defaultProps = {
     dataSource: [],
     primaryKey: "id",
     detailKey: "details",
-    mainInfo: {},
-    showCheckboxes: true,
+    mainInfo: {
+        primaryKey: "id",
+        columns: [],
+        actionWidth: 0,
+        action: [],
+        showCheckboxes: true
+    },
+    showCheckboxes: false,
     checkboxColumnWidth: 50,
     spacey: 14,
     pager: {},
-    fixedCheckbox: true };
+    fixedCheckbox: true,
+    fixedLeftCols: 0
+};
 exports.default = Table;
 
 var Action = function (_React$Component) {
@@ -363,13 +406,13 @@ var Action = function (_React$Component) {
     (0, _createClass3.default)(Action, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this4 = this;
+            var _this5 = this;
 
             this.token = this.context.Table.subscribe("scrollLeftChange", function () {
-                var _context$Table$state$ = _this4.context.Table.state.scrollLeft,
+                var _context$Table$state$ = _this5.context.Table.state.scrollLeft,
                     scrollLeft = _context$Table$state$ === undefined ? 0 : _context$Table$state$;
 
-                _this4.refs.container.style.right = 0 - scrollLeft + "px";
+                _this5.refs.container.style.right = 0 - scrollLeft + "px";
             });
         }
     }, {
@@ -380,7 +423,7 @@ var Action = function (_React$Component) {
     }, {
         key: 'render',
         value: function render() {
-            var _this5 = this;
+            var _this6 = this;
 
             var _context$Table$state$2 = this.context.Table.state.scrollLeft,
                 scrollLeft = _context$Table$state$2 === undefined ? 0 : _context$Table$state$2;
@@ -399,8 +442,9 @@ var Action = function (_React$Component) {
                     this.props.actions.map(function (action, index) {
                         return _react2.default.createElement(
                             'div',
-                            { key: index, className: 'text-primary cursor-pointer', style: { marginRight: index === _this5.props.actions.length - 1 ? 0 : 12 },
-                                onClick: action.onClick.bind(_this5, _this5.props.data) },
+                            { key: index, className: 'text-primary cursor-pointer',
+                                style: { marginRight: index === _this6.props.actions.length - 1 ? 0 : 12 },
+                                onClick: action.onClick.bind(_this6, _this6.props.data) },
                             action.label
                         );
                     })
@@ -437,7 +481,7 @@ var MainInfo = function (_React$Component2) {
     }, {
         key: 'render',
         value: function render() {
-            var _this7 = this;
+            var _this8 = this;
 
             return _react2.default.createElement(
                 'div',
@@ -445,7 +489,7 @@ var MainInfo = function (_React$Component2) {
                 this.props.columns.map(function (column, index) {
                     return _react2.default.createElement(
                         'div',
-                        { className: 'text-ellipsis', key: index, style: { maxWidth: column.width, marginRight: 24 } },
+                        { className: 'text-ellipsis', key: index, style: { width: column.width, marginRight: 24 } },
                         column.label && _react2.default.createElement(
                             'span',
                             { className: 'text-muted' },
@@ -455,11 +499,12 @@ var MainInfo = function (_React$Component2) {
                         _react2.default.createElement(
                             'span',
                             null,
-                            _this7.getValue(column)
+                            _this8.getValue(column)
                         )
                     );
                 }),
-                this.props.actions.length > 0 && _react2.default.createElement(Action, { data: this.props.data, width: this.props.actionWidth, actions: this.props.actions, style: this.props.actionStyle })
+                this.props.actions.length > 0 && _react2.default.createElement(Action, { data: this.props.data, width: this.props.actionWidth, actions: this.props.actions,
+                    style: this.props.actionStyle })
             );
         }
     }]);
@@ -484,21 +529,11 @@ var Content = function (_React$Component3) {
     function Content(props) {
         (0, _classCallCheck3.default)(this, Content);
 
-        var _this8 = (0, _possibleConstructorReturn3.default)(this, (Content.__proto__ || (0, _getPrototypeOf2.default)(Content)).call(this, props));
+        var _this9 = (0, _possibleConstructorReturn3.default)(this, (Content.__proto__ || (0, _getPrototypeOf2.default)(Content)).call(this, props));
 
-        _this8.handleCheck = function (event, isInputCheck) {
-            var checked = _this8.context.Table.state.checked;
-            var primaryKey = _this8.context.Table.props.primaryKey;
+        _initialiseProps.call(_this9);
 
-            if (isInputCheck) {
-                checked[_lodash2.default.get(_this8.props.data, primaryKey)] = true;
-            } else {
-                delete checked[_lodash2.default.get(_this8.props.data, primaryKey)];
-            }
-            _this8.context.Table.setChecked(checked);
-        };
-
-        return _this8;
+        return _this9;
     }
 
     (0, _createClass3.default)(Content, [{
@@ -509,21 +544,31 @@ var Content = function (_React$Component3) {
         value: function componentWillUnmount() {}
     }, {
         key: 'getValue',
-        value: function getValue(column, detail) {
-            return column.render ? column.render(detail) : _utils2.default.render(detail, column);
+        value: function getValue(column, Content) {
+            return column.render ? column.render(Content) : _utils2.default.render(Content, column);
         }
     }, {
         key: 'isChecked',
         value: function isChecked() {
             var checked = this.context.Table.state.checked;
+            var mainInfo = this.context.Table.props.mainInfo;
+            var _mainInfo$primaryKey = mainInfo.primaryKey,
+                primaryKey = _mainInfo$primaryKey === undefined ? "id" : _mainInfo$primaryKey;
+
+            return checked[_lodash2.default.get(this.props.data, primaryKey)] || 0;
+        }
+    }, {
+        key: 'isDetailChecked',
+        value: function isDetailChecked(detail) {
+            var detailChecked = this.context.Table.state.detailChecked;
             var primaryKey = this.context.Table.props.primaryKey;
 
-            return checked[_lodash2.default.get(this.props.data, primaryKey)] ? true : false;
+            return detailChecked[_lodash2.default.get(detail, primaryKey)] || 0;
         }
     }, {
         key: 'render',
         value: function render() {
-            var _this9 = this;
+            var _this10 = this;
 
             var _context$Table = this.context.Table,
                 props = _context$Table.props,
@@ -533,8 +578,9 @@ var Content = function (_React$Component3) {
             var columns = props.columns,
                 mainInfo = props.mainInfo,
                 checkboxColumnWidth = props.checkboxColumnWidth,
-                showCheckboxes = props.showCheckboxes,
                 spacey = props.spacey;
+            var _mainInfo$showCheckbo = mainInfo.showCheckboxes,
+                showCheckboxes = _mainInfo$showCheckbo === undefined ? true : _mainInfo$showCheckbo;
 
             var columnWidths = this.context.Table.getColumnWidths();
             return _react2.default.createElement(
@@ -553,9 +599,9 @@ var Content = function (_React$Component3) {
                     { className: 'flex middle table-header-bg', style: { height: 32 } },
                     showCheckboxes && _react2.default.createElement(
                         'div',
-                        { ref: 'checkbox', className: 'text-center', style: { width: state.checkboxColumnWidth, minWidth: state.checkboxColumnWidth } },
-                        _react2.default.createElement(_Checkbox2.default, (0, _extends3.default)({
-                            checked: this.isChecked(), onCheck: this.handleCheck }, style.checkboxStyle))
+                        { ref: 'checkbox', className: 'text-center',
+                            style: { width: state.checkboxColumnWidth, minWidth: state.checkboxColumnWidth, marginRight: 4 } },
+                        _react2.default.createElement(_checkbox2.default, { checked: this.isChecked(), onCheck: this.handleCheck })
                     ),
                     !this.props.onlyShowCheckbox && _react2.default.createElement(
                         'div',
@@ -577,24 +623,24 @@ var Content = function (_React$Component3) {
                                 return _react2.default.createElement(
                                     'tr',
                                     { key: index },
-                                    showCheckboxes && _react2.default.createElement(
+                                    (showCheckboxes || props.showCheckboxes) && _react2.default.createElement(
                                         'td',
                                         { className: 'text-center',
                                             style: { width: state.checkboxColumnWidth || checkboxColumnWidth } },
-                                        index + 1
+                                        props.showCheckboxes ? _react2.default.createElement(_checkbox2.default, { checked: _this10.isDetailChecked(detail), onCheck: _this10.handleDetailCheck(detail) }) : index + 1
                                     ),
-                                    columns.map(function (column, index) {
-                                        if (_this9.props.onlyShowCheckbox && index > 0) {
-                                            return null;
-                                        }
+                                    !_this10.props.onlyShowCheckbox && columns.map(function (column, index) {
                                         return _react2.default.createElement(
                                             'td',
                                             { key: index,
-                                                style: { width: columnWidths[column.key], textAlign: column.textAlign } },
-                                            _this9.getValue(column, detail)
+                                                style: {
+                                                    width: columnWidths[column.key],
+                                                    textAlign: column.textAlign
+                                                } },
+                                            _this10.getValue(column, detail)
                                         );
                                     }),
-                                    _this9.props.extraWidth > 0 && _react2.default.createElement('td', { style: { width: _this9.props.extraWidth } })
+                                    _this10.props.extraWidth > 0 && _react2.default.createElement('td', { style: { width: _this10.props.extraWidth } })
                                 );
                             })
                         )
@@ -613,6 +659,62 @@ Content.contextTypes = {
     Table: _propTypes2.default.object
 };
 
+var _initialiseProps = function _initialiseProps() {
+    var _this13 = this;
+
+    this.handleCheck = function (event, isInputCheck) {
+        var _context$Table2 = _this13.context.Table,
+            props = _context$Table2.props,
+            state = _context$Table2.state;
+        var checked = state.checked,
+            detailChecked = state.detailChecked;
+        var primaryKey = props.primaryKey;
+
+        var details = _lodash2.default.get(_this13.props.data, props.detailKey) || [];
+        if (isInputCheck) {
+            checked[_lodash2.default.get(_this13.props.data, primaryKey)] = 1;
+            details.forEach(function (detail) {
+                detailChecked[_lodash2.default.get(detail, primaryKey)] = 1;
+            });
+        } else {
+            delete checked[_lodash2.default.get(_this13.props.data, primaryKey)];
+            details.forEach(function (detail) {
+                delete detailChecked[_lodash2.default.get(detail, primaryKey)];
+            });
+        }
+        _this13.context.Table.setChecked(checked, detailChecked);
+    };
+
+    this.handleDetailCheck = function (detail) {
+        return function (event, isInputCheck) {
+            var _context$Table3 = _this13.context.Table,
+                props = _context$Table3.props,
+                state = _context$Table3.state;
+            var checked = state.checked,
+                detailChecked = state.detailChecked;
+            var primaryKey = props.primaryKey;
+
+            var details = _lodash2.default.get(_this13.props.data, props.detailKey) || [];
+            if (isInputCheck) {
+                detailChecked[_lodash2.default.get(detail, primaryKey)] = 1;
+            } else {
+                delete detailChecked[_lodash2.default.get(detail, primaryKey)];
+            }
+            var detailCheckedLength = details.reduce(function (total, item) {
+                return total + (detailChecked[_lodash2.default.get(item, primaryKey)] === 1 ? 1 : 0);
+            }, 0);
+            if (details.length === detailCheckedLength) {
+                checked[_lodash2.default.get(_this13.props.data, primaryKey)] = 1;
+            } else if (detailCheckedLength === 0) {
+                delete checked[_lodash2.default.get(_this13.props.data, primaryKey)];
+            } else {
+                checked[_lodash2.default.get(_this13.props.data, primaryKey)] = 2;
+            }
+            _this13.context.Table.setChecked(checked, detailChecked);
+        };
+    };
+};
+
 var FixedCheckbox = function (_React$Component4) {
     (0, _inherits3.default)(FixedCheckbox, _React$Component4);
 
@@ -624,20 +726,20 @@ var FixedCheckbox = function (_React$Component4) {
     (0, _createClass3.default)(FixedCheckbox, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this11 = this;
+            var _this12 = this;
 
             this.token1 = this.context.Table.subscribe("scrollLeftChange", function () {
-                _this11.forceUpdate();
+                _this12.forceUpdate();
             });
             this.token2 = this.context.Table.subscribe("scrollTopChange", function () {
-                (0, _jquery2.default)(_this11.refs.content).scrollTop(_this11.context.Table.state.scrollTop);
+                (0, _jquery2.default)(_this12.refs.Content).scrollTop(_this12.context.Table.state.scrollTop);
             });
-            (0, _jquery2.default)(this.refs.content).scrollTop(this.context.Table.state.scrollTop);
+            (0, _jquery2.default)(this.refs.Content).scrollTop(this.context.Table.state.scrollTop);
         }
     }, {
         key: 'componentDidUpdate',
         value: function componentDidUpdate() {
-            (0, _jquery2.default)(this.refs.content).scrollTop(this.context.Table.state.scrollTop);
+            (0, _jquery2.default)(this.refs.Content).scrollTop(this.context.Table.state.scrollTop);
         }
     }, {
         key: 'componentWillUnmount',
@@ -653,12 +755,15 @@ var FixedCheckbox = function (_React$Component4) {
                 props = Table.props;
 
             var checkboxColumnWidth = state.checkboxColumnWidth || props.checkboxColumnWidth;
+            var _props$mainInfo$showC2 = props.mainInfo.showCheckboxes,
+                showCheckboxes = _props$mainInfo$showC2 === undefined ? true : _props$mainInfo$showC2;
+
             var containerStyle = {
                 position: 'absolute',
                 top: 0,
                 left: 0,
                 zIndex: 3,
-                width: checkboxColumnWidth,
+                width: checkboxColumnWidth - 2,
                 backgroundColor: '#fff',
                 overflow: 'hidden',
                 bottom: props.pager ? 32 : 0
@@ -666,7 +771,7 @@ var FixedCheckbox = function (_React$Component4) {
             if (state.scrollLeft && state.scrollLeft > 0) {
                 containerStyle.boxShadow = '6px 0 6px rgba(0,0,0,0.1)';
             }
-            if (props.dataSource.length == 0 || props.showCheckboxes === false || state.scrollLeft == 0) {
+            if (props.dataSource.length == 0 || showCheckboxes === false && props.showCheckboxes === false || state.scrollLeft == 0) {
                 return null;
             }
             return _react2.default.createElement(
@@ -674,7 +779,7 @@ var FixedCheckbox = function (_React$Component4) {
                 { style: containerStyle },
                 _react2.default.createElement(
                     'div',
-                    { className: 'table-container bordered full-height text-small', style: { overflow: "hidden" } },
+                    { className: 'table-container full-height text-small', style: { overflow: "hidden" } },
                     props.hasHeader && _react2.default.createElement(
                         'div',
                         {
@@ -699,7 +804,7 @@ var FixedCheckbox = function (_React$Component4) {
                                     _react2.default.createElement(
                                         'th',
                                         { style: { width: checkboxColumnWidth, textAlign: "center", lineHeight: 1 } },
-                                        _react2.default.createElement(_Checkbox2.default, (0, _extends3.default)({ checked: Table.isAllChecked(), onCheck: Table.handleCheckAll }, style.checkboxStyle))
+                                        _react2.default.createElement(_checkbox2.default, { checked: Table.isAllChecked(), onCheck: Table.handleCheckAll })
                                     )
                                 )
                             )
@@ -707,9 +812,10 @@ var FixedCheckbox = function (_React$Component4) {
                     ),
                     _react2.default.createElement(
                         'div',
-                        { ref: 'content', style: { flexGrow: 1, overflow: "hidden" } },
+                        { ref: 'Content', style: { flexGrow: 1, overflow: "hidden" } },
                         props.dataSource.map(function (data, index) {
-                            return _react2.default.createElement(Content, { key: index, data: data, width: checkboxColumnWidth, onlyShowCheckbox: true });
+                            return _react2.default.createElement(Content, { key: index, data: data, width: checkboxColumnWidth,
+                                onlyShowCheckbox: true, fixedLeftCols: props.fixedLeftCols });
                         })
                     )
                 )

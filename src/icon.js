@@ -89,7 +89,7 @@ export default class Icon extends Component {
                 <div className="relative">
                     <div className="position-center">
                         <FontIcon className={iconClassName}
-                                  color={'inherit'}
+                                  color={this.props.color}
                                   style={{
                                       fontSize: this.props.size,
                                       ...this.props.iconStyle

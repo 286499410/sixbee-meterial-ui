@@ -1,27 +1,13 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import Checkbox from "material-ui/Checkbox";
+import Checkbox from "./checkbox";
 import utils from "../utils";
 import {Scrollbars} from 'react-custom-scrollbars';
 import $ from 'jquery';
 import PubSub from 'pubsub-js';
 import Pager from "./pager";
 
-const style = {
-    checkboxStyle: {
-        style: {
-            display: "inline-block",
-            width: 20,
-            height: 20,
-        },
-        iconStyle: {
-            left: 0,
-            width: 20,
-            height: 20,
-        }
-    }
-};
 
 export default class Table extends Component {
 
@@ -30,6 +16,7 @@ export default class Table extends Component {
     };
 
     static defaultProps = {
+
         emptyDataTip: '没有找到相关数据',         //空数据时提示的文本内容
         emptyDataImage: '/image/nodata.png',    //空数据展示的图片
         hasHeader: true,
@@ -37,17 +24,25 @@ export default class Table extends Component {
         dataSource: [],                         //数据源
         primaryKey: "id",                       //主键
         detailKey: "details",                   //明细数据
-        mainInfo: {},                           //主信息
-        showCheckboxes: true,                   //是否显示复选框
+        mainInfo: {                             //主信息
+            primaryKey: "id",                   //主键
+            columns: [],
+            actionWidth: 0,
+            action: [],
+            showCheckboxes: true
+        },
+        showCheckboxes: false,                  //是否显示复选框
         checkboxColumnWidth: 50,                //复选框列的宽度
         spacey: 14,                             //间距
         pager: {},
         fixedCheckbox: true,                    //固定选择框
+        fixedLeftCols: 0,
     };
 
     state = {
         key: new Date().getTime(),
         checked: {},
+        detailChecked: {},
         scrollLeft: 0,
         scrollTop: 0,
         checkboxColumnWidth: 50,
@@ -68,11 +63,11 @@ export default class Table extends Component {
 
     componentDidMount() {
         let forceUpdate = 0;
-        if(this.refs.container) {
+        if (this.refs.container) {
             let state = this.state;
-            $(this.refs.container).find(".table-header th").each(function() {
+            $(this.refs.container).find(".table-header th").each(function () {
                 const key = $(this).attr("col-key");
-                if(key) {
+                if (key) {
                     state.columnWidths[key] = $(this).outerWidth();
                 }
             });
@@ -80,17 +75,25 @@ export default class Table extends Component {
             const tableWidth = this.getTableWidth();
             const mainInfoWidth = this.getMainInfoWidth();
             this.state.extraWidth = mainInfoWidth - tableWidth;
-            if(this.state.containerWidth > tableWidth) forceUpdate = 1;
-            if(this.state.extraWidth > 0) forceUpdate = 1;
+            if (this.state.containerWidth > tableWidth) forceUpdate = 1;
+            if (this.state.extraWidth > 0) forceUpdate = 1;
         }
         this.state.checkboxColumnWidth = this.props.checkboxColumnWidth;
-        if(this.refs.checkboxAll) {
-            if(this.state.checkboxColumnWidth !== $(this.refs.checkboxAll).outerWidth()) {
+        if (this.refs.checkboxAll) {
+            if (this.state.checkboxColumnWidth !== $(this.refs.checkboxAll).outerWidth()) {
                 this.state.checkboxColumnWidth = $(this.refs.checkboxAll).outerWidth();
                 forceUpdate = 1;
             }
         }
-        if(forceUpdate) {
+        if (this.refs.header) {
+            $(this.refs.header).scrollLeft(this.props.scrollLeft);
+        }
+        setTimeout(() => {
+            this.refs.Content.scrollTop(this.props.scrollTop);
+            this.refs.Content.scrollLeft(this.props.scrollLeft);
+        }, 1200);
+
+        if (forceUpdate) {
             this.forceUpdate();
         }
     }
@@ -109,7 +112,7 @@ export default class Table extends Component {
 
     getColumnWidths() {
         return {
-            ...this.props.columns.reduce((acc, { width, key }) => {
+            ...this.props.columns.reduce((acc, {width, key}) => {
                 width && (acc[key] = width);
                 return acc;
             }, {}),
@@ -119,10 +122,16 @@ export default class Table extends Component {
 
     /**
      * 是否全选
-     * @returns {boolean}
      */
     isAllChecked() {
-        return this.props.dataSource.length !== 0 && Object.keys(this.state.checked).length === this.props.dataSource.length;
+        const checkedLength = Object.values(this.state.checked).filter(item => item == 1).length;
+        if (this.props.dataSource.length === 0 || (checkedLength === 0 && Object.values(this.state.checked).filter(item => item == 2).length === 0)) {
+            return 0;
+        }
+        if (this.props.dataSource.length === checkedLength) {
+            return 1;
+        }
+        return 2;
     }
 
     /**
@@ -132,7 +141,7 @@ export default class Table extends Component {
     getTableWidth(props = this.props) {
         let columnWidths = _.cloneDeep(this.getColumnWidths());
         Object.keys(this.getColumnWidths()).forEach(key => {
-            if(_.findIndex(props.columns, {key}) < 0) {
+            if (_.findIndex(props.columns, {key}) < 0) {
                 delete columnWidths[key];
             }
         });
@@ -147,9 +156,10 @@ export default class Table extends Component {
      * @returns {any}
      */
     getMainInfoWidth(props = this.props) {
-        let width = props.mainInfo.columns.reduce((total, column) => total + column.width || 0, 0);
-        if (this.props.showCheckboxes) width += this.state.checkboxColumnWidth;
-        width += props.mainInfo.actionWidth || 0;
+        const marginLeft = 24;
+        let width = props.mainInfo.columns.reduce((total, column) => total + ((column.width || 0) + marginLeft), 0);
+        if (this.props.showCheckboxes) width += this.state.checkboxColumnWidth || this.props.checkboxColumnWidth;
+        width += (props.mainInfo.actionWidth || 0);
         return width;
     }
 
@@ -160,16 +170,22 @@ export default class Table extends Component {
      */
     handleCheckAll = (event, isInputChecked) => {
         let checked = {};
+        let detailChecked = {};
+        const {primaryKey = "id"} = this.props.mainInfo;
         if (isInputChecked) {
             this.props.dataSource.forEach(data => {
-                checked[_.get(data, this.props.primaryKey)] = true;
-            })
+                checked[_.get(data, primaryKey)] = 1;
+                const details = _.get(data, this.props.detailKey) || [];
+                details.forEach(detail => {
+                    detailChecked[_.get(detail, this.props.primaryKey)] = 1;
+                });
+            });
         }
-        this.setChecked(checked);
+        this.setChecked(checked, detailChecked);
     };
 
-    setChecked(checked) {
-        this.handleStateChange({checked});
+    setChecked(checked = this.state.checked, detailChecked = this.state.detailChecked) {
+        this.handleStateChange({checked, detailChecked});
         this.forceUpdate();
     }
 
@@ -180,6 +196,9 @@ export default class Table extends Component {
                 scrollLeft: this.state.scrollLeft,
                 scrollTop: this.state.scrollTop,
                 checked: this.state.checked,
+                detailChecked: this.state.detailChecked,
+                columnWidths: this.state.columnWidths,
+                checkboxColumnWidth: this.state.checkboxColumnWidth
             });
         }
     }
@@ -187,14 +206,14 @@ export default class Table extends Component {
     handleScroll = (event) => {
         const scrollLeft = $(event.target).scrollLeft();
         const scrollTop = $(event.target).scrollTop();
-        if(this.state.scrollLeft !== scrollLeft) {
+        if (this.state.scrollLeft !== scrollLeft) {
             if (this.refs.header) {
                 $(this.refs.header).scrollLeft(scrollLeft);
             }
             this.state.scrollLeft = scrollLeft;
             this.publish("scrollLeftChange");
         }
-        if(this.state.scrollTop !== scrollTop) {
+        if (this.state.scrollTop !== scrollTop) {
             this.state.scrollTop = scrollTop;
             this.publish("scrollTopChange");
         }
@@ -206,8 +225,10 @@ export default class Table extends Component {
         const mainInfoWidth = this.getMainInfoWidth();
         const columnWidths = this.getColumnWidths();
         const width = Math.max(tableWidth, mainInfoWidth, this.state.containerWidth);
+        const {showCheckboxes = true} = this.props.mainInfo;
         return (
-            <div ref="container" className="table-container bordered full-height text-small relative" style={{overflow: "hidden"}}>
+            <div ref="container" className="table-container bordered full-height text-small relative"
+                 style={{overflow: "hidden"}}>
                 {this.props.fixedCheckbox && <FixedCheckbox/>}
                 {this.props.hasHeader && <div
                     ref="header"
@@ -226,16 +247,23 @@ export default class Table extends Component {
                         <thead>
                         <tr>
                             {
-                                this.props.showCheckboxes &&
-                                <th ref="checkboxAll" style={{width: this.state.checkboxColumnWidth || this.props.checkboxColumnWidth, textAlign: "center", lineHeight: 1}}>
-                                    <Checkbox checked={this.isAllChecked()} onCheck={this.handleCheckAll} {...style.checkboxStyle}/>
+                                (this.props.showCheckboxes || showCheckboxes) &&
+                                <th ref="checkboxAll" style={{
+                                    width: this.state.checkboxColumnWidth || this.props.checkboxColumnWidth,
+                                    textAlign: "center",
+                                    lineHeight: 1
+                                }}>
+                                    <Checkbox checked={this.isAllChecked()} onCheck={this.handleCheckAll}/>
                                 </th>
                             }
                             {
                                 this.props.columns.map((column, index) => {
                                     return <th key={index}
                                                col-key={column.key}
-                                               style={{width: columnWidths[column.key]}}>{column.label}</th>
+                                               style={{
+                                                   width: columnWidths[column.key],
+                                                   textAlign: "center"
+                                               }}>{column.label}</th>
                                 })
                             }
                             {
@@ -246,13 +274,14 @@ export default class Table extends Component {
                     </table>
                 </div>}
                 <div style={{flexGrow: 1}}>
-                    <Scrollbars onScroll={this.handleScroll} style={{
+                    <Scrollbars ref="Content" onScroll={this.handleScroll} style={{
                         width: '100%',
                         height: '100%',
                     }}>
                         {
                             this.props.dataSource.map((data, index) => {
-                                return <Content key={index} data={data} width={width} extraWidth={this.state.extraWidth}/>
+                                return <Content key={index} data={data} width={width}
+                                                extraWidth={this.state.extraWidth}/>
                             })
                         }
                     </Scrollbars>
@@ -281,7 +310,6 @@ class Action extends React.Component {
 
     constructor(props) {
         super(props);
-
     }
 
     componentDidMount() {
@@ -308,7 +336,8 @@ class Action extends React.Component {
                 <div className="flex center middle" style={{height: 32}}>
                     {
                         this.props.actions.map((action, index) => {
-                            return <div key={index} className="text-primary cursor-pointer" style={{marginRight: index === this.props.actions.length - 1 ? 0 : 12}}
+                            return <div key={index} className="text-primary cursor-pointer"
+                                        style={{marginRight: index === this.props.actions.length - 1 ? 0 : 12}}
                                         onClick={action.onClick.bind(this, this.props.data)}>
                                 {action.label}
                             </div>
@@ -348,7 +377,7 @@ class MainInfo extends React.Component {
         return (
             <div className="flex middle">
                 {this.props.columns.map((column, index) => {
-                    return <div className="text-ellipsis" key={index} style={{maxWidth: column.width, marginRight: 24}}>
+                    return <div className="text-ellipsis" key={index} style={{width: column.width, marginRight: 24}}>
                         {
                             column.label && <span className="text-muted">{column.label}：</span>
                         }
@@ -356,7 +385,9 @@ class MainInfo extends React.Component {
                     </div>
                 })}
                 {
-                    this.props.actions.length > 0 && <Action data={this.props.data} width={this.props.actionWidth} actions={this.props.actions} style={this.props.actionStyle}/>
+                    this.props.actions.length > 0 &&
+                    <Action data={this.props.data} width={this.props.actionWidth} actions={this.props.actions}
+                            style={this.props.actionStyle}/>
                 }
             </div>
         );
@@ -390,31 +421,68 @@ class Content extends React.Component {
         // this.context.Table.unsubscribe(this.token);
     }
 
-    getValue(column, detail) {
-        return column.render ? column.render(detail) : utils.render(detail, column);
+    getValue(column, Content) {
+        return column.render ? column.render(Content) : utils.render(Content, column);
     }
 
     isChecked() {
         const {checked} = this.context.Table.state;
+        const {mainInfo} = this.context.Table.props;
+        const {primaryKey = "id"} = mainInfo;
+        return checked[_.get(this.props.data, primaryKey)] || 0;
+    }
+
+    isDetailChecked(detail) {
+        const {detailChecked} = this.context.Table.state;
         const {primaryKey} = this.context.Table.props;
-        return checked[_.get(this.props.data, primaryKey)] ? true : false;
+        return detailChecked[_.get(detail, primaryKey)] || 0;
     }
 
     handleCheck = (event, isInputCheck) => {
-        const {checked} = this.context.Table.state;
-        const {primaryKey} = this.context.Table.props;
+        const {props, state} = this.context.Table;
+        const {checked, detailChecked} = state;
+        const {primaryKey} = props;
+        const details = _.get(this.props.data, props.detailKey) || [];
         if (isInputCheck) {
-            checked[_.get(this.props.data, primaryKey)] = true;
+            checked[_.get(this.props.data, primaryKey)] = 1;
+            details.forEach(detail => {
+                detailChecked[_.get(detail, primaryKey)] = 1;
+            });
         } else {
             delete checked[_.get(this.props.data, primaryKey)];
+            details.forEach(detail => {
+                delete detailChecked[_.get(detail, primaryKey)];
+            });
         }
-        this.context.Table.setChecked(checked);
+        this.context.Table.setChecked(checked, detailChecked);
+    };
+
+    handleDetailCheck = (detail) => (event, isInputCheck) => {
+        const {props, state} = this.context.Table;
+        const {checked, detailChecked} = state;
+        const {primaryKey} = props;
+        const details = _.get(this.props.data, props.detailKey) || [];
+        if (isInputCheck) {
+            detailChecked[_.get(detail, primaryKey)] = 1;
+        } else {
+            delete detailChecked[_.get(detail, primaryKey)];
+        }
+        const detailCheckedLength = details.reduce((total, item) => total + (detailChecked[_.get(item, primaryKey)] === 1 ? 1 : 0), 0);
+        if (details.length === detailCheckedLength) {
+            checked[_.get(this.props.data, primaryKey)] = 1;
+        } else if (detailCheckedLength === 0) {
+            delete checked[_.get(this.props.data, primaryKey)];
+        } else {
+            checked[_.get(this.props.data, primaryKey)] = 2;
+        }
+        this.context.Table.setChecked(checked, detailChecked);
     };
 
     render() {
         const {props, state} = this.context.Table;
         const details = _.get(this.props.data, props.detailKey) || [];
-        const {columns, mainInfo, checkboxColumnWidth, showCheckboxes, spacey} = props;
+        const {columns, mainInfo, checkboxColumnWidth, spacey} = props;
+        const {showCheckboxes = true} = mainInfo;
         const columnWidths = this.context.Table.getColumnWidths();
         return (
             <div className="table-container bordered" style={{
@@ -429,11 +497,15 @@ class Content extends React.Component {
                 <div className="flex middle table-header-bg" style={{height: 32}}>
                     {
                         showCheckboxes &&
-                        <div ref="checkbox" className="text-center" style={{width: state.checkboxColumnWidth, minWidth: state.checkboxColumnWidth}}><Checkbox
-                            checked={this.isChecked()} onCheck={this.handleCheck} {...style.checkboxStyle}/></div>
+                        <div ref="checkbox" className="text-center"
+                             style={{width: state.checkboxColumnWidth, minWidth: state.checkboxColumnWidth, marginRight: 4}}>
+                            <Checkbox checked={this.isChecked()} onCheck={this.handleCheck}/>
+                        </div>
                     }
                     {
-                        !this.props.onlyShowCheckbox && <div style={{flexGrow: 1}}>{_.isFunction(mainInfo) ? mainInfo(this.props.data) : <MainInfo {...mainInfo} data={this.props.data}/>}</div>
+                        !this.props.onlyShowCheckbox &&
+                        <div style={{flexGrow: 1}}>{_.isFunction(mainInfo) ? mainInfo(this.props.data) :
+                            <MainInfo {...mainInfo} data={this.props.data}/>}</div>
                     }
                 </div>
                 {
@@ -445,20 +517,24 @@ class Content extends React.Component {
                                 details.map((detail, index) => {
                                     return <tr key={index}>
                                         {
-                                            showCheckboxes && <td className="text-center"
-                                                                  style={{width: state.checkboxColumnWidth || checkboxColumnWidth}}>{index + 1}</td>
+                                            (showCheckboxes || props.showCheckboxes) && <td className="text-center"
+                                                                                            style={{width: state.checkboxColumnWidth || checkboxColumnWidth}}>
+                                                {props.showCheckboxes ? <Checkbox checked={this.isDetailChecked(detail)} onCheck={this.handleDetailCheck(detail)}/> : index + 1}
+                                            </td>
                                         }
                                         {
-                                            columns.map((column, index) => {
-                                                if(this.props.onlyShowCheckbox && index > 0) {
-                                                    return null;
-                                                }
+
+                                            !this.props.onlyShowCheckbox && columns.map((column, index) => {
                                                 return <td key={index}
-                                                           style={{width: columnWidths[column.key], textAlign: column.textAlign}}>{this.getValue(column, detail)}</td>
+                                                           style={{
+                                                               width: columnWidths[column.key],
+                                                               textAlign: column.textAlign
+                                                           }}>{this.getValue(column, detail)}</td>
                                             })
                                         }
                                         {
-                                            this.props.extraWidth > 0 && <td style={{width: this.props.extraWidth}}></td>
+                                            this.props.extraWidth > 0 &&
+                                            <td style={{width: this.props.extraWidth}}></td>
                                         }
                                     </tr>
                                 })
@@ -482,18 +558,18 @@ class FixedCheckbox extends React.Component {
         super(props);
     }
 
-    componentDidMount()  {
+    componentDidMount() {
         this.token1 = this.context.Table.subscribe("scrollLeftChange", () => {
             this.forceUpdate();
         });
         this.token2 = this.context.Table.subscribe("scrollTopChange", () => {
-            $(this.refs.content).scrollTop(this.context.Table.state.scrollTop);
+            $(this.refs.Content).scrollTop(this.context.Table.state.scrollTop);
         });
-        $(this.refs.content).scrollTop(this.context.Table.state.scrollTop);
+        $(this.refs.Content).scrollTop(this.context.Table.state.scrollTop);
     }
 
     componentDidUpdate() {
-        $(this.refs.content).scrollTop(this.context.Table.state.scrollTop);
+        $(this.refs.Content).scrollTop(this.context.Table.state.scrollTop);
     }
 
     componentWillUnmount() {
@@ -505,12 +581,13 @@ class FixedCheckbox extends React.Component {
         const {Table} = this.context;
         const {state, props} = Table;
         const checkboxColumnWidth = state.checkboxColumnWidth || props.checkboxColumnWidth;
+        const {showCheckboxes = true} = props.mainInfo;
         let containerStyle = {
             position: 'absolute',
             top: 0,
             left: 0,
             zIndex: 3,
-            width: checkboxColumnWidth,
+            width: checkboxColumnWidth - 2,
             backgroundColor: '#fff',
             overflow: 'hidden',
             bottom: props.pager ? 32 : 0
@@ -518,12 +595,12 @@ class FixedCheckbox extends React.Component {
         if (state.scrollLeft && state.scrollLeft > 0) {
             containerStyle.boxShadow = '6px 0 6px rgba(0,0,0,0.1)';
         }
-        if (props.dataSource.length == 0 || props.showCheckboxes === false || state.scrollLeft == 0) {
+        if (props.dataSource.length == 0 || (showCheckboxes === false && props.showCheckboxes === false) || state.scrollLeft == 0) {
             return null;
         }
         return (
             <div style={containerStyle}>
-                <div className="table-container bordered full-height text-small" style={{overflow: "hidden"}}>
+                <div className="table-container full-height text-small" style={{overflow: "hidden"}}>
                     {props.hasHeader && <div
                         ref="header"
                         className="table-header"
@@ -538,16 +615,17 @@ class FixedCheckbox extends React.Component {
                             <thead>
                             <tr>
                                 <th style={{width: checkboxColumnWidth, textAlign: "center", lineHeight: 1}}>
-                                    <Checkbox checked={Table.isAllChecked()} onCheck={Table.handleCheckAll} {...style.checkboxStyle}/>
+                                    <Checkbox checked={Table.isAllChecked()} onCheck={Table.handleCheckAll}/>
                                 </th>
                             </tr>
                             </thead>
                         </table>
                     </div>}
-                    <div ref="content" style={{flexGrow: 1, overflow: "hidden",}}>
+                    <div ref="Content" style={{flexGrow: 1, overflow: "hidden",}}>
                         {
                             props.dataSource.map((data, index) => {
-                                return <Content key={index} data={data} width={checkboxColumnWidth} onlyShowCheckbox={true}/>
+                                return <Content key={index} data={data} width={checkboxColumnWidth}
+                                                onlyShowCheckbox={true} fixedLeftCols={props.fixedLeftCols}/>
                             })
                         }
                     </div>

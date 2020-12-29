@@ -125,7 +125,7 @@ var Icon = function (_Component) {
                             'div',
                             { className: 'position-center' },
                             _react2.default.createElement(_FontIcon2.default, { className: iconClassName,
-                                color: 'inherit',
+                                color: this.props.color,
                                 style: (0, _extends3.default)({
                                     fontSize: this.props.size
                                 }, this.props.iconStyle) }),
