@@ -93,15 +93,8 @@ var Table = function (_Component) {
         var _this = (0, _possibleConstructorReturn3.default)(this, (Table.__proto__ || (0, _getPrototypeOf2.default)(Table)).call(this, props));
 
         _this.state = {
-            key: new Date().getTime(),
-            checked: {},
-            detailChecked: {},
-            scrollLeft: 0,
-            scrollTop: 0,
-            checkboxColumnWidth: 50,
             containerWidth: 0,
-            extraWidth: 0,
-            columnWidths: {}
+            extraWidth: 0
         };
 
         _this.handleCheckAll = function (event, isInputChecked) {
@@ -139,6 +132,15 @@ var Table = function (_Component) {
             _this.handleStateChange({});
         };
 
+        _this.state = (0, _extends3.default)({}, _this.state, {
+            key: new Date().getTime(),
+            scrollLeft: props.scrollLeft,
+            scrollTop: props.scrollTop,
+            checked: props.checked,
+            detailChecked: props.detailChecked,
+            columnWidths: props.columnWidths,
+            checkboxColumnWidth: props.checkboxColumnWidth
+        });
         return _this;
     }
 
@@ -387,11 +389,19 @@ Table.defaultProps = {
         showCheckboxes: true
     },
     showCheckboxes: false,
-    checkboxColumnWidth: 50,
     spacey: 14,
     pager: {},
     fixedCheckbox: true,
-    fixedLeftCols: 0
+    fixedLeftCols: 0,
+
+    checked: {},
+    detailChecked: {},
+    scrollLeft: 0,
+    scrollTop: 0,
+    checkboxColumnWidth: 50,
+    containerWidth: 0,
+    extraWidth: 0,
+    columnWidths: {}
 };
 exports.default = Table;
 

@@ -32,23 +32,24 @@ export default class Table extends Component {
             showCheckboxes: true
         },
         showCheckboxes: false,                  //是否显示复选框
-        checkboxColumnWidth: 50,                //复选框列的宽度
         spacey: 14,                             //间距
         pager: {},
         fixedCheckbox: true,                    //固定选择框
         fixedLeftCols: 0,
-    };
 
-    state = {
-        key: new Date().getTime(),
         checked: {},
         detailChecked: {},
         scrollLeft: 0,
         scrollTop: 0,
-        checkboxColumnWidth: 50,
+        checkboxColumnWidth: 50,                //复选框列的宽度
         containerWidth: 0,
         extraWidth: 0,
         columnWidths: {}
+    };
+
+    state = {
+        containerWidth: 0,
+        extraWidth: 0,
     };
 
     getChildContext() {
@@ -59,7 +60,18 @@ export default class Table extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            ...this.state,
+            key: new Date().getTime(),
+            scrollLeft: props.scrollLeft,
+            scrollTop: props.scrollTop,
+            checked: props.checked,
+            detailChecked: props.detailChecked,
+            columnWidths: props.columnWidths,
+            checkboxColumnWidth: props.checkboxColumnWidth,
+        };
     }
+
 
     componentDidMount() {
         let forceUpdate = 0;
