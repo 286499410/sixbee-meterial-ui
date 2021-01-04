@@ -7,6 +7,7 @@ import 'react-date-range/dist/theme/default.css'; // theme css file
 import * as rdrLocales from 'react-date-range/dist/locale';
 import Popover from 'material-ui/Popover';
 import utils from "../utils";
+import Label from "./label";
 
 export default class DateRange extends Component {
 
@@ -239,15 +240,7 @@ export default class DateRange extends Component {
         </div>;
         return <div style={this.props.rootStyle}>
             {
-                label === false ? null : <div>
-                    <span style={{
-                        transform: "scale(0.75)",
-                        transformOrigin: 'left top 0px',
-                        color: 'rgba(0,0,0,0.3)',
-                        fontSize: 15,
-                        display: 'inline-block'
-                    }}>{label}</span>
-                </div>
+                label === false ? null : <Label>{label}</Label>
             }
             {
                 borderStyle === 'border' && this.props.borderShow ?

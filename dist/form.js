@@ -451,7 +451,7 @@ var Form = function (_Component) {
                     _reactCustomScrollbars.Scrollbars,
                     { style: { height: contentHeight },
                         autoHeight: this.props.height == 'auto',
-                        autoHeightMax: contentHeight },
+                        autoHeightMax: this.props.maxHeight || contentHeight },
                     _react2.default.createElement(
                         'div',
                         { className: 'space', style: {

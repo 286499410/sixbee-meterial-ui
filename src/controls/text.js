@@ -9,6 +9,7 @@ import _ from 'lodash';
 import style from '../style';
 import utils from "../utils";
 import Icon from '../icon';
+import Label from "./label";
 
 export default class Text extends Component {
 
@@ -39,7 +40,7 @@ export default class Text extends Component {
         value: undefined,
         errorText: '',
         focus: false,
-        pyInputing: false
+        pyInputting: false
     };
 
     constructor(props) {
@@ -70,7 +71,7 @@ export default class Text extends Component {
      */
     setValue = (value) => {
         this.state.value = value;
-        if (this.props.onChange && !this.state.pyInputing) {
+        if (this.props.onChange && !this.state.pyInputting) {
             this.props.onChange(value, this);
         }
         this.forceUpdate();
@@ -89,7 +90,11 @@ export default class Text extends Component {
      * @returns {*}
      */
     getStyleProps() {
-        let styleProps = style.getStyle('text', this.props);
+        let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+        let styleProps = style.getStyle('text', {
+            ...this.props,
+            label: borderStyle === "underline" && this.props.label
+        });
         if (this.props.textAlign) {
             styleProps.inputStyle = Object.assign({}, styleProps.inputStyle, {textAlign: this.props.textAlign});
         }
@@ -171,7 +176,7 @@ export default class Text extends Component {
             ref="text"
             name={this.props.name || this.props.dataKey || utils.uuid()}
             fullWidth={this.props.fullWidth}
-            floatingLabelText={label}
+            floatingLabelText={borderStyle === 'underline' ? label : undefined}
             type={type}
             value={value == null ? '' : value}
             disabled={this.props.disabled}
@@ -187,10 +192,10 @@ export default class Text extends Component {
             underlineShow={borderStyle === 'underline' && this.props.borderShow}
             autoComplete={this.props.autoComplete}
             onCompositionStart={() => {
-                this.state.pyInputing = true;
+                this.state.pyInputting = true;
             }}
             onCompositionEnd={(event) => {
-                this.state.pyInputing = false;
+                this.state.pyInputting = false;
                 this.handleChange(event);
             }}
             {...styleProps}
@@ -206,6 +211,9 @@ export default class Text extends Component {
         }
         if (borderStyle === 'border' && this.props.borderShow) {
             return <div className="full-width" style={{...this.props.rootStyle}}>
+                {
+                    label === false ? null : <Label>{label}</Label>
+                }
                 <div className={"control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>
                     {content}
                 </div>

@@ -156,7 +156,10 @@ var Money = function (_Component) {
     }, {
         key: 'getStyleProps',
         value: function getStyleProps() {
-            var styleProps = _style2.default.getStyle('text', this.props);
+            var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+            var styleProps = _style2.default.getStyle('text', (0, _extends3.default)({}, this.props, {
+                label: borderStyle === "underline" && this.props.label
+            }));
             if (this.props.textAlign) {
                 styleProps.inputStyle = (0, _extends3.default)({}, styleProps.inputStyle, {
                     textAlign: this.props.textAlign

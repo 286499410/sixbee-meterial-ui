@@ -102,6 +102,10 @@ var _icon = require('../icon');
 
 var _icon2 = _interopRequireDefault(_icon);
 
+var _label = require('./label');
+
+var _label2 = _interopRequireDefault(_label);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var selectStyle = {
@@ -365,8 +369,12 @@ var Select = function (_Component) {
         value: function getContent() {
             var _this5 = this;
 
+            var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+            var styleProps = _style2.default.getStyle('select', (0, _extends3.default)({}, this.props, {
+                label: borderStyle === "underline" && this.props.label
+            }));
             var value = this.getValue();
-            var styleProps = _lodash2.default.merge(_style2.default.getStyle('select', this.props), this.props.styleProps);
+            styleProps = _lodash2.default.merge(styleProps, this.props.styleProps);
             var options = this.getOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]);
             var menuWidth = this.state.anchorEl && this.props.fullWidth ? this.state.anchorEl.clientWidth : this.props.menuWidth;
             if (this.props.tableProps === undefined) {
@@ -542,8 +550,11 @@ var Select = function (_Component) {
             var _this6 = this;
 
             var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+            var styleProps = _style2.default.getStyle('select', (0, _extends3.default)({}, this.props, {
+                label: borderStyle === "underline" && this.props.label
+            }));
             var value = this.getValue();
-            var styleProps = _lodash2.default.merge(_style2.default.getStyle('select', this.props), this.props.styleProps);
+            styleProps = _lodash2.default.merge(styleProps, this.props.styleProps);
             var label = this.props.label;
             var selectValue = this.props.multiple && this.props.carryKey ? (value || []).map(function (n) {
                 return _lodash2.default.get(n, _this6.props.dataSourceConfig.value);
@@ -602,6 +613,11 @@ var Select = function (_Component) {
                     borderStyle === 'border' && this.props.borderShow ? _react2.default.createElement(
                         'div',
                         { className: 'full-width' },
+                        label === false ? null : _react2.default.createElement(
+                            _label2.default,
+                            null,
+                            label
+                        ),
                         _react2.default.createElement(
                             'div',
                             {

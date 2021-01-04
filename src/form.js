@@ -640,7 +640,7 @@ export default class Form extends Component {
                         </div> :
                         <Scrollbars style={{height: contentHeight}}
                                     autoHeight={this.props.height == 'auto'}
-                                    autoHeightMax={contentHeight}>
+                                    autoHeightMax={this.props.maxHeight || contentHeight}>
                             <div className="space" style={{
                                 width: '100%',
                                 overflowX: 'hidden',

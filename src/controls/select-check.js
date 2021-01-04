@@ -20,6 +20,7 @@ import Table from '../table';
 import Button from "../button";
 import Icon from '../icon';
 import Checkbox from './checkbox';
+import Label from "./label";
 
 const selectStyle = {
     wrapper: {},
@@ -243,6 +244,7 @@ export default class Select extends Component {
                  onClick={this.handleClick}>
                 {
                     borderStyle === 'border' && this.props.borderShow ? <div className="full-width">
+                            {this.props.label && <Label>{this.props.label}</Label>}
                         <div
                             className={"control-border" + (this.state.focus || this.state.open ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>{content}</div>
                         <div className="text-small text-danger" style={{marginTop: 2}}>{this.props.errorText}</div>

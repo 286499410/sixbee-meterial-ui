@@ -32,12 +32,12 @@ export default class Dropdown extends Component {
         });
     };
 
-    handleClick = (item) => (event) => {
+    handleClick = (item, index) => (event) => {
         this.setState({
             open: false
         });
         if (this.props.onClick) {
-            this.props.onClick(item);
+            this.props.onClick(item, index);
         }
         if (item.onClick) {
             item.onClick(item, this.props.context);
@@ -71,7 +71,7 @@ export default class Dropdown extends Component {
                             key={index}
                             primaryText={item.label}
                             disabled={item.disabled}
-                            onClick={this.handleClick(item)}
+                            onClick={this.handleClick(item, index)}
                         />
                     })}
                 </Menu>

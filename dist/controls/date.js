@@ -66,6 +66,10 @@ var _utils = require('../utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
+var _label = require('./label');
+
+var _label2 = _interopRequireDefault(_label);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -197,10 +201,12 @@ var Date2 = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
+            var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
             var value = this.getValue();
             var label = this.props.label;
-            var styleProps = _style2.default.getStyle('calender', this.props);
-            var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+            var styleProps = _style2.default.getStyle('calender', (0, _extends3.default)({}, this.props, {
+                label: borderStyle === "underline" && this.props.label
+            }));
             if (borderStyle == 'border') {
                 styleProps.iconStyle.style.right = 0;
                 styleProps.iconStyle.style.top = 3;
@@ -240,6 +246,11 @@ var Date2 = function (_Component) {
                 borderStyle === 'border' && this.props.borderShow ? _react2.default.createElement(
                     'div',
                     { className: 'full-width' },
+                    this.props.label && _react2.default.createElement(
+                        _label2.default,
+                        null,
+                        this.props.label
+                    ),
                     _react2.default.createElement(
                         'div',
                         { className: "control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '') },

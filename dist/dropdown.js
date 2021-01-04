@@ -69,13 +69,13 @@ var Dropdown = function (_Component) {
             });
         };
 
-        _this.handleClick = function (item) {
+        _this.handleClick = function (item, index) {
             return function (event) {
                 _this.setState({
                     open: false
                 });
                 if (_this.props.onClick) {
-                    _this.props.onClick(item);
+                    _this.props.onClick(item, index);
                 }
                 if (item.onClick) {
                     item.onClick(item, _this.props.context);
@@ -125,7 +125,7 @@ var Dropdown = function (_Component) {
                                 key: index,
                                 primaryText: item.label,
                                 disabled: item.disabled,
-                                onClick: _this2.handleClick(item)
+                                onClick: _this2.handleClick(item, index)
                             });
                         })
                     )

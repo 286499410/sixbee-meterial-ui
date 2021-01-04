@@ -4,13 +4,13 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
 var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
 
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
@@ -60,6 +60,10 @@ var _icon = require('../icon');
 
 var _icon2 = _interopRequireDefault(_icon);
 
+var _label = require('./label');
+
+var _label2 = _interopRequireDefault(_label);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Text = function (_Component) {
@@ -74,12 +78,12 @@ var Text = function (_Component) {
             value: undefined,
             errorText: '',
             focus: false,
-            pyInputing: false
+            pyInputting: false
         };
 
         _this.setValue = function (value) {
             _this.state.value = value;
-            if (_this.props.onChange && !_this.state.pyInputing) {
+            if (_this.props.onChange && !_this.state.pyInputting) {
                 _this.props.onChange(value, _this);
             }
             _this.forceUpdate();
@@ -163,7 +167,10 @@ var Text = function (_Component) {
     }, {
         key: 'getStyleProps',
         value: function getStyleProps() {
-            var styleProps = _style2.default.getStyle('text', this.props);
+            var borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+            var styleProps = _style2.default.getStyle('text', (0, _extends3.default)({}, this.props, {
+                label: borderStyle === "underline" && this.props.label
+            }));
             if (this.props.textAlign) {
                 styleProps.inputStyle = (0, _assign2.default)({}, styleProps.inputStyle, { textAlign: this.props.textAlign });
             }
@@ -186,7 +193,7 @@ var Text = function (_Component) {
                 ref: 'text',
                 name: this.props.name || this.props.dataKey || _utils2.default.uuid(),
                 fullWidth: this.props.fullWidth,
-                floatingLabelText: label,
+                floatingLabelText: borderStyle === 'underline' ? label : undefined,
                 type: type,
                 value: value == null ? '' : value,
                 disabled: this.props.disabled,
@@ -202,10 +209,10 @@ var Text = function (_Component) {
                 underlineShow: borderStyle === 'underline' && this.props.borderShow,
                 autoComplete: this.props.autoComplete,
                 onCompositionStart: function onCompositionStart() {
-                    _this2.state.pyInputing = true;
+                    _this2.state.pyInputting = true;
                 },
                 onCompositionEnd: function onCompositionEnd(event) {
-                    _this2.state.pyInputing = false;
+                    _this2.state.pyInputting = false;
                     _this2.handleChange(event);
                 }
             }, styleProps));
@@ -226,6 +233,11 @@ var Text = function (_Component) {
                 return _react2.default.createElement(
                     'div',
                     { className: 'full-width', style: (0, _extends3.default)({}, this.props.rootStyle) },
+                    label === false ? null : _react2.default.createElement(
+                        _label2.default,
+                        null,
+                        label
+                    ),
                     _react2.default.createElement(
                         'div',
                         { className: "control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '') },

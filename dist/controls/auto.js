@@ -56,6 +56,10 @@ var _utils = require('../utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
+var _label = require('./label');
+
+var _label2 = _interopRequireDefault(_label);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Auto = function (_Component) {
@@ -268,9 +272,12 @@ var _initialiseProps = function _initialiseProps() {
 
     this.render = function () {
         var borderStyle = _this4.props.borderStyle || _this4.context.muiTheme.controlBorderStyle || 'underline';
+        var styleProps = _style2.default.getStyle('auto', (0, _extends3.default)({}, _this4.props, {
+            label: borderStyle === "underline" && _this4.props.label
+        }));
         var value = _this4.getValue() || '';
         var searchText = _this4.getSearchText() || '';
-        var styleProps = _lodash2.default.merge(_style2.default.getStyle('auto', _this4.props), _this4.props.styleProps);
+        styleProps = _lodash2.default.merge(styleProps, _this4.props.styleProps);
         var label = _this4.props.label;
         if (borderStyle == 'border') {
             styleProps.iconStyle.style.right = 0;
@@ -281,7 +288,7 @@ var _initialiseProps = function _initialiseProps() {
             filter: _lodash2.default.isFunction(_this4.props.filter) ? _this4.props.filter : _this4.filter,
             name: _this4.props.name || _this4.props.dataKey || _utils2.default.uuid(),
             fullWidth: _this4.props.fullWidth,
-            floatingLabelText: label,
+            floatingLabelText: borderStyle === 'underline' ? label : undefined,
             value: value,
             searchText: searchText,
             disabled: _this4.props.disabled,
@@ -328,6 +335,11 @@ var _initialiseProps = function _initialiseProps() {
                 borderStyle === 'border' && _this4.props.borderShow ? _react2.default.createElement(
                     'div',
                     { className: 'full-width' },
+                    _this4.props.label && _react2.default.createElement(
+                        _label2.default,
+                        null,
+                        _this4.props.label
+                    ),
                     _react2.default.createElement(
                         'div',
                         {

@@ -62,6 +62,9 @@ export default class Nav2 extends Component {
                 $(this).css('max-height', height);
             }
             $(this).css("width", $(this).find(".sub-nav").last().offset().left - $(this).find(".sub-nav").first().offset().left + $(this).find(".sub-nav").last().width() + 36);
+            if($(window).height() - $(this).parent().offset().top < height) {
+                $(this).css("top", $(window).height() - $(this).parent().offset().top - height - 20);
+            }
         });
     }
 

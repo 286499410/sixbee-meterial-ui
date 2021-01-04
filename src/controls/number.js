@@ -89,7 +89,11 @@ export default class Number extends Component {
      * @returns {*}
      */
     getStyleProps() {
-        let styleProps = style.getStyle('text', this.props);
+        let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+        let styleProps = style.getStyle('text', {
+            ...this.props,
+            label: borderStyle === "underline" && this.props.label
+        });
         if (this.props.textAlign) {
             styleProps.inputStyle = Object.assign({}, styleProps.inputStyle, {textAlign: this.props.textAlign});
         }

@@ -19,6 +19,7 @@ import utils from '../utils';
 import Table from '../table';
 import Button from "../button";
 import Icon from '../icon';
+import Label from "./label";
 
 const selectStyle = {
     wrapper: {},
@@ -325,8 +326,13 @@ export default class Select extends Component {
     };
 
     getContent() {
+        let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+        let styleProps = style.getStyle('select', {
+            ...this.props,
+            label: borderStyle === "underline" && this.props.label
+        });
         let value = this.getValue();
-        let styleProps = _.merge(style.getStyle('select', this.props), this.props.styleProps);
+        styleProps = _.merge(styleProps, this.props.styleProps);
         let options = this.getOptions(this.state.dataSource, 1, this.props.indent || this.indent[this.props.size]);
         let menuWidth = this.state.anchorEl && this.props.fullWidth ? this.state.anchorEl.clientWidth : this.props.menuWidth;
         if (this.props.tableProps === undefined) {
@@ -448,8 +454,12 @@ export default class Select extends Component {
 
     render() {
         let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+        let styleProps = style.getStyle('select', {
+            ...this.props,
+            label: borderStyle === "underline" && this.props.label
+        });
         let value = this.getValue();
-        let styleProps = _.merge(style.getStyle('select', this.props), this.props.styleProps);
+        styleProps = _.merge(styleProps, this.props.styleProps);
         let label = this.props.label;
         let selectValue = (this.props.multiple && this.props.carryKey) ? (value || []).map((n) => (_.get(n, this.props.dataSourceConfig.value))) : value;
         let selectField;
@@ -492,6 +502,9 @@ export default class Select extends Component {
                  onClick={this.handleClick}>
                 {
                     borderStyle === 'border' && this.props.borderShow ? <div className="full-width">
+                        {
+                            label === false ? null : <Label>{label}</Label>
+                        }
                         <div
                             className={"control-border" + (this.state.focus || this.state.open ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>{selectField}</div>
                         <div className="text-small text-danger" style={{marginTop: 2}}>{this.props.errorText}</div>

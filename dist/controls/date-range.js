@@ -58,6 +58,10 @@ var _utils = require('../utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
+var _label = require('./label');
+
+var _label2 = _interopRequireDefault(_label);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -299,19 +303,9 @@ var DateRange = function (_Component) {
                 'div',
                 { style: this.props.rootStyle },
                 label === false ? null : _react2.default.createElement(
-                    'div',
+                    _label2.default,
                     null,
-                    _react2.default.createElement(
-                        'span',
-                        { style: {
-                                transform: "scale(0.75)",
-                                transformOrigin: 'left top 0px',
-                                color: 'rgba(0,0,0,0.3)',
-                                fontSize: 15,
-                                display: 'inline-block'
-                            } },
-                        label
-                    )
+                    label
                 ),
                 borderStyle === 'border' && this.props.borderShow ? _react2.default.createElement(
                     'div',

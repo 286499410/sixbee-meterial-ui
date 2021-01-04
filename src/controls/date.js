@@ -13,6 +13,7 @@ import 'react-date-range/dist/theme/default.css'; // theme css file
 import * as rdrLocales from 'react-date-range/dist/locale';
 import style from '../style';
 import utils from '../utils';
+import Label from "./label";
 
 export default class Date2 extends Component {
 
@@ -188,10 +189,13 @@ export default class Date2 extends Component {
     };
 
     render() {
+        let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
         let value = this.getValue();
         let label = this.props.label;
-        let styleProps = style.getStyle('calender', this.props);
-        let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+        let styleProps = style.getStyle('calender', {
+            ...this.props,
+            label: borderStyle === "underline" && this.props.label
+        });
         if (borderStyle == 'border') {
             styleProps.iconStyle.style.right = 0;
             styleProps.iconStyle.style.top = 3;
@@ -228,6 +232,7 @@ export default class Date2 extends Component {
         return <div ref="container" style={{position: 'relative', ...this.props.rootStyle}}>
             {
                 borderStyle === 'border' && this.props.borderShow ? <div className="full-width">
+                        {this.props.label && <Label>{this.props.label}</Label>}
                         <div className={"control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>{textField}</div>
                         <div className="text-small text-danger" style={{marginTop: 2}}>{this.props.errorText}</div>
                     </div> : textField

@@ -293,6 +293,9 @@ var Nav2 = function (_Component) {
                     (0, _jquery2.default)(this).css('max-height', height);
                 }
                 (0, _jquery2.default)(this).css("width", (0, _jquery2.default)(this).find(".sub-nav").last().offset().left - (0, _jquery2.default)(this).find(".sub-nav").first().offset().left + (0, _jquery2.default)(this).find(".sub-nav").last().width() + 36);
+                if ((0, _jquery2.default)(window).height() - (0, _jquery2.default)(this).parent().offset().top < height) {
+                    (0, _jquery2.default)(this).css("top", (0, _jquery2.default)(window).height() - (0, _jquery2.default)(this).parent().offset().top - height - 20);
+                }
             });
         }
     }, {

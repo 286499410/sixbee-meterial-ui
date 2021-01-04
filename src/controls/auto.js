@@ -9,6 +9,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import IconButton from 'material-ui/IconButton';
 import style from '../style';
 import utils from "../utils";
+import Label from "./label";
 
 /**
  * 输入文本自动联想
@@ -259,9 +260,13 @@ export default class Auto extends Component {
 
     render = () => {
         let borderStyle = this.props.borderStyle || this.context.muiTheme.controlBorderStyle || 'underline';
+        let styleProps = style.getStyle('auto', {
+            ...this.props,
+            label: borderStyle === "underline" && this.props.label
+        });
         let value = this.getValue() || '';
         let searchText = this.getSearchText() || '';
-        let styleProps = _.merge(style.getStyle('auto', this.props), this.props.styleProps);
+        styleProps = _.merge(styleProps, this.props.styleProps);
         let label = this.props.label;
         if (borderStyle == 'border') {
             styleProps.iconStyle.style.right = 0;
@@ -272,7 +277,7 @@ export default class Auto extends Component {
             filter={_.isFunction(this.props.filter) ? this.props.filter : this.filter}
             name={this.props.name || this.props.dataKey || utils.uuid()}
             fullWidth={this.props.fullWidth}
-            floatingLabelText={label}
+            floatingLabelText={borderStyle === 'underline' ? label : undefined}
             value={value}
             searchText={searchText}
             disabled={this.props.disabled}
@@ -316,6 +321,7 @@ export default class Auto extends Component {
                     {
                         borderStyle === 'border' && this.props.borderShow ?
                             <div className="full-width">
+                                {this.props.label && <Label>{this.props.label}</Label>}
                                 <div
                                     className={"control-border" + (this.state.focus ? ' focus' : '') + (this.props.errorText ? ' error' : '')}>{autoComplete}</div>
                                 <div className="text-small text-danger"

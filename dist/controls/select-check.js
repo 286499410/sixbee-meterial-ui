@@ -102,6 +102,10 @@ var _checkbox = require('./checkbox');
 
 var _checkbox2 = _interopRequireDefault(_checkbox);
 
+var _label = require('./label');
+
+var _label2 = _interopRequireDefault(_label);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var selectStyle = {
@@ -317,6 +321,11 @@ var Select = function (_Component) {
                     borderStyle === 'border' && this.props.borderShow ? _react2.default.createElement(
                         'div',
                         { className: 'full-width' },
+                        this.props.label && _react2.default.createElement(
+                            _label2.default,
+                            null,
+                            this.props.label
+                        ),
                         _react2.default.createElement(
                             'div',
                             {
